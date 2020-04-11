@@ -8,18 +8,11 @@ case class CommandMessage private(
   id: Int,
   commandName: String,
   arguments: Seq[String]
-) extends YeelightMessage {
+) extends ApiMessage {
   override def isValid: Boolean = true
 
-  override def text: String = {
-    s"""
-      |{
-      |  "id": ${id.toString},
-      |  "method": "$commandName",
-      |  "params": [${arguments.mkString(", ")}]
-      |}
-      |""".stripMargin
-  }
+  override def text: String = s"""{"id":${id.toString}, "method":"$commandName", "params":[${arguments.mkString(", ")}]}\r\n"""
+
 
 }
 
@@ -27,5 +20,5 @@ object CommandMessage {
   def randomId: Int = Random.nextInt(Int.MaxValue)
 
   def apply(command: YeelightCommand): CommandMessage =
-    new CommandMessage(randomId, command.name, command.args.map(_.value))
+    new CommandMessage(randomId, command.name, command.args.map(_.jsonValue))
 }

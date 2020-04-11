@@ -2,30 +2,31 @@ package wazxse5.model
 
 import java.time.LocalDateTime
 
+import wazxse5.UID
 import wazxse5.property._
 
 class YeelightState(
-  deviceId: String,
+  internalId: UID,
   deviceService: IYeelightService
 ) extends IYeelightState {
 
-  override def power: PowerMode = deviceService.deviceInfo(deviceId).map(_.power).getOrElse(PowerMode.Unknown)
+  override def power: Option[PowerMode] = deviceService.deviceInfo(internalId).flatMap(_.power)
 
-  override def brightness: Brightness = deviceService.deviceInfo(deviceId).map(_.brightness).getOrElse(Brightness.Unknown)
+  override def brightness: Option[Brightness] = deviceService.deviceInfo(internalId).flatMap(_.brightness)
 
-  override def temperature: Temperature = deviceService.deviceInfo(deviceId).map(_.temperature).getOrElse(Temperature.Unknown)
+  override def temperature: Option[Temperature] = deviceService.deviceInfo(internalId).flatMap(_.temperature)
 
-  override def rgb: Rgb = deviceService.deviceInfo(deviceId).map(_.rgb).getOrElse(Rgb.Unknown)
+  override def rgb: Option[Rgb] = deviceService.deviceInfo(internalId).flatMap(_.rgb)
 
-  override def hue: Hue = deviceService.deviceInfo(deviceId).map(_.hue).getOrElse(Hue.Unknown)
+  override def hue: Option[Hue] = deviceService.deviceInfo(internalId).flatMap(_.hue)
 
-  override def saturation: Saturation = deviceService.deviceInfo(deviceId).map(_.saturation).getOrElse(Saturation.Unknown)
+  override def saturation: Option[Saturation] = deviceService.deviceInfo(internalId).flatMap(_.saturation)
 
-  override def colorMode: ColorMode = deviceService.deviceInfo(deviceId).map(_.colorMode).getOrElse(ColorMode.Unknown)
+  override def colorMode: Option[ColorMode] = deviceService.deviceInfo(internalId).flatMap(_.colorMode)
 
   override def lastUpdate: Option[LocalDateTime] = None // TODO:
 }
 
 object YeelightState {
-  def apply(device: IYeelightDevice): YeelightState = new YeelightState(device.id, device.service)
+  def apply(device: IYeelightDevice): YeelightState = new YeelightState(device.internalId, device.service)
 }

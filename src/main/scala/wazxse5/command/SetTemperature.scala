@@ -9,3 +9,9 @@ case class SetTemperature(p1: PTemperature, p2: PEffect, p3: PDuration) extends 
 
   override def params: Seq[Parameter[_]] = List(p1, p2, p3)
 }
+
+object SetTemperature {
+  def apply(p1: PTemperature): SetTemperature = new SetTemperature(p1, PEffect.Smooth, PDuration(500))
+
+  def apply(p1: Int): SetTemperature = apply(PTemperature(p1))
+}

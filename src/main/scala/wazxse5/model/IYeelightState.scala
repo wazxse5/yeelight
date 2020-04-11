@@ -5,19 +5,19 @@ import java.time.LocalDateTime
 import wazxse5.property.{Brightness, ColorMode, Hue, PowerMode, Rgb, Saturation, Temperature}
 
 trait IYeelightState {
-  def power: PowerMode
+  def power: Option[PowerMode]
 
-  def brightness: Brightness
+  def brightness: Option[Brightness]
 
-  def temperature: Temperature
+  def temperature: Option[Temperature]
 
-  def rgb: Rgb
+  def rgb: Option[Rgb]
 
-  def hue: Hue
+  def hue: Option[Hue]
 
-  def saturation: Saturation
+  def saturation: Option[Saturation]
 
-  def colorMode: ColorMode
+  def colorMode: Option[ColorMode]
 
   def lastUpdate: Option[LocalDateTime]
 }

@@ -10,3 +10,8 @@ case class SetBrightness(p1: PBrightness, p2: PEffect, p3: PDuration) extends Ye
   override def params: Seq[Parameter[_]] = List(p1, p2, p3)
 }
 
+object SetBrightness {
+  def apply(p1: PBrightness): SetBrightness = new SetBrightness(p1, PEffect.Smooth, PDuration(500))
+
+  def apply(p1: Int): SetBrightness = apply(PBrightness(p1))
+}

@@ -6,12 +6,13 @@ import akka.actor.{ActorRef, Props}
 import akka.io.Udp._
 import akka.io.{IO, Udp}
 import akka.util.ByteString
-import wazxse5.connection.DiscovererActor.{NewDiscovery, Search}
-import wazxse5.message.{DiscoveryMessage, SearchMessage}
+import wazxse5.connection.Discoverer.Search
+import wazxse5.message.{DiscoveryResponseMessage, DiscoveryMessage}
+import wazxse5.model.YeelightService
 
 import scala.collection.JavaConverters._
 
-class DiscovererActor(supervisor: ActorRef) extends YeelightActor {
+class Discoverer(service: YeelightService) extends YeelightActor {
   val remote: InetSocketAddress = new InetSocketAddress("239.255.255.250", 1982)
 
   findLocalInetSocketAddress match {
@@ -21,11 +22,10 @@ class DiscovererActor(supervisor: ActorRef) extends YeelightActor {
 
   def receiveReady(local: InetSocketAddress, connection: ActorRef): Receive = {
     case Search =>
-      connection ! Send(ByteString(SearchMessage.text), remote)
+      connection ! Send(ByteString(DiscoveryMessage.text), remote)
     case Received(data, sender) =>
-      logger.info(s"${this.getClass.getSimpleName} received from $sender")
-      val discoveryMessage = DiscoveryMessage(data.utf8String)
-      if (discoveryMessage.isValid) supervisor ! NewDiscovery(discoveryMessage)
+      val discoveryMessage = DiscoveryResponseMessage(data.utf8String)
+      if (discoveryMessage.isValid) service.handleMessage(discoveryMessage)
     case Unbind =>
       connection ! Unbind
     case Unbound =>
@@ -46,21 +46,15 @@ class DiscovererActor(supervisor: ActorRef) extends YeelightActor {
   override def receive: Receive = {
     case Bound(local) =>
       context.become(receiveReady(local, sender))
-      supervisor ! DiscovererActor.Ready
       logger.info(s"${this.getClass.getSimpleName} is ready (bound to $local)")
   }
 
 }
 
-object DiscovererActor {
+object Discoverer {
+  final case object Search
 
-  final object Ready
-
-  final object Search
-
-  final case class NewDiscovery(discoveryMessage: DiscoveryMessage)
-
-  def props(listener: ActorRef): Props = Props(new DiscovererActor(listener))
+  def props(service: YeelightService): Props = Props(new Discoverer(service))
 }
 
 

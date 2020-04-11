@@ -3,7 +3,7 @@ package wazxse5.parameter
 case class PEffect(value: String) extends Parameter[String] {
   override val name: String = "effect"
 
-  override def toJson: JsonValueType = JsonStringValueType(value)
+  override def toJson: JsonStringValueType = JsonStringValueType(value)
 
   override def isValid: Boolean = value == "sudden" || value == "smooth"
 }

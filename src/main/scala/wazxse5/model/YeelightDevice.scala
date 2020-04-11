@@ -1,35 +1,35 @@
 package wazxse5.model
 
+import wazxse5.UID
 import wazxse5.command.YeelightCommand
 import wazxse5.connection.NetworkLocation
-import wazxse5.property.{Brightness, ColorMode, Hue, PowerMode, Rgb, Saturation, Temperature}
 
 class YeelightDevice private(
-  val id: String,
-  val model: DeviceModel,
+  val internalId: UID,
   val state: IYeelightState,
   val service: IYeelightService,
 ) extends IYeelightDevice {
 
-  override def location: Option[NetworkLocation] = service.deviceInfo(id).flatMap(_.location)
+  override def id: Option[String] = service.deviceInfo(internalId).flatMap(_.id)
 
-  override def firmwareVersion: Option[String] = service.deviceInfo(id).map(_.firmwareVersion)
+  override def model: Option[DeviceModel] = service.deviceInfo(internalId).flatMap(_.model)
 
-  override def supportedCommands: Set[String] = service.deviceInfo(id).map(_.supportedCommands).getOrElse(Set.empty)
+  override def location: Option[NetworkLocation] = service.deviceInfo(internalId).flatMap(_.location)
 
-  override def isConnected: Boolean = service.deviceInfo(id).exists(_.isConnected)
+  override def firmwareVersion: Option[String] = service.deviceInfo(internalId).flatMap(_.firmwareVersion)
 
-  override def performCommand(command: YeelightCommand): Unit = service.performCommand(id, command)
+  override def supportedCommands: Option[Set[String]] = service.deviceInfo(internalId).flatMap(_.supportedCommands)
+
+  override def isConnected: Boolean = service.deviceInfo(internalId).exists(_.isConnected)
+
+  override def performCommand(command: YeelightCommand): Unit = service.performCommand(internalId, command)
 
 }
 
 object YeelightDevice {
-  def apply(
-    deviceInfo: DeviceInfo,
-    service: IYeelightService
-  ): YeelightDevice = {
-    val state = new YeelightState(deviceInfo.id, service)
-    new YeelightDevice(deviceInfo.id, deviceInfo.model, state, service)
+  def apply(deviceInfo: DeviceInfo)(implicit service: IYeelightService): YeelightDevice = {
+    val state = new YeelightState(deviceInfo.internalId, service)
+    new YeelightDevice(deviceInfo.internalId, state, service)
   }
 
 }

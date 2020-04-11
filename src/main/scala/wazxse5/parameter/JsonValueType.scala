@@ -1,17 +1,35 @@
 package wazxse5.parameter
 
-sealed trait JsonValueType {
-  def value: String
+sealed trait JsonValueType[A] {
+  val rawValue: A
+  def jsonValue: String
 }
 
-final case class JsonIntValueType(rawValue: Int) extends JsonValueType {
-  override def value: String = rawValue.toString
+object JsonValueType {
+  def apply(jsonValue: String): JsonValueType[_] = {
+    if (jsonValue.startsWith("\"") && jsonValue.endsWith("\""))
+      JsonStringValueType(jsonValue.substring(1, jsonValue.length - 1))
+    else if (jsonValue == "true" || jsonValue == "false")
+      JsonBooleanValueType(jsonValue.toBoolean)
+    else if (jsonValue forall Character.isDigit)
+      JsonIntValueType(jsonValue.toInt)
+    else
+      JsonInvalidValueType(jsonValue)
+  }
 }
 
-final case class JsonStringValueType(rawValue: String) extends JsonValueType {
-  override def value: String = "\"" + rawValue + "\""
+final case class JsonIntValueType(rawValue: Int) extends JsonValueType[Int] {
+  override def jsonValue: String = rawValue.toString
 }
 
-final case class JsonBooleanValueType(rawValue: Boolean) extends JsonValueType {
-  override def value: String = rawValue.toString
+final case class JsonStringValueType(rawValue: String) extends JsonValueType[String] {
+  override def jsonValue: String = "\"" + rawValue + "\""
+}
+
+final case class JsonBooleanValueType(rawValue: Boolean) extends JsonValueType[Boolean] {
+  override def jsonValue: String = rawValue.toString
+}
+
+final case class JsonInvalidValueType(rawValue: String) extends JsonValueType[String] {
+  override def jsonValue: String = rawValue
 }

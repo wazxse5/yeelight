@@ -1,8 +1,14 @@
 package wazxse5.model
+import wazxse5.UID
 import wazxse5.command.YeelightCommand
+import wazxse5.connection.NetworkLocation
 
 class FakeYeelightService(val devices: Set[IYeelightDevice]) extends IYeelightService {
-  override def deviceInfo(deviceId: String): Option[DeviceInfo] = ???
+  override def deviceInfo(internalId: UID): Option[DeviceInfo] = ???
+
+  override def deviceOf(deviceInfo: DeviceInfo): IYeelightDevice = ???
+
+  override def deviceOf(location: NetworkLocation): IYeelightDevice = ???
 
   override def search(): Unit = ???
 
@@ -10,5 +16,5 @@ class FakeYeelightService(val devices: Set[IYeelightDevice]) extends IYeelightSe
 
   override def stopListening(): Unit = ???
 
-  override def performCommand(deviceId: String, command: YeelightCommand): Unit = ???
+  override def performCommand(internalId: UID, command: YeelightCommand): Unit = ???
 }

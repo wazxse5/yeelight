@@ -6,7 +6,7 @@ trait Parameter[A] {
 
   val value: A
 
-  def toJson: JsonValueType
+  def toJson: JsonValueType[_]
 
   def isValid: Boolean
 }

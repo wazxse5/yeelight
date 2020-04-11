@@ -3,7 +3,7 @@ package wazxse5.parameter
 case class PPowerMode(value: Int) extends Parameter[Int] {
   override val name: String = "mode"
 
-  override def toJson: JsonValueType = JsonIntValueType(value)
+  override def toJson: JsonIntValueType = JsonIntValueType(value)
 
   def isValid: Boolean = value >= 0 && value <= 5
 }

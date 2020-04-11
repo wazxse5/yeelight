@@ -12,7 +12,7 @@ trait YeelightCommand {
 
   def params: Seq[Parameter[_]]
 
-  def args: Seq[JsonValueType] = params.map(_.toJson)
+  def args: Seq[JsonValueType[_]] = params.map(_.toJson)
 
   def isValid: Boolean = true // TODO: walidacja komend
 }

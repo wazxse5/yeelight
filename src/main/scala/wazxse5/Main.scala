@@ -1,8 +1,9 @@
 package wazxse5
 
+import wazxse5.command.{SetBrightness, SetPower, SetTemperature}
+import wazxse5.connection.NetworkLocation
 import wazxse5.model.YeelightService
-
-import scala.io.StdIn
+import wazxse5.parameter.PPower.ON
 
 object Main {
 
@@ -10,13 +11,14 @@ object Main {
 
     val service = new YeelightService
 
-    StdIn.readLine()
+    val device = service.deviceOf(NetworkLocation("192.168.0.101", 55443))
 
-    service.search()
+    device.performCommand(SetPower(ON))
+    device.performCommand(SetBrightness(90))
+    device.performCommand(SetTemperature(6400))
 
-    StdIn.readLine()
+    service.devices.foreach(d => println(s" internalId=${d.internalId.uid} id=${d.id} model=${d.model} location=${d.location}"))
 
-    service.devices.foreach(d => println(s"${d.model} id=${d.id} location=${d.location}"))
   }
 }
  
