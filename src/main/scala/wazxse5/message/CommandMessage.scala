@@ -8,11 +8,10 @@ case class CommandMessage private(
   id: Int,
   commandName: String,
   arguments: Seq[String]
-) extends ApiMessage {
+) extends IdentifiableMessage {
   override def isValid: Boolean = true
 
   override def text: String = s"""{"id":${id.toString}, "method":"$commandName", "params":[${arguments.mkString(", ")}]}\r\n"""
-
 
 }
 

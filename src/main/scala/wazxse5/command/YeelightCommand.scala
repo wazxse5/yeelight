@@ -1,6 +1,6 @@
 package wazxse5.command
 
-import wazxse5.parameter.{JsonValueType, Parameter}
+import wazxse5.valuetype.{JsonValueType, Parameter}
 
 
 trait YeelightCommand {

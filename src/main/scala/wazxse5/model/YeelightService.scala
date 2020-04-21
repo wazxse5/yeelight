@@ -29,7 +29,7 @@ class YeelightService extends IYeelightService with StrictLogging {
       case Some(existingDevice) => YeelightDevice(existingDevice)
       case None =>
         val newDeviceInfo = DeviceInfo.empty.withValue(location = Some(location))
-        devicesInfos += newDeviceInfo.internalId -> newDeviceInfo
+        insertOrUpdateDeviceInfo(newDeviceInfo)
         YeelightDevice(newDeviceInfo)
     }
   }
@@ -64,26 +64,33 @@ class YeelightService extends IYeelightService with StrictLogging {
       val newDeviceInfo = DeviceInfo(deviceInfoMessage, isConnected = false)
       devicesInfos.get(newDeviceInfo.internalId) match {
         case Some(deviceInfo) =>
-          devicesInfos += newDeviceInfo.internalId -> newDeviceInfo.withValue(isConnected = deviceInfo.isConnected)
+          insertOrUpdateDeviceInfo(newDeviceInfo.withValue(isConnected = deviceInfo.isConnected))
         case None =>
           connectTo(newDeviceInfo.location.get)
-          devicesInfos += newDeviceInfo.internalId -> newDeviceInfo
+          insertOrUpdateDeviceInfo(newDeviceInfo)
       }
-    case CommandResultMessage(id, result, text) =>
-      println(s"handled CommandResultMessage result=$result text=\n$text")
+    case resultMessage: CommandResultMessage =>
+      println(s"CommandResultMessage ${resultMessage.text}\tresult=${resultMessage.result}")
+    case notification: NotificationMessage =>
+      println(s"NotificationMessage  ${notification.text}\tprops=${notification.newProps}")
+    case _ =>
+      println(s"--Unknown message--  ${message.text}")
   }
 
   private def handleControlMessage(message: ControlMessage): Unit = message match {
     case Connector.ConnectionSucceeded(location) =>
-      findDeviceByLocation(location).map(_.withValue(isConnected = true))
+      findDeviceByLocation(location).map(_.withValue(isConnected = true)).foreach(insertOrUpdateDeviceInfo)
     case Connector.Disconnected(location) =>
-      findDeviceByLocation(location).map(_.withValue(isConnected = false))
+      findDeviceByLocation(location).map(_.withValue(isConnected = false)).foreach(insertOrUpdateDeviceInfo)
   }
 
   private def connectTo(location: NetworkLocation): Unit = {
     val newConnector = actorSystem.actorOf(Connector.props(location, service = this))
     connectors += location -> newConnector
   }
+
+  private def insertOrUpdateDeviceInfo(deviceInfo: DeviceInfo): Unit =
+    devicesInfos += deviceInfo.internalId -> deviceInfo
 
   private def findDeviceByLocation(location: NetworkLocation): Option[DeviceInfo] =
     devicesInfos.find(pair => pair._2.location.contains(location)).map(_._2)

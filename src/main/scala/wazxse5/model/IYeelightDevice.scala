@@ -3,7 +3,6 @@ package wazxse5.model
 import wazxse5.UID
 import wazxse5.command.YeelightCommand
 import wazxse5.connection.NetworkLocation
-import wazxse5.property.{Brightness, ColorMode, Hue, PowerMode, Rgb, Saturation, Temperature}
 
 trait IYeelightDevice { // TODO: Pomyśleć nad lepszą nazwą
 
@@ -25,6 +24,6 @@ trait IYeelightDevice { // TODO: Pomyśleć nad lepszą nazwą
 
   def service: IYeelightService
 
-  def performCommand(command: YeelightCommand): Unit // TODO: zwracany typ
+  def performCommand(command: YeelightCommand): Unit
 
 }

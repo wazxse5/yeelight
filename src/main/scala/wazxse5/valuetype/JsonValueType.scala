@@ -1,4 +1,4 @@
-package wazxse5.parameter
+package wazxse5.valuetype
 
 sealed trait JsonValueType[A] {
   val rawValue: A

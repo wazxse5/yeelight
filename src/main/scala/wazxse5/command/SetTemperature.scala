@@ -1,17 +1,19 @@
 package wazxse5.command
 
-import wazxse5.parameter.{PDuration, PEffect, PTemperature, Parameter}
+import wazxse5.valuetype.{Duration, Effect, Parameter, Temperature}
 
-case class SetTemperature(p1: PTemperature, p2: PEffect, p3: PDuration) extends YeelightCommand {
+case class SetTemperature(p1: Temperature, p2: Effect, p3: Duration) extends YeelightCommand {
   override val name: String = "set_ct_abx"
+
   override val minParameters: Int = 3
+
   override val maxParameters: Int = 3
 
   override def params: Seq[Parameter[_]] = List(p1, p2, p3)
 }
 
 object SetTemperature {
-  def apply(p1: PTemperature): SetTemperature = new SetTemperature(p1, PEffect.Smooth, PDuration(500))
+  def apply(temperature: Temperature): SetTemperature = new SetTemperature(temperature, Effect.Smooth, Duration(500))
 
-  def apply(p1: Int): SetTemperature = apply(PTemperature(p1))
+  def apply(temperature: Int): SetTemperature = apply(Temperature(temperature))
 }

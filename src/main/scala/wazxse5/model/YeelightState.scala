@@ -3,14 +3,14 @@ package wazxse5.model
 import java.time.LocalDateTime
 
 import wazxse5.UID
-import wazxse5.property._
+import wazxse5.valuetype._
 
 class YeelightState(
   internalId: UID,
   deviceService: IYeelightService
 ) extends IYeelightState {
 
-  override def power: Option[PowerMode] = deviceService.deviceInfo(internalId).flatMap(_.power)
+  override def power: Option[Power] = deviceService.deviceInfo(internalId).flatMap(_.power)
 
   override def brightness: Option[Brightness] = deviceService.deviceInfo(internalId).flatMap(_.brightness)
 

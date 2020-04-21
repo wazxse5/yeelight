@@ -1,6 +1,6 @@
 package wazxse5.message
 
-trait DeviceInfoMessage extends ApiMessage {
+trait DeviceInfoMessage extends ApiUnconnectedMessage {
   val header: String
   val cacheControl: Int
   val location: String

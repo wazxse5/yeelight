@@ -2,10 +2,10 @@ package wazxse5.model
 
 import java.time.LocalDateTime
 
-import wazxse5.property.{Brightness, ColorMode, Hue, PowerMode, Rgb, Saturation, Temperature}
+import wazxse5.valuetype._
 
 trait IYeelightState {
-  def power: Option[PowerMode]
+  def power: Option[Power]
 
   def brightness: Option[Brightness]
 

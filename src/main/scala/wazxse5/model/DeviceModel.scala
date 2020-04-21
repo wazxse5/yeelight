@@ -6,27 +6,27 @@ sealed trait DeviceModel {
 
 object DeviceModel {
 
-  case object Mono extends DeviceModel {
+  final case object Mono extends DeviceModel {
     override val name: String = "mono"
   }
 
-  case object Color extends DeviceModel {
+  final case object Color extends DeviceModel {
     override val name: String = "color"
   }
 
-  case object Stripe extends DeviceModel {
+  final case object Stripe extends DeviceModel {
     override val name: String = "stripe"
   }
 
-  case object Ceiling extends DeviceModel {
+  final case object Ceiling extends DeviceModel {
     override val name: String = "ceiling"
   }
 
-  case object DeskLamp extends DeviceModel {
+  final case object DeskLamp extends DeviceModel {
     override val name: String = "desklamp"
   }
 
-  case object BsLamp extends DeviceModel {
+  final case object BsLamp extends DeviceModel {
     override val name: String = "bslamp"
   }
 

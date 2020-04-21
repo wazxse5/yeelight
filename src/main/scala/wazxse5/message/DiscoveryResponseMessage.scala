@@ -1,7 +1,7 @@
 package wazxse5.message
 
 import wazxse5.model.DeviceModel
-import wazxse5.property.PowerMode
+import wazxse5.valuetype.Power
 
 case class DiscoveryResponseMessage private (
   header: String,
@@ -32,7 +32,7 @@ case class DiscoveryResponseMessage private (
       date == "" &&
       ext == "" &&
       DeviceModel.names.contains(model) &&
-      PowerMode.names.contains(power)
+      Power.values.contains(power)
   }
 }
 

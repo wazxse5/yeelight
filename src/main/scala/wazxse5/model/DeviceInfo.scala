@@ -2,8 +2,8 @@ package wazxse5.model
 
 import wazxse5.UID
 import wazxse5.connection.NetworkLocation
-import wazxse5.message.DeviceInfoMessage
-import wazxse5.property._
+import wazxse5.message.{DeviceInfoMessage, NotificationMessage}
+import wazxse5.valuetype._
 
 case class DeviceInfo(
   internalId: UID,
@@ -11,7 +11,7 @@ case class DeviceInfo(
   model: Option[DeviceModel],
   firmwareVersion: Option[String],
   supportedCommands: Option[Set[String]],
-  power: Option[PowerMode],
+  power: Option[Power],
   brightness: Option[Brightness],
   temperature: Option[Temperature],
   rgb: Option[Rgb],
@@ -27,7 +27,7 @@ case class DeviceInfo(
     model: Option[DeviceModel] = model,
     firmwareVersion: Option[String] = firmwareVersion,
     supportedCommands: Option[Set[String]] = supportedCommands,
-    power: Option[PowerMode] = power,
+    power: Option[Power] = power,
     brightness: Option[Brightness] = brightness,
     temperature: Option[Temperature] = temperature,
     rgb: Option[Rgb] = rgb,
@@ -39,6 +39,10 @@ case class DeviceInfo(
   ): DeviceInfo = DeviceInfo(
     internalId, id, model, firmwareVersion, supportedCommands, power, brightness, temperature, rgb, hue, saturation, colorMode, location, isConnected
   )
+
+  def withNotificationMessageChange(message: NotificationMessage): DeviceInfo = {
+    this // TODO:
+  }
 }
 
 object DeviceInfo {
@@ -49,7 +53,7 @@ object DeviceInfo {
     Some(DeviceModel(message.model)),
     Some(message.firmwareVersion),
     Some(message.supportedCommands),
-    Some(PowerMode(message.power)),
+    Some(Power(message.power)),
     Some(Brightness(message.brightness)),
     Some(Temperature(message.temperature)),
     Some(Rgb(message.rgb)),

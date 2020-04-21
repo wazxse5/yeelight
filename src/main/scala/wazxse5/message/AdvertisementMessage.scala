@@ -1,7 +1,7 @@
 package wazxse5.message
 
 import wazxse5.model.DeviceModel
-import wazxse5.property.PowerMode
+import wazxse5.valuetype.Power
 
 case class AdvertisementMessage private (
   header: String,
@@ -30,7 +30,7 @@ case class AdvertisementMessage private (
   override def isValid: Boolean = { // TODO: Dorobić prawdziwą walidację
     header == "HTTP/1.1 200 OK" &&
       DeviceModel.names.contains(model) &&
-      PowerMode.names.contains(power)
+      Power.values.contains(power)
   }
 }
 

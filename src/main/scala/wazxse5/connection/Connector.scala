@@ -6,8 +6,8 @@ import akka.actor.{ActorRef, Props, Stash}
 import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
-import wazxse5.connection.Connector.{ConnectionFailed, Disconnected, Send}
-import wazxse5.message.{CommandMessage, CommandResultMessage, ControlMessage}
+import wazxse5.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
+import wazxse5.message.{ApiConnectedMessage, CommandMessage, ControlMessage}
 import wazxse5.model.YeelightService
 
 class Connector(location: NetworkLocation, service: YeelightService) extends YeelightActor with Stash {
@@ -19,7 +19,7 @@ class Connector(location: NetworkLocation, service: YeelightService) extends Yee
       println(s"sending command to $location text=${message.text}")
       connection ! Write(ByteString(message.text))
     case Received(data) =>
-      val message = CommandResultMessage(data.utf8String)
+      val message = ApiConnectedMessage.fromMessageText(data.utf8String)
       if (message.isValid) service.handleMessage(message)
     case CommandFailed(write: Write) =>
       val text = write.data.utf8String
@@ -32,9 +32,10 @@ class Connector(location: NetworkLocation, service: YeelightService) extends Yee
   //
 
   override def receive: Receive = {
-    case Send(commandMessage, true) => stash
+    case Send(_, true) => stash
     case CommandFailed => service.handleMessage(ConnectionFailed(location))
     case Connected(_, _) =>
+      service.handleMessage(ConnectionSucceeded(location))
       sender ! Register(self)
       unstashAll()
       context.become(ready(sender))
