@@ -8,29 +8,29 @@ import wazxse5.connection.{Connector, Discoverer, Listener, NetworkLocation}
 import wazxse5.message._
 
 class YeelightService extends IYeelightService with StrictLogging {
-  private implicit val service: IYeelightService = this
+  private implicit val service: YeelightService = this
   private implicit val actorSystem: ActorSystem = ActorSystem("yeelight-actor-system")
 
   private val discoverer: ActorRef = actorSystem.actorOf(Discoverer.props(service = this))
   private val listener: ActorRef = actorSystem.actorOf(Listener.props(service = this))
-  private var connectors: Map[NetworkLocation, ActorRef] = Map.empty
-
-  private var devicesInfos: Map[UID, DeviceInfo] = Map.empty
+  private var devicesInternal: Map[UID, KnownDevice] = Map.empty
 
 
-  override def devices: Set[IYeelightDevice] = devicesInfos.values.map(YeelightDevice(_)).toSet
+  override def devices: Set[IYeelightDevice] = devicesInternal.values.map(cdi => YeelightDevice(cdi.deviceInfo)).toSet
 
-  override def deviceInfo(internalId: UID): Option[DeviceInfo] = devicesInfos.get(internalId)
+  override def deviceInfo(internalId: UID): Option[DeviceInfo] = devicesInternal.get(internalId).map(_.deviceInfo)
 
   override def deviceOf(deviceInfo: DeviceInfo): IYeelightDevice = ??? // TODO:
 
-  override def deviceOf(location: NetworkLocation): IYeelightDevice = {
+  override def deviceOf(address: String, port: Int = 55443): IYeelightDevice = {
+    val location = NetworkLocation(address, port)
     findDeviceByLocation(location) match {
-      case Some(existingDevice) => YeelightDevice(existingDevice)
+      case Some(existingDevice) =>
+        YeelightDevice(existingDevice.deviceInfo)
       case None =>
-        val newDeviceInfo = DeviceInfo.empty.withValue(location = Some(location))
-        insertOrUpdateDeviceInfo(newDeviceInfo)
-        YeelightDevice(newDeviceInfo)
+        val newDevice = KnownDevice(DeviceInfo(location))
+        insertOrUpdateDevice(newDevice)
+        YeelightDevice(newDevice.deviceInfo)
     }
   }
 
@@ -40,16 +40,9 @@ class YeelightService extends IYeelightService with StrictLogging {
 
   override def stopListening(): Unit = listener ! Listener.Stop
 
-  override def performCommand(internalId: UID, command: YeelightCommand): Unit = {
-    devicesInfos.get(internalId) match {
-      case Some(deviceInfo) if deviceInfo.location.nonEmpty =>
-        connectors.get(deviceInfo.location.get) match {
-          case Some(connector) if deviceInfo.isConnected =>
-            connector ! Connector.Send(CommandMessage(command))
-          case _ =>
-            connectTo(deviceInfo.location.get)
-            connectors.get(deviceInfo.location.get).foreach(_ ! Connector.Send(CommandMessage(command), stash = true))
-        }
+  def performCommand(internalId: UID, command: YeelightCommand): Unit = {
+    devicesInternal.get(internalId) match {
+      case Some(device) => device.performCommand(command)
       case None => logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
     }
   }
@@ -61,40 +54,36 @@ class YeelightService extends IYeelightService with StrictLogging {
 
   private def handleApiMessage(message: ApiMessage): Unit = message match {
     case deviceInfoMessage: DeviceInfoMessage =>
-      val newDeviceInfo = DeviceInfo(deviceInfoMessage, isConnected = false)
-      devicesInfos.get(newDeviceInfo.internalId) match {
-        case Some(deviceInfo) =>
-          insertOrUpdateDeviceInfo(newDeviceInfo.withValue(isConnected = deviceInfo.isConnected))
+      val location = NetworkLocation(deviceInfoMessage.location, deviceInfoMessage.locationPort)
+      findDeviceByLocation(location) match {
+        case Some(device) =>
+          val newDeviceInfo = DeviceInfo(deviceInfoMessage).withValue(isConnected = device.deviceInfo.isConnected)
+          device.setDeviceInfo(newDeviceInfo)
         case None =>
-          connectTo(newDeviceInfo.location.get)
-          insertOrUpdateDeviceInfo(newDeviceInfo)
+          val newDevice = KnownDevice(DeviceInfo(deviceInfoMessage))
+          insertOrUpdateDevice(newDevice)
       }
     case resultMessage: CommandResultMessage =>
       println(s"CommandResultMessage ${resultMessage.text}\tresult=${resultMessage.result}")
     case notification: NotificationMessage =>
-      println(s"NotificationMessage  ${notification.text}\tprops=${notification.newProps}")
+      devicesInternal.get(notification.deviceInternalId).foreach(_.updateDeviceInfo(notification))
     case _ =>
       println(s"--Unknown message--  ${message.text}")
   }
 
   private def handleControlMessage(message: ControlMessage): Unit = message match {
-    case Connector.ConnectionSucceeded(location) =>
-      findDeviceByLocation(location).map(_.withValue(isConnected = true)).foreach(insertOrUpdateDeviceInfo)
-    case Connector.Disconnected(location) =>
-      findDeviceByLocation(location).map(_.withValue(isConnected = false)).foreach(insertOrUpdateDeviceInfo)
+    case Connector.ConnectionSucceeded(deviceInternalId) =>
+      devicesInternal.get(deviceInternalId).foreach(_.updateDeviceInfo(isConnected = true))
+    case Connector.Disconnected(deviceInternalId) =>
+      devicesInternal.get(deviceInternalId).foreach(_.updateDeviceInfo(isConnected = false))
   }
 
-  private def connectTo(location: NetworkLocation): Unit = {
-    val newConnector = actorSystem.actorOf(Connector.props(location, service = this))
-    connectors += location -> newConnector
-  }
+  private def insertOrUpdateDevice(device: KnownDevice): Unit =
+    devicesInternal += device.internalId -> device
 
-  private def insertOrUpdateDeviceInfo(deviceInfo: DeviceInfo): Unit =
-    devicesInfos += deviceInfo.internalId -> deviceInfo
+  private def findDeviceByLocation(location: NetworkLocation): Option[KnownDevice] =
+    devicesInternal.find(pair => pair._2.deviceInfo.location.contains(location)).map(_._2)
 
-  private def findDeviceByLocation(location: NetworkLocation): Option[DeviceInfo] =
-    devicesInfos.find(pair => pair._2.location.contains(location)).map(_._2)
-
-  private def findDeviceById(deviceId: String): Option[DeviceInfo] =
-    devicesInfos.find(pair => pair._2.id.contains(deviceId)).map(_._2)
+  private def findDeviceById(deviceId: String): Option[KnownDevice] =
+    devicesInternal.find(pair => pair._2.deviceInfo.id.contains(deviceId)).map(_._2)
 }

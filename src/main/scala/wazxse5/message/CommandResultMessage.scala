@@ -1,9 +1,11 @@
 package wazxse5.message
 
+import wazxse5.UID
 import wazxse5.valuetype.{JsonStringValueType, JsonValueType}
 
 case class CommandResultMessage private (
   id: Int,
+  deviceInternalId: UID,
   result: Option[Seq[JsonValueType[_]]] = None,
   errorCode: Option[Int] = None,
   errorMessage: Option[String] = None,
@@ -17,10 +19,10 @@ case class CommandResultMessage private (
 
 object CommandResultMessage {
 
-  def apply(message: String): CommandResultMessage = {
+  def apply(message: String, deviceInternalId: UID): CommandResultMessage = {
     // TODO: Napisać to porządnie, z odpornością na błędy
     try {
-      val m1 = message.substring(1, message.length - 1) // obcięcie zewnętrznych klamer
+      val m1 = message.substring(1, message.length - 3) // obcięcie zewnętrznych klamer
       val m2 = m1.split(',').toSeq.map(_.trim)
       val m3a = m2.head
       val m4a = m3a.split(':').toSeq.map(_.trim)
@@ -29,16 +31,16 @@ object CommandResultMessage {
       val m3b = m2.tail.head.substring(1)
       if (m3b.startsWith("result")) {
         val jvt = readResultMessage(m3b)
-        new CommandResultMessage(idValue, result = Some(jvt), text = message)
+        new CommandResultMessage(idValue, deviceInternalId, result = Some(jvt), text = message)
       }
       else if (m3b.startsWith("error")) {
         val (errorCode, errorMessage) = readErrorMessage(m3b)
-        new CommandResultMessage(idValue, errorCode = Some(errorCode), errorMessage = Some(errorMessage), text = message)
+        new CommandResultMessage(idValue, deviceInternalId, errorCode = Some(errorCode), errorMessage = Some(errorMessage), text = message)
       }
       else throw new RuntimeException("invalid message") // TODO: poprawić
     } catch {
-      case e: RuntimeException =>
-        new CommandResultMessage(-1, text = message, isValid = false)
+      case _: RuntimeException =>
+        new CommandResultMessage(-1, deviceInternalId, text = message, isValid = false)
     }
   }
 
@@ -57,9 +59,8 @@ object CommandResultMessage {
   }
 
   private def readResultMessage(partText: String): Seq[JsonValueType[_]] = {
-    val r1 = partText.replace("\"","").replace("result:","")
-    val r2 = r1.substring(1, r1.length - 1)
-    val r3 = r2.split(',').toSeq.map(_.trim)
-    r3.map(JsonValueType(_))
+    val r1 = partText.substring(9, partText.length - 1)
+    val r2 = r1.split(',').toSeq.map(_.trim)
+    r2.map(JsonValueType(_))
   }
 }

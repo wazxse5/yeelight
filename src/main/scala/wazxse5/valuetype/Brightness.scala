@@ -18,5 +18,5 @@ case class Brightness(value: Int, isBackground: Boolean = false) extends Propert
 object Brightness {
   val propName: String = "bright"
   val propBgName: String = "bg_bright"
-  val paramName: String = "brightness"
+  val paramName: String = "rgb"
 }

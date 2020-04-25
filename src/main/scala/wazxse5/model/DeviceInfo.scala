@@ -40,14 +40,20 @@ case class DeviceInfo(
     internalId, id, model, firmwareVersion, supportedCommands, power, brightness, temperature, rgb, hue, saturation, colorMode, location, isConnected
   )
 
-  def withNotificationMessageChange(message: NotificationMessage): DeviceInfo = {
-    this // TODO:
-  }
+  def withNotificationMessageChange(message: NotificationMessage): DeviceInfo = withValue(
+    power = message.power,
+    brightness = message.brightness,
+    temperature = message.temperature,
+    rgb = message.rgb,
+    hue = message.hue,
+    saturation = message.saturation,
+    colorMode = message.colorMode
+  )
 }
 
 object DeviceInfo {
 
-  def apply(message: DeviceInfoMessage, isConnected: Boolean): DeviceInfo = new DeviceInfo(
+  def apply(message: DeviceInfoMessage, isConnected: Boolean = false): DeviceInfo = new DeviceInfo(
     UID.generate(),
     Some(message.deviceId),
     Some(DeviceModel(message.model)),
@@ -69,5 +75,7 @@ object DeviceInfo {
     None, None, None, None, None, None, None, None, None, None, None, None,
     isConnected = false
   )
+
+  def apply(location: NetworkLocation): DeviceInfo = empty.withValue(location = Some(location))
 
 }

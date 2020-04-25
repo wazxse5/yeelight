@@ -17,5 +17,19 @@ object Rgb {
   val propName: String = "rgb"
   val propBgName: String = "bg_rgb"
   val paramName: String = "rgb_value"
+
+  def apply(r: Int, g: Int, b: Int): Rgb = {
+    val value = r * 255 * 255 + g * 255 + b
+    new Rgb(value)
+  }
+
+  def red: Rgb = apply(255, 0, 0)
+
+  def green: Rgb = apply(0, 255, 0)
+
+  def blue: Rgb = apply(0, 0, 255)
+
+  def yellow: Rgb = apply(255, 255, 0)
+
   // TODO: Dodać metody ułatwiające tworzenie instancji z różnych rzeczy
 }

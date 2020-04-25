@@ -30,6 +30,10 @@ object Power {
     case "off" => Off(isBackground)
   }
 
+  def on: On = On()
+
+  def off: Off = Off()
+
   val values = Set("on", "off")
 }
 

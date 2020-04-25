@@ -1,6 +1,7 @@
 package wazxse5.message
 
 import com.typesafe.scalalogging.StrictLogging
+import wazxse5.UID
 
 sealed trait Message extends StrictLogging
 
@@ -14,7 +15,9 @@ sealed trait ApiMessage extends Message {
 
 trait ApiUnconnectedMessage extends ApiMessage
 
-trait ApiConnectedMessage extends ApiMessage
+trait ApiConnectedMessage extends ApiMessage {
+  val deviceInternalId: UID
+}
 
 trait IdentifiableMessage extends ApiConnectedMessage {
   val id: Int
@@ -22,9 +25,9 @@ trait IdentifiableMessage extends ApiConnectedMessage {
 
 
 object ApiConnectedMessage {
-  def fromMessageText(messageText: String): ApiConnectedMessage = {
+  def fromJsonText(messageText: String, deviceInternalId: UID): ApiConnectedMessage = {
     // TODO: Może try-catch tu zrobić
-    if (messageText.contains(""""method":"props"""")) NotificationMessage(messageText)
-    else CommandResultMessage(messageText)
+    if (messageText.contains(""""method":"props"""")) NotificationMessage(messageText, deviceInternalId)
+    else CommandResultMessage(messageText, deviceInternalId)
   }
 }

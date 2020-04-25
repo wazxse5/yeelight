@@ -2,7 +2,6 @@ package wazxse5.model
 
 import wazxse5.UID
 import wazxse5.command.YeelightCommand
-import wazxse5.connection.NetworkLocation
 
 trait IYeelightService {
 
@@ -12,7 +11,7 @@ trait IYeelightService {
 
   def deviceOf(deviceInfo: DeviceInfo): IYeelightDevice
 
-  def deviceOf(location: NetworkLocation): IYeelightDevice
+  def deviceOf(address: String, port: Int = 55443): IYeelightDevice
 
   def search(): Unit
 
