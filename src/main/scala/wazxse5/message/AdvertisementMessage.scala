@@ -1,7 +1,6 @@
 package wazxse5.message
 
-import wazxse5.model.DeviceModel
-import wazxse5.valuetype.Power
+import wazxse5.valuetype.{DeviceModel, Power}
 
 case class AdvertisementMessage private (
   header: String,

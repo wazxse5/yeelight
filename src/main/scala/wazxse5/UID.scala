@@ -7,6 +7,8 @@ class UID private(value: String) {
 }
 
 object UID {
+  def apply(value: String) = new UID(value)
+
   def generate(length: Int): UID = {
     val generated = Random.alphanumeric.take(length)
     new UID(generated.mkString)

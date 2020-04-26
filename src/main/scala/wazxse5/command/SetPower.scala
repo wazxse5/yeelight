@@ -14,4 +14,6 @@ case class SetPower(p1: Power, p2: Effect, p3: Duration) extends YeelightCommand
 
 object SetPower {
   def apply(power: Power): SetPower = new SetPower(power, Effect.Smooth, Duration(500))
+
+  def apply(power: String): SetPower = apply(Power(power))
 }

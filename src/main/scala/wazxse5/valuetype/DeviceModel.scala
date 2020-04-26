@@ -1,4 +1,4 @@
-package wazxse5.model
+package wazxse5.valuetype
 
 sealed trait DeviceModel {
   def name: String
