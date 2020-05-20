@@ -1,9 +1,8 @@
 plugins {
-    id 'java'
     id 'scala'
 }
 
-group 'wazxse5'
+group 'com.wazxse5'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -13,13 +12,13 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.scala-lang:scala-library:2.12.8'
-    implementation 'com.typesafe.akka:akka-actor_2.12:2.5.25'
-    implementation 'com.typesafe.scala-logging:scala-logging_2.12:3.9.2'
+    implementation 'org.scala-lang:scala-library:2.13.0'
+    implementation 'com.typesafe.akka:akka-actor_2.13:2.5.25'
+    implementation 'com.typesafe.scala-logging:scala-logging_2.13:3.9.2'
     implementation 'org.slf4j:slf4j-simple:1.7.25'
     //    implementation 'org.slf4j:slf4j-log4j12:1.7.25'
 
-    testImplementation 'com.typesafe.akka:akka-testkit_2.12:2.5.25'
+    testImplementation 'com.typesafe.akka:akka-testkit_2.13:2.5.25'
     testImplementation 'org.scalatest:scalatest_2.12:3.0.8'
     testImplementation 'junit:junit:4.12'
 }
