@@ -1,16 +1,16 @@
 package com.wazxse5.cli
 
-import com.wazxse5.InternalId
-import com.wazxse5.api.IYeelightService
+import com.wazxse5.api.InternalId
+import com.wazxse5.api.command._
+import com.wazxse5.api.model.IYeelightService
+import com.wazxse5.api.valuetype.Power
 import com.wazxse5.cli.CLI._
-import com.wazxse5.command.{SetBrightness, SetPower, SetRgb, YeelightCommand}
-import com.wazxse5.valuetype.Power
 
 import scala.collection.mutable.{Map => MutableMap}
 
 class CLI(service: IYeelightService) {
 
-  private var cliDevices: MutableMap[InternalId, CliDeviceInfo] = MutableMap.empty
+  private var cliDevices: MutableMap[InternalId, CliDevice] = MutableMap.empty
 
   def perform(string: String): Unit = {
     val words = string.split(' ').toList
@@ -59,7 +59,7 @@ class CLI(service: IYeelightService) {
       case CLI.set if words.length > 1 => words(1) match {
         case CLI.alias => setAlias(deviceInternalId, words(2))
         case CLI.brightness => performCommand(SetBrightness(words(2).toInt))
-        case CLI.temperature => performCommand(SetBrightness(words(2).toInt))
+        case CLI.temperature => performCommand(SetTemperature(words(2).toInt))
         case CLI.color => performCommand(SetRgb(words(2).toInt))
       }
     }
@@ -68,7 +68,7 @@ class CLI(service: IYeelightService) {
   private def createNewDevice(words: List[String]): Unit = {
     val address = words.headOption
     val newDevice = address.map(service.deviceOf(_))
-    val newCliDevice = newDevice.map(CliDeviceInfo(_, words.lift(1)))
+    val newCliDevice = newDevice.map(CliDevice(_, words.lift(1)))
     newCliDevice.foreach(insertOrUpdateCliDevice)
   }
 
@@ -77,7 +77,7 @@ class CLI(service: IYeelightService) {
     else println("Alias is reserved keyword")
   }
 
-  private def insertOrUpdateCliDevice(cliDeviceInfo: CliDeviceInfo): Unit = {
+  private def insertOrUpdateCliDevice(cliDeviceInfo: CliDevice): Unit = {
     cliDevices += cliDeviceInfo.yeelightDevice.internalId -> cliDeviceInfo
   }
 

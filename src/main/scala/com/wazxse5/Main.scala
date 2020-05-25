@@ -1,6 +1,6 @@
 package com.wazxse5
 
-import com.wazxse5.api.YeelightService
+import com.wazxse5.api.model.YeelightService
 import com.wazxse5.cli.CLI
 
 import scala.io.StdIn
