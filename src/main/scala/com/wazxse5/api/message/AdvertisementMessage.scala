@@ -1,8 +1,9 @@
 package com.wazxse5.api.message
 
 import com.wazxse5.api.valuetype.{DeviceModel, Power}
+import play.api.libs.json.{JsNull, JsValue}
 
-case class AdvertisementMessage private (
+case class AdvertisementMessage private(
   header: String,
   host: String,
   cacheControl: Int,
@@ -21,10 +22,12 @@ case class AdvertisementMessage private (
   hue: Int,
   saturation: Int,
   name: String,
-  text: String
+  override val text: String
 ) extends DeviceInfoMessage {
 
   def headerCode: Int = header.substring(9, 12).toInt
+
+  override def json: JsValue = JsNull
 
   override def isValid: Boolean = { // TODO: Dorobić prawdziwą walidację
     header == "HTTP/1.1 200 OK" &&
@@ -36,7 +39,7 @@ case class AdvertisementMessage private (
 object AdvertisementMessage {
 
   def apply(message: String): AdvertisementMessage = {
-    val messageLines = message.lines.toArray
+    val messageLines = message.linesIterator.toArray
 
     val header = messageLines(0)
     val host = messageLines(1).substring(6)

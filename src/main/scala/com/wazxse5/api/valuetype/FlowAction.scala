@@ -1,9 +1,13 @@
 package com.wazxse5.api.valuetype
 
-sealed trait FlowAction extends Parameter[Int] {
-  override def paramName: String = FlowAction.paramName
+import play.api.libs.json.{JsNumber, JsValue}
 
-  override def toJson: JsonValueType[_] = JsonIntValueType(value)
+sealed trait FlowAction extends Parameter[Int] {
+  override val paramName: String = FlowAction.paramName
+
+  override def rawValue: String = value.toString
+
+  override def toJson: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 0
 }

@@ -32,13 +32,13 @@ case class DeviceInfo(
 ) {
 
   def withNotificationMessageChange(message: NotificationMessage): DeviceInfo = copy(
-    power = message.power,
-    brightness = message.brightness,
-    temperature = message.temperature,
-    rgb = message.rgb,
-    hue = message.hue,
-    saturation = message.saturation,
-    colorMode = message.colorMode
+    power = message.power.orElse(power),
+    brightness = message.brightness.orElse(brightness),
+    temperature = message.temperature.orElse(temperature),
+    rgb = message.rgb.orElse(rgb),
+    hue = message.hue.orElse(hue),
+    saturation = message.saturation.orElse(saturation),
+    colorMode = message.colorMode.orElse(colorMode)
   )
 }
 

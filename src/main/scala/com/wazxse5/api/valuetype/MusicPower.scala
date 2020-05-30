@@ -1,5 +1,7 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsNull, JsValue}
+
 sealed trait MusicPower extends Property[Int] with Parameter[Int] {
   override val propFgName: String = MusicPower.propFgName
 
@@ -7,9 +9,11 @@ sealed trait MusicPower extends Property[Int] with Parameter[Int] {
 
   override val paramName: String = MusicPower.paramName
 
+  override def rawValue: String = value.toString
+
   override def isBackground: Boolean = false
 
-  override def toJson: JsonValueType[_] = JsonIntValueType(value)
+  override def toJson: JsValue = JsNull(value)
 
   override def isValid: Boolean = value == 0 || value == 1
 }

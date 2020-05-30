@@ -1,7 +1,11 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue}
+
 sealed trait PropOrParam[A] {
   def value: A
+
+  def rawValue: String
 
   def isProp: Boolean = false
 
@@ -14,7 +18,7 @@ trait Parameter[A] extends PropOrParam[A] {
 
   def paramName: String
 
-  def toJson: JsonValueType[_]
+  def toJson: JsValue
 
   def isValid: Boolean
 
@@ -23,16 +27,13 @@ trait Parameter[A] extends PropOrParam[A] {
 
 trait Property[A] extends PropOrParam[A] {
 
-  final def propName: String = {
-    if (isBackground) propBgName.get
-    else propFgName
-  }
-
   def propFgName: String
 
   def propBgName: Option[String]
 
-  def isBackground: Boolean // TODO: czy to jest w sumie potrzebne?
+  final def propName: String = if (isBackground) propBgName.get else propFgName
+
+  def isBackground: Boolean
 
   override final def isProp: Boolean = true
 }
@@ -61,6 +62,12 @@ object Property {
     case Rgb.propBgName => Rgb(value.toInt, isBackground = true)
     case Saturation.propBgName => Saturation(value.toInt, isBackground = true)
     case Temperature.propBgName => Temperature(value.toInt, isBackground = true)
+  }
+
+  def applyFromJsValue(name: String, jsValue: JsValue): Property[_] = jsValue match {
+    case JsString(string) => applyByName(name, string)
+    case JsNumber(number) => applyByName(name, number.toString)
+    case JsBoolean(bool) => applyByName(name, bool.toString)
   }
 
   val fgNames: Seq[String] = List(

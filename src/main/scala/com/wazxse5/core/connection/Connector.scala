@@ -10,6 +10,7 @@ import com.wazxse5.api.InternalId
 import com.wazxse5.api.message.{ApiConnectedMessage, CommandMessage, ControlMessage}
 import com.wazxse5.api.model.YeelightService
 import com.wazxse5.core.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
+import play.api.libs.json.Json
 
 class Connector(location: NetworkLocation, deviceInternalId: InternalId, service: YeelightService) extends YeelightActor with Stash {
 
@@ -19,7 +20,8 @@ class Connector(location: NetworkLocation, deviceInternalId: InternalId, service
     case Send(message, _) =>
       connection ! Write(ByteString(message.text))
     case Received(data) =>
-      val message = ApiConnectedMessage.fromJsonText(data.utf8String, deviceInternalId)
+      val json = Json.parse(data.utf8String.replace("\r\n",""))
+      val message = ApiConnectedMessage.fromJson(json, deviceInternalId)
       if (message.isValid) service.handleMessage(message)
     case CommandFailed(write: Write) =>
       val text = write.data.utf8String

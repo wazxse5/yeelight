@@ -1,8 +1,9 @@
 package com.wazxse5.api.message
 
 import com.wazxse5.api.valuetype.{DeviceModel, Power}
+import play.api.libs.json.{JsNull, JsValue}
 
-case class DiscoveryResponseMessage private (
+case class DiscoveryResponseMessage private(
   header: String,
   cacheControl: Int,
   date: String = "",
@@ -26,6 +27,8 @@ case class DiscoveryResponseMessage private (
 
   def headerCode: Int = header.substring(9, 12).toInt
 
+  override def json: JsValue = JsNull
+
   override def isValid: Boolean = { // TODO: Dorobić prawdziwą walidację
     header == "HTTP/1.1 200 OK" &&
       date == "" &&
@@ -38,7 +41,7 @@ case class DiscoveryResponseMessage private (
 object DiscoveryResponseMessage {
 
   def apply(message: String): DiscoveryResponseMessage = {
-    val messageLines = message.lines.toArray
+    val messageLines = message.linesIterator.toArray
 
     val header = messageLines(0)
     val cacheControl = messageLines(1).substring(23).toInt

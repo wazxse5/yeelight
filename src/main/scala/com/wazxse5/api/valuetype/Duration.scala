@@ -1,9 +1,13 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsNumber, JsValue}
+
 case class Duration(value: Int) extends Parameter[Int] {
   override val paramName: String = Duration.paramName
 
-  override def toJson: JsonIntValueType = JsonIntValueType(value)
+  override def rawValue: String = value.toString
+
+  override def toJson: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 30
 }

@@ -2,6 +2,8 @@ package com.wazxse5.api.message
 
 import com.typesafe.scalalogging.StrictLogging
 import com.wazxse5.api.InternalId
+import com.wazxse5.core.exception.InvalidMessageException
+import play.api.libs.json.JsValue
 
 sealed trait Message extends StrictLogging
 
@@ -9,6 +11,8 @@ trait ControlMessage extends Message // TODO: Może to nie powinno być łączon
 
 sealed trait ApiMessage extends Message {
   def isValid: Boolean
+
+  def json: JsValue
 
   def text: String
 }
@@ -25,9 +29,16 @@ trait IdentifiableMessage extends ApiConnectedMessage {
 
 
 object ApiConnectedMessage {
-  def fromJsonText(messageText: String, deviceInternalId: InternalId): ApiConnectedMessage = {
-    // TODO: Może try-catch tu zrobić
-    if (messageText.contains(""""method":"props"""")) NotificationMessage(messageText, deviceInternalId)
-    else CommandResultMessage(messageText, deviceInternalId)
+
+  def fromJson(json: JsValue, deviceInternalId: InternalId): ApiConnectedMessage = {
+    val id = json \ "id"
+    val result = json \ "result"
+    val error = json \ "error"
+    val method = (json \ "method").asOpt[String]
+
+    if (id.isDefined && (result.isDefined || error.isDefined)) CommandResultMessage(json, deviceInternalId)
+    else if (method.contains("props")) NotificationMessage(json, deviceInternalId)
+    else throw new InvalidMessageException
   }
+
 }

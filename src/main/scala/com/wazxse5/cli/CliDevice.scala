@@ -1,7 +1,9 @@
 package com.wazxse5.cli
 
 import com.wazxse5.api.model.IYeelightDevice
+import com.wazxse5.api.valuetype.Property
 import com.wazxse5.cli.CliDevice._
+
 
 class CliDevice private(_yeelightDevice: IYeelightDevice, _alias: Option[String]) {
   val cliId: String = nextCliId
@@ -16,6 +18,17 @@ class CliDevice private(_yeelightDevice: IYeelightDevice, _alias: Option[String]
     s"cliId=$cliId\talias=$alias\tip=${yeelightDevice.location}\tid=${yeelightDevice.id}"
   }
 
+  def state: String = { // TODO dodać pozostałe po dostosowaniu deviceInfo
+    s"""|brightness  = ${optPropToString(yeelightDevice.state.brightness)}
+        |colorMode   = ${optPropToString(yeelightDevice.state.colorMode)}
+        |hue         = ${optPropToString(yeelightDevice.state.hue)}
+        |power       = ${optPropToString(yeelightDevice.state.power)}
+        |rgb         = ${optPropToString(yeelightDevice.state.rgb)}
+        |saturation  = ${optPropToString(yeelightDevice.state.saturation)}
+        |temperature = ${optPropToString(yeelightDevice.state.temperature)}""".stripMargin
+  }
+
+  private def optPropToString(property: Option[Property[_]]): String = property.map(_.rawValue).getOrElse("unknown")
 }
 
 object CliDevice {

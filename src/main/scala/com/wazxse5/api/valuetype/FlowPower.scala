@@ -5,6 +5,8 @@ sealed trait FlowPower extends Property[Int] {
 
   override val propBgName: Option[String] = None
 
+  override def rawValue: String = value.toString
+
 }
 
 object FlowPower {

@@ -6,6 +6,8 @@ sealed trait ColorMode extends Property[Int] {
 
   override val propBgName: Option[String] = Some(ColorMode.propBgName)
 
+  override def rawValue: String = value.toString
+
 }
 
 object ColorMode {

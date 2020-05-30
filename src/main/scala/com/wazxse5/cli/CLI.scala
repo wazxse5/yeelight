@@ -22,6 +22,7 @@ class CLI(service: IYeelightService) {
         case None => println("Cannot find device")
       }
     }
+    else println(unknownCommand)
   }
 
   private def findDeviceInternalId(identifier: String): Option[InternalId] = {
@@ -47,6 +48,7 @@ class CLI(service: IYeelightService) {
       case CLI.deviceOf => createNewDevice(words.tail)
       case CLI.devices => cliDevices.foreach(c => println(c._2.simpleInfo))
       case CLI.exit => System.exit(0)
+      case _ => println(unknownCommand)
     }
   }
 
@@ -62,6 +64,8 @@ class CLI(service: IYeelightService) {
         case CLI.temperature => performCommand(SetTemperature(words(2).toInt))
         case CLI.color => performCommand(SetRgb(words(2).toInt))
       }
+      case CLI.state => println(cliDevices(deviceInternalId).state)
+      case _ => println(unknownCommand)
     }
   }
 
@@ -92,10 +96,13 @@ object CLI {
   val on = "on"
   val off = "off"
   val set = "set"
+  val state = "state"
   val alias = "alias"
   val brightness = "brightness"
   val temperature = "temperature"
   val color = "color"
+
+  val unknownCommand = "unknown command"
 
 
   val keywords: Set[String] = Set(discover, deviceOf, devices, exit, on, off, set, alias)

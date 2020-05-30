@@ -1,5 +1,7 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsString, JsValue}
+
 case class FlowExpression(value: Seq[FlowBlock], isBackground: Boolean) extends Property[Seq[FlowBlock]] with Parameter[Seq[FlowBlock]] {
 
   override val propFgName: String = FlowExpression.propFgName
@@ -8,10 +10,9 @@ case class FlowExpression(value: Seq[FlowBlock], isBackground: Boolean) extends 
 
   override val paramName: String = FlowExpression.paramName
 
-  override def toJson: JsonValueType[_] = {
-    val string = value.map(_.toJsonValue).mkString(",")
-    JsonStringValueType(string)
-  }
+  override def rawValue: String = value.map(_.toJsonValue).mkString(",")
+
+  override def toJson: JsValue = JsString(rawValue)
 
   override def isValid: Boolean = {
     value.nonEmpty && value.forall(_.isValid)

@@ -29,12 +29,16 @@ class KnownDevice private(
       else logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
   }
 
-  def reconnectAndSend(command: YeelightCommand): Unit = deviceInfo.location match {
+  def connect(): Unit = deviceInfo.location match {
     case Some(location) =>
       val connector = actorSystem.actorOf(Connector.props(location, internalId, service))
-      connector ! Send(CommandMessage(command, internalId))
       this.connector = Some(connector)
     case None => logger.warn(s"Cannot reconnect - location is empty")
+  }
+
+  def reconnectAndSend(command: YeelightCommand): Unit = {
+    connect()
+    connector.foreach(_ ! Send(CommandMessage(command, internalId)))
   }
 
   def isConnected: Boolean = deviceInfo.isConnected

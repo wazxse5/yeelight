@@ -10,7 +10,6 @@ import com.wazxse5.api.message.{DiscoveryMessage, DiscoveryResponseMessage}
 import com.wazxse5.api.model.YeelightService
 import com.wazxse5.core.connection.Discoverer.Search
 
-//import scala.collection.JavaConverters._
 import scala.jdk.CollectionConverters._
 
 class Discoverer(service: YeelightService) extends YeelightActor {

@@ -2,8 +2,9 @@ package com.wazxse5.api.message
 
 import com.wazxse5.api.InternalId
 import com.wazxse5.api.valuetype._
+import play.api.libs.json.{JsResultException, JsValue, Json}
 
-case class NotificationMessage private (newProps: Seq[Property[_]], deviceInternalId: InternalId, text: String, isValid: Boolean = true) extends ApiConnectedMessage {
+case class NotificationMessage private (newProps: Seq[Property[_]], deviceInternalId: InternalId, json: JsValue, isValid: Boolean = true) extends ApiConnectedMessage {
 
   def propByName(propName: String): Option[Property[_]] = newProps.find(_.propName == propName)
 
@@ -21,22 +22,24 @@ case class NotificationMessage private (newProps: Seq[Property[_]], deviceIntern
 
   def temperature: Option[Temperature] = propByName(Temperature.propFgName).map(_.asInstanceOf[Temperature])
 
+  override def text: String = Json.stringify(json)
+
 }
 
 object NotificationMessage {
-  private val startText = """{"method":"props","params":{"""
-  private val endText = "}}\r\n"
 
-  def apply(messageText: String, deviceInternalId: InternalId): NotificationMessage = {
-    try { // TODO: Może da się to ładniej a nie try-catchem
-      val m1 = messageText.replace(startText, "").replace(endText, "")
-        .replace("\"", "").replace("\r", "").replace("\n", "")
-      val m2 = m1.split(',').toSeq // params
-      val m3 = m2.map(_.split(':')).map(p => (p.head, p.tail.head)) //  pairs of params
-      val m4 = m3.map(pair => Property.applyByName(pair._1, pair._2))
-      new NotificationMessage(m4, deviceInternalId, messageText)
+  def apply(json: JsValue, deviceInternalId: InternalId): NotificationMessage = {
+    try {
+      val method = (json \ "method").as[String]
+      val params = (json \ "params").as[Map[String, JsValue]]
+      val newProps = params.map(p => Property.applyFromJsValue(p._1, p._2))
+      new NotificationMessage(newProps.toSeq, deviceInternalId, json)
     } catch {
-      case _: RuntimeException => new NotificationMessage(Seq.empty, deviceInternalId, "", isValid = false)
+      case e: JsResultException =>
+        println(Json.prettyPrint(json))
+        new NotificationMessage(Seq.empty, deviceInternalId, json, false)
     }
+
   }
+
 }

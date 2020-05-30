@@ -1,5 +1,7 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsNumber, JsValue}
+
 final case class Temperature(value: Int, isBackground: Boolean = false) extends Property[Int] with Parameter[Int] {
   override val propFgName: String = Temperature.propFgName
 
@@ -7,7 +9,9 @@ final case class Temperature(value: Int, isBackground: Boolean = false) extends 
 
   override val paramName: String = Temperature.paramName
 
-  override def toJson: JsonValueType[_] = JsonIntValueType(value)
+  override def rawValue: String = value.toString
+
+  override def toJson: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 1700 && value <= 6500
 }

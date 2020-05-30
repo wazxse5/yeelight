@@ -1,6 +1,7 @@
 package com.wazxse5.api.command
 
-import com.wazxse5.api.valuetype.{JsonValueType, Parameter}
+import com.wazxse5.api.valuetype.Parameter
+import play.api.libs.json.JsValue
 
 
 trait YeelightCommand {
@@ -12,7 +13,7 @@ trait YeelightCommand {
 
   def params: Seq[Parameter[_]]
 
-  def args: Seq[JsonValueType[_]] = params.map(_.toJson)
+  def args: Seq[JsValue] = params.map(_.toJson)
 
   def isValid: Boolean = true // TODO: walidacja komend
 }

@@ -1,5 +1,7 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsString, JsValue}
+
 sealed trait Power extends Property[String] with Parameter[String] {
   override val propFgName: String = Power.propFgName
 
@@ -7,7 +9,9 @@ sealed trait Power extends Property[String] with Parameter[String] {
 
   override val paramName: String = Power.paramName
 
-  override def toJson: JsonValueType[_] = JsonStringValueType(value)
+  override def rawValue: String = value
+
+  override def toJson: JsValue = JsString(value)
 
   override def isValid: Boolean = Power.values.contains(value)
 }

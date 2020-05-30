@@ -1,0 +1,27 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <HTMLCodeStyleSettings>
+      <option name="HTML_DO_NOT_INDENT_CHILDREN_OF" value="html,thead,tbody,tfoot" />
+      <option name="HTML_KEEP_WHITESPACES_INSIDE" value="span,pre" />
+    </HTMLCodeStyleSettings>
+    <ScalaCodeStyleSettings>
+      <option name="NOT_CONTINUATION_INDENT_FOR_PARAMS" value="true" />
+    </ScalaCodeStyleSettings>
+    <codeStyleSettings language="JSP">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="TAB_SIZE" value="2" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="JavaScript">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
+      </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="Scala">
+      <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+    </codeStyleSettings>
+  </code_scheme>
+</component>

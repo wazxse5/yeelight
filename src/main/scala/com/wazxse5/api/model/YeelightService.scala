@@ -57,11 +57,12 @@ class YeelightService extends IYeelightService with StrictLogging {
     case deviceInfoMessage: DeviceInfoMessage =>
       handleDeviceInfoMessage(deviceInfoMessage)
     case resultMessage: CommandResultMessage =>
-      println(s"CommandResultMessage ${resultMessage.text}\tresult=${resultMessage.result}")
+      println(s"CommandResultMessage ${resultMessage.json}")
     case notification: NotificationMessage =>
+      println(s"NotificationMessage ${notification.json}")
       knownDevices.find(notification.deviceInternalId).foreach(_.update(notification))
     case _ =>
-      println(s"--Unknown message--  ${message.text}")
+      println(s"Unknown message  ${message.json}")
   }
 
   private def handleControlMessage(message: ControlMessage): Unit = message match {

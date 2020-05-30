@@ -1,9 +1,13 @@
 package com.wazxse5.api.valuetype
 
-case class TcpPort(value: Int) extends Parameter[Int] {
-  override def paramName: String = TcpPort.paramName
+import play.api.libs.json.{JsNumber, JsValue}
 
-  override def toJson: JsonValueType[_] = JsonIntValueType(value)
+case class TcpPort(value: Int) extends Parameter[Int] {
+  override val paramName: String = TcpPort.paramName
+
+  override def rawValue: String = value.toString
+
+  override def toJson: JsValue = JsNumber(value)
 
   override def isValid: Boolean = {
     0 < value && value <= 65535

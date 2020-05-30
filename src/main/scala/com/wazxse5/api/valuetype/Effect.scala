@@ -1,9 +1,13 @@
 package com.wazxse5.api.valuetype
 
+import play.api.libs.json.{JsString, JsValue}
+
 sealed trait Effect extends Parameter[String] {
   override val paramName: String = Effect.paramName
 
-  override def toJson: JsonStringValueType = JsonStringValueType(value)
+  override def rawValue: String = value
+
+  override def toJson: JsValue = JsString(value)
 
   override def isValid: Boolean = value == Sudden.value || value == Smooth.value
 }
