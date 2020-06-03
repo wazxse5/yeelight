@@ -3,8 +3,7 @@ package com.wazxse5.core
 import akka.actor.{ActorRef, ActorSystem}
 import com.typesafe.scalalogging.StrictLogging
 import com.wazxse5.api.InternalId
-import com.wazxse5.api.command.YeelightCommand
-import com.wazxse5.api.message.{CommandMessage, NotificationMessage}
+import com.wazxse5.api.message.CommandMessage
 import com.wazxse5.api.model.YeelightService
 import com.wazxse5.api.valuetype._
 import com.wazxse5.core.connection.Connector.Send
@@ -21,12 +20,12 @@ class KnownDevice private(
 
   def internalId: InternalId = deviceInfo.internalId
 
-  def performCommand(command: YeelightCommand): Unit = connector match {
+  def sendMessage(message: CommandMessage): Unit = connector match {
     case Some(connector) if deviceInfo.isConnected =>
-      connector ! Send(CommandMessage(command, internalId))
+      connector ! Send(message)
     case _ =>
-      if (deviceInfo.location.nonEmpty) reconnectAndSend(command)
-      else logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
+      if (deviceInfo.location.nonEmpty) reconnectAndSend(message)
+      else logger.warn(s"Cannot send message $message") // TODO: Do refaktoryzacji na później
   }
 
   def connect(): Unit = deviceInfo.location match {
@@ -36,35 +35,54 @@ class KnownDevice private(
     case None => logger.warn(s"Cannot reconnect - location is empty")
   }
 
-  def reconnectAndSend(command: YeelightCommand): Unit = {
+  def reconnectAndSend(message: CommandMessage): Unit = {
     connect()
-    connector.foreach(_ ! Send(CommandMessage(command, internalId)))
+    connector.foreach(_ ! Send(message))
   }
 
   def isConnected: Boolean = deviceInfo.isConnected
 
   def update(
+    location: Option[NetworkLocation] = deviceInfo.location,
+    isConnected: Boolean = deviceInfo.isConnected,
     id: Option[String] = deviceInfo.id,
     model: Option[DeviceModel] = deviceInfo.model,
     firmwareVersion: Option[String] = deviceInfo.firmwareVersion,
     supportedCommands: Option[Set[String]] = deviceInfo.supportedCommands,
-    power: Option[Power] = deviceInfo.power,
+    //
     brightness: Option[Brightness] = deviceInfo.brightness,
-    temperature: Option[Temperature] = deviceInfo.temperature,
-    rgb: Option[Rgb] = deviceInfo.rgb,
-    hue: Option[Hue] = deviceInfo.hue,
-    saturation: Option[Saturation] = deviceInfo.saturation,
     colorMode: Option[ColorMode] = deviceInfo.colorMode,
-    location: Option[NetworkLocation] = deviceInfo.location,
-    isConnected: Boolean = deviceInfo.isConnected
+    flowExpression: Option[FlowExpression] = deviceInfo.flowExpression,
+    flowPower: Option[FlowPower] = deviceInfo.flowPower,
+    hue: Option[Hue] = deviceInfo.hue,
+    musicPower: Option[MusicPower] = deviceInfo.musicPower,
+    name: Option[Name] = deviceInfo.name,
+    power: Option[Power] = deviceInfo.power,
+    rgb: Option[Rgb] = deviceInfo.rgb,
+    saturation: Option[Saturation] = deviceInfo.saturation,
+    temperature: Option[Temperature] = deviceInfo.temperature,
+    timerValue: Option[TimerValue] = deviceInfo.timerValue,
+    //
+    bgBrightness: Option[Brightness] = deviceInfo.bgBrightness,
+    bgColorMode: Option[ColorMode] = deviceInfo.bgColorMode,
+    bgFlowExpression: Option[FlowExpression] = deviceInfo.bgFlowExpression,
+    bgFlowPower: Option[FlowPower] = deviceInfo.bgFlowPower,
+    bgHue: Option[Hue] = deviceInfo.bgHue,
+    bgPower: Option[Power] = deviceInfo.bgPower,
+    bgRgb: Option[Rgb] = deviceInfo.bgRgb,
+    bgSaturation: Option[Saturation] = deviceInfo.bgSaturation,
+    bgTemperature: Option[Temperature] = deviceInfo.bgTemperature,
   ): Unit = {
-    deviceInfo = deviceInfo.copy(deviceInfo.internalId, location, isConnected, id, model, firmwareVersion, supportedCommands, power,
-      brightness, temperature, rgb, hue, saturation, colorMode)
+    deviceInfo = deviceInfo.copy(deviceInfo.internalId, location, isConnected, id, model, firmwareVersion, supportedCommands,
+      brightness, colorMode, flowExpression, flowPower, hue, musicPower, name, power, rgb, saturation, temperature, timerValue,
+      bgBrightness, bgColorMode, bgFlowExpression, bgFlowPower, bgHue, bgPower, bgRgb, bgSaturation, bgTemperature)
   }
 
   def update(deviceInfo: DeviceInfo): Unit = this.deviceInfo = deviceInfo
 
-  def update(notification: NotificationMessage): Unit = update(deviceInfo.withNotificationMessageChange(notification))
+  def update(stateUpdate: StateUpdate): Unit = update(deviceInfo.withStateUpdate(stateUpdate))
+
+  def update(stateUpdate: Option[StateUpdate]): Unit = stateUpdate.foreach(update(_))
 
 }
 

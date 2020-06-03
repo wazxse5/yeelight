@@ -7,8 +7,9 @@ import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import com.wazxse5.api.InternalId
-import com.wazxse5.api.message.{ApiConnectedMessage, CommandMessage, ControlMessage}
+import com.wazxse5.api.message.{ApiConnectedMessage, CommandMessage}
 import com.wazxse5.api.model.YeelightService
+import com.wazxse5.core.ControlMessage
 import com.wazxse5.core.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
 import play.api.libs.json.Json
 

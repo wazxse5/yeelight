@@ -64,16 +64,21 @@ class CLI(service: IYeelightService) {
         case CLI.temperature => performCommand(SetTemperature(words(2).toInt))
         case CLI.color => performCommand(SetRgb(words(2).toInt))
       }
+      case CLI.refresh => performCommand(GetProps.all)
       case CLI.state => println(cliDevices(deviceInternalId).state)
       case _ => println(unknownCommand)
     }
   }
 
   private def createNewDevice(words: List[String]): Unit = {
-    val address = words.headOption
-    val newDevice = address.map(service.deviceOf(_))
-    val newCliDevice = newDevice.map(CliDevice(_, words.lift(1)))
-    newCliDevice.foreach(insertOrUpdateCliDevice)
+    words.headOption match {
+      case Some(address) =>
+        val newDevice = service.deviceOf(address)
+        newDevice.performCommand(GetProps.all)
+        val newCliDevice = CliDevice(newDevice, words.lift(1))
+        insertOrUpdateCliDevice(newCliDevice)
+      case None =>
+    }
   }
 
   private def setAlias(deviceInternalId: InternalId, alias: String): Unit = {
@@ -97,6 +102,7 @@ object CLI {
   val off = "off"
   val set = "set"
   val state = "state"
+  val refresh = "refresh"
   val alias = "alias"
   val brightness = "brightness"
   val temperature = "temperature"

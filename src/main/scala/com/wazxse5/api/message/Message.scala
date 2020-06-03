@@ -5,9 +5,7 @@ import com.wazxse5.api.InternalId
 import com.wazxse5.core.exception.InvalidMessageException
 import play.api.libs.json.JsValue
 
-sealed trait Message extends StrictLogging
-
-trait ControlMessage extends Message // TODO: Może to nie powinno być łączone z normalnymi wiadomościami
+trait Message extends StrictLogging
 
 sealed trait ApiMessage extends Message {
   def isValid: Boolean
@@ -20,7 +18,7 @@ sealed trait ApiMessage extends Message {
 trait ApiUnconnectedMessage extends ApiMessage
 
 trait ApiConnectedMessage extends ApiMessage {
-  val deviceInternalId: InternalId
+  val deviceId: InternalId
 }
 
 trait IdentifiableMessage extends ApiConnectedMessage {

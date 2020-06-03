@@ -1,7 +1,7 @@
 package com.wazxse5.core
 
 import com.wazxse5.api.InternalId
-import com.wazxse5.api.message.{DeviceInfoMessage, NotificationMessage}
+import com.wazxse5.api.message.DeviceInfoMessage
 import com.wazxse5.api.valuetype._
 import com.wazxse5.core.connection.NetworkLocation
 
@@ -15,30 +15,53 @@ case class DeviceInfo(
   firmwareVersion: Option[String],
   supportedCommands: Option[Set[String]],
   //
-  power: Option[Power],
-  brightness: Option[Brightness],
-  temperature: Option[Temperature],
-  rgb: Option[Rgb],
-  hue: Option[Hue],
-  saturation: Option[Saturation],
-  colorMode: Option[ColorMode],
-  bgPower: Option[Power] = None,
+  brightness: Option[Brightness] = None,
+  colorMode: Option[ColorMode] = None,
+  flowExpression: Option[FlowExpression] = None,
+  flowPower: Option[FlowPower] = None,
+  hue: Option[Hue] = None,
+  musicPower: Option[MusicPower] = None,
+  name: Option[Name] = None,
+  power: Option[Power] = None,
+  rgb: Option[Rgb] = None,
+  saturation: Option[Saturation] = None,
+  temperature: Option[Temperature] = None,
+  timerValue: Option[TimerValue] = None,
+  //
   bgBrightness: Option[Brightness] = None,
-  bgTemperature: Option[Temperature] = None,
-  bgRgb: Option[Rgb] = None,
+  bgColorMode: Option[ColorMode] = None,
+  bgFlowExpression: Option[FlowExpression] = None,
+  bgFlowPower: Option[FlowPower] = None,
   bgHue: Option[Hue] = None,
+  bgPower: Option[Power] = None,
+  bgRgb: Option[Rgb] = None,
   bgSaturation: Option[Saturation] = None,
-  bgColorMode: Option[ColorMode] = None
+  bgTemperature: Option[Temperature] = None,
 ) {
 
-  def withNotificationMessageChange(message: NotificationMessage): DeviceInfo = copy(
-    power = message.power.orElse(power),
-    brightness = message.brightness.orElse(brightness),
-    temperature = message.temperature.orElse(temperature),
-    rgb = message.rgb.orElse(rgb),
-    hue = message.hue.orElse(hue),
-    saturation = message.saturation.orElse(saturation),
-    colorMode = message.colorMode.orElse(colorMode)
+  def withStateUpdate(stateUpdate: StateUpdate): DeviceInfo = copy(
+    brightness = stateUpdate.brightness.orElse(brightness),
+    colorMode = stateUpdate.colorMode.orElse(colorMode),
+    flowExpression = stateUpdate.flowExpression.orElse(flowExpression),
+    flowPower = stateUpdate.flowPower.orElse(flowPower),
+    hue = stateUpdate.hue.orElse(hue),
+    musicPower = stateUpdate.musicPower.orElse(musicPower),
+    name = stateUpdate.name.orElse(name),
+    power = stateUpdate.power.orElse(power),
+    rgb = stateUpdate.rgb.orElse(rgb),
+    saturation = stateUpdate.saturation.orElse(saturation),
+    temperature = stateUpdate.temperature.orElse(temperature),
+    timerValue = stateUpdate.timerValue.orElse(timerValue),
+    //
+    bgBrightness = stateUpdate.bgBrightness.orElse(bgBrightness),
+    bgColorMode = stateUpdate.bgColorMode.orElse(bgColorMode),
+    bgFlowExpression = stateUpdate.bgFlowExpression.orElse(bgFlowExpression),
+    bgFlowPower = stateUpdate.bgFlowPower.orElse(bgFlowPower),
+    bgHue = stateUpdate.bgHue.orElse(bgHue),
+    bgPower = stateUpdate.bgPower.orElse(bgPower),
+    bgRgb = stateUpdate.bgRgb.orElse(bgRgb),
+    bgSaturation = stateUpdate.bgSaturation.orElse(bgSaturation),
+    bgTemperature = stateUpdate.bgTemperature.orElse(bgTemperature),
   )
 }
 
@@ -52,20 +75,22 @@ object DeviceInfo {
     Some(DeviceModel(message.model)),
     Some(message.firmwareVersion),
     Some(message.supportedCommands),
-    Some(Power(message.power)),
-    Some(Brightness(message.brightness)),
-    Some(Temperature(message.temperature)),
-    Some(Rgb(message.rgb)),
-    Some(Hue(message.hue)),
-    Some(Saturation(message.saturation)),
-    Some(ColorMode(message.colorMode))
+    //
+    brightness = Some(Brightness(message.brightness)),
+    colorMode = Some(ColorMode(message.colorMode)),
+    hue = Some(Hue(message.hue)),
+    name = Some(Name(message.name)),
+    power = Some(Power(message.power)),
+    rgb = Some(Rgb(message.rgb)),
+    saturation = Some(Saturation(message.saturation)),
+    temperature = Some(Temperature(message.temperature))
   )
 
   def empty: DeviceInfo = new DeviceInfo(
     InternalId.generate,
     None,
     isConnected = false,
-    None, None, None, None, None, None, None, None, None, None, None
+    None, None, None, None
   )
 
   def apply(location: NetworkLocation): DeviceInfo = empty.copy(location = Some(location))

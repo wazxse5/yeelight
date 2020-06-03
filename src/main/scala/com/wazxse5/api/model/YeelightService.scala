@@ -6,7 +6,7 @@ import com.wazxse5.api.InternalId
 import com.wazxse5.api.command.YeelightCommand
 import com.wazxse5.api.message._
 import com.wazxse5.core.connection.{Connector, Discoverer, Listener, NetworkLocation}
-import com.wazxse5.core.{DeviceInfo, KnownDevice, KnownDevices}
+import com.wazxse5.core._
 
 class YeelightService extends IYeelightService with StrictLogging {
   private implicit val service: YeelightService = this
@@ -14,7 +14,9 @@ class YeelightService extends IYeelightService with StrictLogging {
 
   private val discoverer: ActorRef = actorSystem.actorOf(Discoverer.props(service = this))
   private val listener: ActorRef = actorSystem.actorOf(Listener.props(service = this))
+
   private val knownDevices: KnownDevices = new KnownDevices
+  private val messageRegistry: MessageRegistry = new MessageRegistry
 
 
   override def devices: Set[IYeelightDevice] = knownDevices.all.map(cdi => YeelightDevice(cdi.deviceInfo)).toSet
@@ -43,7 +45,10 @@ class YeelightService extends IYeelightService with StrictLogging {
 
   def performCommand(internalId: InternalId, command: YeelightCommand): Unit = {
     knownDevices.find(internalId) match {
-      case Some(device) => device.performCommand(command)
+      case Some(device) =>
+        val message = CommandMessage(command, internalId)
+        messageRegistry.put(message)
+        device.sendMessage(message)
       case None => logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
     }
   }
@@ -57,12 +62,16 @@ class YeelightService extends IYeelightService with StrictLogging {
     case deviceInfoMessage: DeviceInfoMessage =>
       handleDeviceInfoMessage(deviceInfoMessage)
     case resultMessage: CommandResultMessage =>
-      println(s"CommandResultMessage ${resultMessage.json}")
+      messageRegistry.put(resultMessage)
+      val relatedCommand = messageRegistry.getCommand(resultMessage)
+      val deviceToUpdate = knownDevices.find(resultMessage.deviceId)
+      val stateUpdate = relatedCommand.map(StateUpdate(_, resultMessage))
+      deviceToUpdate.foreach(_.update(stateUpdate))
     case notification: NotificationMessage =>
-      println(s"NotificationMessage ${notification.json}")
-      knownDevices.find(notification.deviceInternalId).foreach(_.update(notification))
+      val deviceToUpdate = knownDevices.find(notification.deviceId)
+      deviceToUpdate.foreach(_.update(notification.toStateUpdate))
     case _ =>
-      println(s"Unknown message  ${message.json}")
+      println(s"Unknown command  ${message.json}")
   }
 
   private def handleControlMessage(message: ControlMessage): Unit = message match {

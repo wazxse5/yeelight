@@ -5,7 +5,7 @@ import play.api.libs.json.{JsValue, Json}
 
 case class CommandResultMessage private (
   id: Int,
-  deviceInternalId: InternalId,
+  deviceId: InternalId,
   result: Option[Seq[String]] = None,
   errorCode: Option[Int] = None,
   errorMessage: Option[String] = None,
@@ -25,9 +25,8 @@ object CommandResultMessage {
   def apply(json: JsValue, deviceInternalId: InternalId): CommandResultMessage = {
     val id = (json \ "id").as[Int]
     val errorCode = (json \ "error" \ "code").asOpt[Int]
-    val errorMessage = (json \ "error" \ "message").asOpt[String]
+    val errorMessage = (json \ "error" \ "command").asOpt[String]
     val result = (json \ "result").asOpt[Seq[String]]
-
     new CommandResultMessage(id, deviceInternalId, result, errorCode, errorMessage, json)
   }
 
