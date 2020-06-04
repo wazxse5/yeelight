@@ -22,6 +22,8 @@ trait Parameter[A] extends PropOrParam[A] {
 
   def isValid: Boolean
 
+  def isEmptyParam: Boolean = false
+
   override final def isParam: Boolean = true
 }
 

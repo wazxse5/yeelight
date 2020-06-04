@@ -1,14 +1,18 @@
 package com.wazxse5.api.command
 import com.wazxse5.api.valuetype.{Parameter, SceneClass, SceneValue}
 
-case class SetScene(p1: SceneClass, p2: SceneValue[_], p3: SceneValue[_], p4: SceneValue[_]) extends YeelightCommand {
+case class SetScene(p1: SceneClass, p2: SceneValue[_], p3: SceneValue[_], p4Opt: Option[SceneValue[_]]) extends YeelightCommand4 {
   override val name: String = "set_scene"
 
-  override val minParameters: Int = 3
+  override def p4: Parameter[_] = p4Opt
 
-  override val maxParameters: Int = 4
+  override def p1Mandatory: Boolean = true
 
-  override def params: Seq[Parameter[_]] = List(p1, p2, p3, p4) // TODO: obsługa gdy czwarty parametr nie jest podany
+  override def p2Mandatory: Boolean = true
+
+  override def p3Mandatory: Boolean = true
+
+  override def p4Mandatory: Boolean = false
 }
 
 object SetScene {

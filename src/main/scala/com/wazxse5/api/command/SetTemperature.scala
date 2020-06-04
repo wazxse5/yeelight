@@ -1,15 +1,15 @@
 package com.wazxse5.api.command
 
-import com.wazxse5.api.valuetype.{Duration, Effect, Parameter, Temperature}
+import com.wazxse5.api.valuetype.{Duration, Effect, Temperature}
 
-case class SetTemperature(p1: Temperature, p2: Effect, p3: Duration) extends YeelightCommand {
+case class SetTemperature(p1: Temperature, p2: Effect, p3: Duration) extends YeelightCommand3 {
   override val name: String = "set_ct_abx"
 
-  override val minParameters: Int = 3
+  override def p1Mandatory: Boolean = true
 
-  override val maxParameters: Int = 3
+  override def p2Mandatory: Boolean = true
 
-  override def params: Seq[Parameter[_]] = List(p1, p2, p3)
+  override def p3Mandatory: Boolean = true
 }
 
 object SetTemperature {

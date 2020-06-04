@@ -1,15 +1,15 @@
 package com.wazxse5.api.command
 
-import com.wazxse5.api.valuetype.{Duration, Effect, Parameter, Rgb}
+import com.wazxse5.api.valuetype.{Duration, Effect, Rgb}
 
-case class SetRgb(p1: Rgb, p2: Effect, p3: Duration) extends YeelightCommand {
+case class SetRgb(p1: Rgb, p2: Effect, p3: Duration) extends YeelightCommand3 {
   override val name: String = "set_rgb"
 
-  override val minParameters: Int = 3
+  override def p1Mandatory: Boolean = true
 
-  override val maxParameters: Int = 3
+  override def p2Mandatory: Boolean = true
 
-  override def params: Seq[Parameter[_]] = List(p1, p2, p3)
+  override def p3Mandatory: Boolean = true
 }
 
 object SetRgb {

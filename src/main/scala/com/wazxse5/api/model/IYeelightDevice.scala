@@ -5,7 +5,7 @@ import com.wazxse5.api.command.YeelightCommand
 import com.wazxse5.api.valuetype.DeviceModel
 import com.wazxse5.core.connection.NetworkLocation
 
-trait IYeelightDevice { // TODO: Pomyśleć nad lepszą nazwą
+trait IYeelightDevice {
 
   val internalId: InternalId
 

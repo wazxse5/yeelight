@@ -1,15 +1,15 @@
 package com.wazxse5.api.command
 
-import com.wazxse5.api.valuetype.{FlowAction, FlowCount, FlowExpression, Parameter}
+import com.wazxse5.api.valuetype.{FlowAction, FlowCount, FlowExpression}
 
-case class StartFlow(p1: FlowCount, p2: FlowAction, p3: FlowExpression) extends YeelightCommand {
+case class StartFlow(p1: FlowCount, p2: FlowAction, p3: FlowExpression) extends YeelightCommand3 {
   override def name: String = "start_cf"
 
-  override def minParameters: Int = 3
+  override def p1Mandatory: Boolean = true
 
-  override def maxParameters: Int = 3
+  override def p2Mandatory: Boolean = true
 
-  override def params: Seq[Parameter[_]] = List(p1, p2, p3)
+  override def p3Mandatory: Boolean = true
 }
 
 object StartFlow {

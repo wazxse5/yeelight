@@ -2,12 +2,15 @@ package com.wazxse5.api.command
 
 import com.wazxse5.api.valuetype._
 
-case class SetHsv(p1: Hue, p2: Saturation, p3: Effect, p4: Duration) extends YeelightCommand {
+case class SetHsv(p1: Hue, p2: Saturation, p3: Effect, p4: Duration) extends YeelightCommand4 {
   override val name: String = "set_hsv"
 
-  override val minParameters: Int = 4
+  override def p1Mandatory: Boolean = true
 
-  override val maxParameters: Int = 4
+  override def p2Mandatory: Boolean = true
 
-  override def params: Seq[Parameter[_]] = List(p1, p2, p3)
+  override def p3Mandatory: Boolean = true
+
+  override def p4Mandatory: Boolean = true
+
 }
