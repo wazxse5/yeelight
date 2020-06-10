@@ -1,3 +1,3 @@
-package com.wazxse5.core.exception
+package com.wazxse5.api.exception
 
 class EmptyParamException extends Exception

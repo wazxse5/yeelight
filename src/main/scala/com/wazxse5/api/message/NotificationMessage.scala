@@ -4,7 +4,7 @@ import com.wazxse5.api.InternalId
 import com.wazxse5.core.StateUpdate
 import play.api.libs.json.{JsResultException, JsValue, Json}
 
-case class NotificationMessage private(params: Map[String, JsValue], deviceId: InternalId, json: JsValue, isValid: Boolean = true) extends ApiConnectedMessage {
+case class NotificationMessage private(params: Map[String, JsValue], deviceId: InternalId, json: JsValue, isValid: Boolean = true) extends YeelightConnectedMessage {
 
   override def text: String = Json.stringify(json)
 

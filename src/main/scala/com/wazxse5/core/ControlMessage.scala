@@ -1,5 +1,7 @@
 package com.wazxse5.core
 
-import com.wazxse5.api.message.Message
+import com.wazxse5.api.message.YeelightMessage
 
-trait ControlMessage extends Message
+trait ControlMessage extends YeelightMessage
+
+

@@ -1,7 +1,7 @@
 package com.wazxse5.core
 
 import com.wazxse5.api.InternalId
-import com.wazxse5.api.message.DeviceInfoMessage
+import com.wazxse5.api.message.DeviceInfoLike
 import com.wazxse5.api.valuetype._
 import com.wazxse5.core.connection.NetworkLocation
 
@@ -61,13 +61,45 @@ case class DeviceInfo(
     bgPower = stateUpdate.bgPower.orElse(bgPower),
     bgRgb = stateUpdate.bgRgb.orElse(bgRgb),
     bgSaturation = stateUpdate.bgSaturation.orElse(bgSaturation),
-    bgTemperature = stateUpdate.bgTemperature.orElse(bgTemperature),
+    bgTemperature = stateUpdate.bgTemperature.orElse(bgTemperature)
+  )
+  
+  def update(deviceInfo: DeviceInfo): DeviceInfo = copy(
+    location = deviceInfo.location.orElse(location),
+    //
+    id = deviceInfo.id.orElse(id),
+    model = deviceInfo.model.orElse(model),
+    firmwareVersion = deviceInfo.firmwareVersion.orElse(firmwareVersion),
+    supportedCommands = deviceInfo.supportedCommands.orElse(supportedCommands),
+    //
+    brightness = deviceInfo.brightness.orElse(brightness),
+    colorMode = deviceInfo.colorMode.orElse(colorMode),
+    flowExpression = deviceInfo.flowExpression.orElse(flowExpression),
+    flowPower = deviceInfo.flowPower.orElse(flowPower),
+    hue = deviceInfo.hue.orElse(hue),
+    musicPower = deviceInfo.musicPower.orElse(musicPower),
+    name = deviceInfo.name.orElse(name),
+    power = deviceInfo.power.orElse(power),
+    rgb = deviceInfo.rgb.orElse(rgb),
+    saturation = deviceInfo.saturation.orElse(saturation),
+    temperature = deviceInfo.temperature.orElse(temperature),
+    timerValue = deviceInfo.timerValue.orElse(timerValue),
+    //
+    bgBrightness = deviceInfo.bgBrightness.orElse(bgBrightness),
+    bgColorMode = deviceInfo.bgColorMode.orElse(bgColorMode),
+    bgFlowExpression = deviceInfo.bgFlowExpression.orElse(bgFlowExpression),
+    bgFlowPower = deviceInfo.bgFlowPower.orElse(bgFlowPower),
+    bgHue = deviceInfo.bgHue.orElse(bgHue),
+    bgPower = deviceInfo.bgPower.orElse(bgPower),
+    bgRgb = deviceInfo.bgRgb.orElse(bgRgb),
+    bgSaturation = deviceInfo.bgSaturation.orElse(bgSaturation),
+    bgTemperature = deviceInfo.bgTemperature.orElse(bgTemperature)
   )
 }
 
 object DeviceInfo {
 
-  def apply(message: DeviceInfoMessage, isConnected: Boolean): DeviceInfo = new DeviceInfo(
+  def apply(message: DeviceInfoLike, isConnected: Boolean): DeviceInfo = new DeviceInfo(
     InternalId.generate,
     Some(NetworkLocation(message.locationAddress, message.locationPort)),
     isConnected,

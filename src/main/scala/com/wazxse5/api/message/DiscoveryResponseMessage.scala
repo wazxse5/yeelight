@@ -23,7 +23,7 @@ case class DiscoveryResponseMessage private(
   saturation: Int,
   name: String,
   text: String
-) extends DeviceInfoMessage {
+) extends YeelightUnconnectedMessage with DeviceInfoLike {
 
   def headerCode: Int = header.substring(9, 12).toInt
 

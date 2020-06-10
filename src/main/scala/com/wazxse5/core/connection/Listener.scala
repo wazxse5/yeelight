@@ -3,10 +3,10 @@ package com.wazxse5.core.connection
 import akka.actor.{ActorRef, Props}
 import akka.io.Udp.{Bound, Received}
 import com.wazxse5.api.message.AdvertisementMessage
-import com.wazxse5.api.model.YeelightService
+import com.wazxse5.core.ConnectionAdapter
 import com.wazxse5.core.connection.Listener.{Start, Stop}
 
-class Listener(service: YeelightService) extends YeelightActor {
+class Listener(adapter  : ConnectionAdapter) extends ConnectionActor {
   val opts = List(Inet6ProtocolFamily, MultiCastGroup("239.255.255.250"))
 
 //  IO(Udp) ! Bind(self, new InetSocketAddress(1982), opts) // TODO: do zrobienia
@@ -15,7 +15,7 @@ class Listener(service: YeelightService) extends YeelightActor {
     case Received(data, sender) =>
       logger.info(s"${this.getClass.getSimpleName} received from $sender")
       val advertisementMessage = AdvertisementMessage(data.utf8String)
-      if (advertisementMessage.isValid) service.handleMessage(advertisementMessage)
+      if (advertisementMessage.isValid) adapter.handleMessage(advertisementMessage)
     case Stop =>
       context.become(receiveReadyStop(connection))
   }
@@ -37,5 +37,5 @@ object Listener {
   final case object Start
   final case object Stop
 
-  def props(service: YeelightService): Props = Props(new Listener(service))
+  def props(adapter: ConnectionAdapter): Props = Props(new Listener(adapter))
 }

@@ -1,6 +1,6 @@
 package com.wazxse5.api.valuetype
 
-import com.wazxse5.core.exception.EmptyParamException
+import com.wazxse5.api.exception.EmptyParamException
 
 case object EmptyParam extends Parameter[String] {
   override def value = throw new EmptyParamException

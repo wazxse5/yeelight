@@ -7,12 +7,12 @@ import akka.io.Udp._
 import akka.io.{IO, Udp}
 import akka.util.ByteString
 import com.wazxse5.api.message.{DiscoveryMessage, DiscoveryResponseMessage}
-import com.wazxse5.api.model.YeelightService
+import com.wazxse5.core.ConnectionAdapter
 import com.wazxse5.core.connection.Discoverer.Search
 
 import scala.jdk.CollectionConverters._
 
-class Discoverer(service: YeelightService) extends YeelightActor {
+class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
   val remote: InetSocketAddress = new InetSocketAddress("239.255.255.250", 1982)
 
   findLocalInetSocketAddress match {
@@ -25,7 +25,7 @@ class Discoverer(service: YeelightService) extends YeelightActor {
       connection ! Send(ByteString(DiscoveryMessage.text), remote)
     case Received(data, sender) =>
       val discoveryMessage = DiscoveryResponseMessage(data.utf8String)
-      if (discoveryMessage.isValid) service.handleMessage(discoveryMessage)
+      if (discoveryMessage.isValid) adapter.handleMessage(discoveryMessage)
     case Unbind =>
       connection ! Unbind
     case Unbound =>
@@ -54,7 +54,7 @@ class Discoverer(service: YeelightService) extends YeelightActor {
 object Discoverer {
   final case object Search
 
-  def props(service: YeelightService): Props = Props(new Discoverer(service))
+  def props(adapter: ConnectionAdapter): Props = Props(new Discoverer(adapter))
 }
 
 

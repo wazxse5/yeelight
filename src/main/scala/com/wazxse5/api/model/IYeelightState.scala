@@ -2,8 +2,8 @@ package com.wazxse5.api.model
 
 import java.time.LocalDateTime
 
+import com.wazxse5.api.exception.UnsupportedPropertyException
 import com.wazxse5.api.valuetype._
-import com.wazxse5.core.exception.UnsupportedPropertyException
 
 trait IYeelightState {
   def brightness: Option[Brightness] = throw new UnsupportedPropertyException

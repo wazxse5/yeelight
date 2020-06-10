@@ -1,27 +1,22 @@
 package com.wazxse5.api.model
 
-import akka.actor.{ActorRef, ActorSystem}
 import com.typesafe.scalalogging.StrictLogging
 import com.wazxse5.api.InternalId
-import com.wazxse5.api.command.YeelightCommand
+import com.wazxse5.api.command.{GetProps, YeelightCommand}
 import com.wazxse5.api.message._
-import com.wazxse5.core.connection.{Connector, Discoverer, Listener, NetworkLocation}
-import com.wazxse5.core._
+import com.wazxse5.core.connection.{Connector, NetworkLocation}
+import com.wazxse5.core.{ControlMessage, _}
 
 class YeelightService extends IYeelightService with StrictLogging {
   private implicit val service: YeelightService = this
-  private implicit val actorSystem: ActorSystem = ActorSystem("yeelight-actor-system")
-
-  private val discoverer: ActorRef = actorSystem.actorOf(Discoverer.props(service = this))
-  private val listener: ActorRef = actorSystem.actorOf(Listener.props(service = this))
 
   private val knownDevices: KnownDevices = new KnownDevices
   private val messageRegistry: MessageRegistry = new MessageRegistry
+  override val connectionAdapter: ConnectionAdapter = new RealConnectionAdapter(service = this)
 
+  override def devices: Set[IYeelightDevice] = knownDevices.all.map(YeelightDevice(_)).toSet
 
-  override def devices: Set[IYeelightDevice] = knownDevices.all.map(cdi => YeelightDevice(cdi.deviceInfo)).toSet
-
-  override def deviceInfo(internalId: InternalId): Option[DeviceInfo] = knownDevices.find(internalId).map(_.deviceInfo)
+  override def deviceInfo(internalId: InternalId): Option[DeviceInfo] = knownDevices.find(internalId)
 
   override def deviceOf(deviceInfo: DeviceInfo): IYeelightDevice = ??? // TODO:
 
@@ -29,66 +24,72 @@ class YeelightService extends IYeelightService with StrictLogging {
     val location = NetworkLocation(address, port)
     knownDevices.findByLocation(location) match {
       case Some(existingDevice) =>
-        YeelightDevice(existingDevice.deviceInfo)
+        YeelightDevice(existingDevice)
       case None =>
-        val newDevice = KnownDevice(DeviceInfo(location))
+        val newDevice = DeviceInfo(location)
         knownDevices.add(newDevice)
-        YeelightDevice(newDevice.deviceInfo)
+        connectionAdapter.connect(newDevice.internalId, location)
+        performCommand(newDevice.internalId, GetProps.all)
+        YeelightDevice(newDevice)
     }
   }
 
-  override def search(): Unit = discoverer ! Discoverer.Search
+  override def search(): Unit = connectionAdapter.search()
 
-  override def startListening(): Unit = listener ! Listener.Start
+  override def startListening(): Unit = connectionAdapter.startListening()
 
-  override def stopListening(): Unit = listener ! Listener.Stop
+  override def stopListening(): Unit = connectionAdapter.stopListening()
 
-  def performCommand(internalId: InternalId, command: YeelightCommand): Unit = {
-    knownDevices.find(internalId) match {
-      case Some(device) =>
-        val message = CommandMessage(command, internalId)
-        messageRegistry.put(message)
-        device.sendMessage(message)
-      case None => logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
+  override def performCommand(internalId: InternalId, command: YeelightCommand): Unit = {
+    if (knownDevices.contains(internalId)) {
+      val message = CommandMessage(command, internalId)
+      messageRegistry.put(message)
+      connectionAdapter.send(message)
     }
+    else logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
   }
 
-  def handleMessage(message: Message): Unit = message match {
-    case apiMessage: ApiMessage => handleApiMessage(apiMessage)
+  def handleMessage(message: YeelightMessage): Unit = message match {
+    case apiMessage: YeelightApiMessage => handleApiMessage(apiMessage)
     case controlMessage: ControlMessage => handleControlMessage(controlMessage)
   }
 
-  private def handleApiMessage(message: ApiMessage): Unit = message match {
-    case deviceInfoMessage: DeviceInfoMessage =>
+  private def handleApiMessage(message: YeelightApiMessage): Unit = message match {
+    case deviceInfoMessage: DeviceInfoLike =>
       handleDeviceInfoMessage(deviceInfoMessage)
     case resultMessage: CommandResultMessage =>
-      messageRegistry.put(resultMessage)
-      val relatedCommand = messageRegistry.getCommand(resultMessage)
-      val deviceToUpdate = knownDevices.find(resultMessage.deviceId)
-      val stateUpdate = relatedCommand.map(StateUpdate(_, resultMessage))
-      deviceToUpdate.foreach(_.update(stateUpdate))
+      handleResultMessage(resultMessage)
     case notification: NotificationMessage =>
-      val deviceToUpdate = knownDevices.find(notification.deviceId)
-      deviceToUpdate.foreach(_.update(notification.toStateUpdate))
+      knownDevices.update(notification.deviceId, notification.toStateUpdate)
     case _ =>
-      println(s"Unknown command  ${message.json}")
+      println(s"Unknown message: $message")
   }
 
   private def handleControlMessage(message: ControlMessage): Unit = message match {
     case Connector.ConnectionSucceeded(deviceInternalId) =>
-      knownDevices.find(deviceInternalId).foreach(_.update(isConnected = true))
+      knownDevices.update(deviceInternalId, isConnected = true)
     case Connector.Disconnected(deviceInternalId) =>
-      knownDevices.find(deviceInternalId).foreach(_.update(isConnected = false))
+      knownDevices.update(deviceInternalId, isConnected = false)
   }
 
-  private def handleDeviceInfoMessage(message: DeviceInfoMessage): Unit = {
+  private def handleDeviceInfoMessage(message: DeviceInfoLike): Unit = {
     val location = NetworkLocation(message.location, message.locationPort)
     knownDevices.findByLocation(location) match {
       case Some(device) =>
         val newDeviceInfo = DeviceInfo(message, isConnected = device.isConnected)
         device.update(newDeviceInfo)
       case None =>
-        knownDevices.add(KnownDevice(DeviceInfo(message, isConnected = false)))
+        val newDeviceInfo = DeviceInfo(message, isConnected = false)
+        knownDevices.add(newDeviceInfo)
+        connectionAdapter.connect(newDeviceInfo.internalId, location)
     }
   }
+
+  private def handleResultMessage(message: CommandResultMessage): Unit = {
+    messageRegistry.put(message)
+    val relatedCommand = messageRegistry.getCommand(message)
+    val stateUpdate = relatedCommand.map(StateUpdate(_, message))
+    stateUpdate.foreach(knownDevices.update(message.deviceId, _))
+  }
+
 }

@@ -6,7 +6,13 @@ import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Random
 
-case class CommandMessage private(id: Int, deviceId: InternalId, commandName: String, arguments: Seq[JsValue]) extends IdentifiableMessage {
+case class CommandMessage private(
+  id: Int,
+  deviceId: InternalId,
+  commandName: String,
+  arguments: Seq[JsValue]
+) extends YeelightConnectedMessage with Identifiable {
+
   override def isValid: Boolean = true
 
   override def json: JsValue = Json.obj(
@@ -16,7 +22,6 @@ case class CommandMessage private(id: Int, deviceId: InternalId, commandName: St
   )
 
   override def text: String = Json.stringify(json) + "\r\n"
-
 }
 
 object CommandMessage {
