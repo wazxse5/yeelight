@@ -1,5 +1,6 @@
 package com.wazxse5.api.valuetype
 
+import com.wazxse5.api.exception.InvalidParamValueException
 import play.api.libs.json.{JsString, JsValue}
 
 sealed trait Effect extends Parameter[String] {
@@ -18,11 +19,14 @@ object Effect {
   def apply(value: String): Effect = value match {
     case Sudden.value => Sudden
     case Smooth.value => Smooth
+    case _ => throw new InvalidParamValueException(value)
   }
 
   def sudden: Effect = Sudden
 
   def smooth: Effect = Smooth
+
+  def values = Set(Sudden.value, Smooth.value)
 
 }
 

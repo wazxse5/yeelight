@@ -27,6 +27,8 @@ object Rgb {
     new Rgb(value)
   }
 
+  def apply(name: String): Rgb = predefinedColors(name)
+
   def red: Rgb = apply(255, 0, 0)
 
   def green: Rgb = apply(0, 255, 0)
@@ -35,5 +37,12 @@ object Rgb {
 
   def yellow: Rgb = apply(255, 255, 0)
 
-  // TODO: Dodać metody ułatwiające tworzenie instancji z różnych rzeczy
+  val predefinedColors: Map[String, Rgb] = Map(
+    "red" -> red,
+    "green" -> green,
+    "blue" -> blue,
+    "yellow" -> yellow
+  )
+
+  val predefinedColorsNames: Set[String] = predefinedColors.keySet
 }

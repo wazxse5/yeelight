@@ -8,3 +8,7 @@ case class SetName(p1: Name) extends YeelightCommand1 {
   override def p1Mandatory: Boolean = true
 
 }
+
+object SetName {
+  def apply(name: String): SetName = new SetName(Name(name))
+}

@@ -22,4 +22,6 @@ trait ConnectionAdapter {
   def send(message: CommandMessage): Unit
 
   def handleMessage(message: YeelightMessage): Unit
+
+  def exit: Int
 }

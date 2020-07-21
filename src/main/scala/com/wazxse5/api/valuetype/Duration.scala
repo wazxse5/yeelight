@@ -2,6 +2,8 @@ package com.wazxse5.api.valuetype
 
 import play.api.libs.json.{JsNumber, JsValue}
 
+import scala.concurrent.duration._
+
 case class Duration(value: Int) extends Parameter[Int] {
   override val paramName: String = Duration.paramName
 
@@ -14,4 +16,8 @@ case class Duration(value: Int) extends Parameter[Int] {
 
 object Duration {
   val paramName = "duration"
+
+  implicit def finiteDurationToDuration(finiteDuration: FiniteDuration): Duration = {
+    Duration(finiteDuration.toMillis.toInt)
+  }
 }

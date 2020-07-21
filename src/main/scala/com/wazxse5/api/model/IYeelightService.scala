@@ -27,4 +27,6 @@ trait IYeelightService {
 
   def connectionAdapter: ConnectionAdapter
 
+  def exit: Int = connectionAdapter.exit
+
 }

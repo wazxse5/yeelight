@@ -6,6 +6,11 @@ import com.wazxse5.api.model.IYeelightService
 import com.wazxse5.core.connection.Connector.Send
 import com.wazxse5.core.connection.{Connector, Discoverer, Listener, NetworkLocation}
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.language.postfixOps
+import scala.util.{Failure, Success, Try}
+
 class RealConnectionAdapter(val service: IYeelightService) extends ConnectionAdapter {
 
   private implicit val actorSystem: ActorSystem = ActorSystem("yeelight-actor-system")
@@ -31,4 +36,11 @@ class RealConnectionAdapter(val service: IYeelightService) extends ConnectionAda
   }
 
   override def handleMessage(message: YeelightMessage): Unit = service.handleMessage(message)
+
+  override def exit: Int = {
+    Try(Await.result(actorSystem.terminate(), 5 seconds)) match {
+      case Success(_) => 0
+      case Failure(_) => -1
+    }
+  }
 }

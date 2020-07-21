@@ -3,113 +3,93 @@ package com.wazxse5.cli
 import com.wazxse5.api.InternalId
 import com.wazxse5.api.command._
 import com.wazxse5.api.model.IYeelightService
-import com.wazxse5.api.valuetype.Power
-import com.wazxse5.cli.CLI._
+import com.wazxse5.cli.CliCommands._
+import com.wazxse5.cli.exception.{AliasReservedKeyWordException, AliasTaken, CliException, UnknownCommandException}
 
 import scala.collection.mutable.{Map => MutableMap}
 
-class CLI(service: IYeelightService) {
+class CLI(yeelightService: IYeelightService) {
 
   private var cliDevices: MutableMap[InternalId, CliDevice] = MutableMap.empty
 
   def perform(string: String): Unit = {
-    val words = string.split(' ').toList
-    if (words.headOption.exists(keywords.contains))
-      performService(words)
-    else if (words.length > 1) {
-      findDeviceInternalId(words.head) match {
-        case Some(deviceInternalId) => performDevice(deviceInternalId, words.tail)
-        case None => println("Cannot find device")
+    try {
+      val words = string.split(' ').toList
+      if (words.isEmpty) throw UnknownCommandException.emptyCommand
+      else {
+        val (head, tail) = (words.head, words.tail)
+        if (app._commands.contains(head)) performForApp(head)
+        else if (service._commands.contains(head)) performForService(head, tail)
+        else if (head == allDevices_) performForAllDevices(tail)
+        else findCliDevice(head) match {
+          case Some(cliDevice) => performForSingleDevice(tail)(cliDevice)
+          case None => throw UnknownCommandException(head)
+        }
       }
-    }
-    else println(unknownCommand)
-  }
-
-  private def findDeviceInternalId(identifier: String): Option[InternalId] = {
-    lazy val asAlias = cliDevices.collectFirst {
-      case (uid, cliDevice) if cliDevice.alias.contains(identifier) => uid
-    }
-    lazy val asCliId = cliDevices.collectFirst {
-      case (uid, cliDevice) if cliDevice.cliId == identifier => uid
-    }
-    lazy val asId = cliDevices.collectFirst {
-      case (uid, cliDevice) if cliDevice.yeelightDevice.id.contains(identifier) => uid
-    }
-    lazy val asInternalId = cliDevices.collectFirst {
-      case (uid, _) if uid.id == identifier => uid
-    }
-
-    asCliId orElse asAlias orElse asId orElse asInternalId
-  }
-
-  private def performService(words: List[String]): Unit = if (words.nonEmpty) {
-    words.head match {
-      case CLI.discover => service.search()
-      case CLI.deviceOf => createNewDevice(words.tail)
-      case CLI.devices => cliDevices.foreach(c => println(c._2.simpleInfo))
-      case CLI.exit => System.exit(0)
-      case _ => println(unknownCommand)
+    } catch {
+      case e: CliException => println(e.cliMessage)
     }
   }
 
-  private def performDevice(deviceInternalId: InternalId, words: List[String]): Unit = if (words.nonEmpty) {
-    def performCommand(command: YeelightCommand): Unit = service.performCommand(deviceInternalId, command)
+  private def performForApp(command: String): Unit = command match {
+    case app.exit =>
+      yeelightService.exit
+      System.exit(0)
+    case _ => throw UnknownCommandException(command)
+  }
 
-    words.head match {
-      case CLI.on => performCommand(SetPower(Power.on))
-      case CLI.off => performCommand(SetPower(Power.off))
-      case CLI.set if words.length > 1 => words(1) match {
-        case CLI.alias => setAlias(deviceInternalId, words(2))
-        case CLI.brightness => performCommand(SetBrightness(words(2).toInt))
-        case CLI.temperature => performCommand(SetTemperature(words(2).toInt))
-        case CLI.color => performCommand(SetRgb(words(2).toInt))
-      }
-      case CLI.refresh => performCommand(GetProps.all)
-      case CLI.state => println(cliDevices(deviceInternalId).state)
-      case _ => println(unknownCommand)
+  private def performForService(command: String, tail: List[String]): Unit = command match {
+    case service.deviceOf => createNewDevice(tail)
+    case service.devices => cliDevices.foreach(c => println(c._2.simpleInfo))
+    case service.discover => yeelightService.search()
+    case service.listen => tail.headOption match {
+      case Some(service.listenOff) => yeelightService.stopListening()
+      case None | Some(service.listenOn) => yeelightService.startListening()
+      case other => throw UnknownCommandException(other, Seq(service.listenOn, service.listenOff))
+    }
+    case _ => throw UnknownCommandException(command)
+  }
+
+  private def performForAllDevices(commands: List[String]): Unit = {
+    cliDevices.values.foreach(performForSingleDevice(commands)(_))
+  }
+
+  private def performForSingleDevice(commands: List[String])(implicit cliDevice: CliDevice): Unit = {
+    commands.head match {
+      case device.decrease_ => CliDevicePerformer.decrease(commands.tail)
+      case device.increase_ => CliDevicePerformer.increase(commands.tail)
+      case device.get_ => CliDevicePerformer.get(commands.tail)
+      case device.set_ => CliDevicePerformer.set(commands.tail, this)
+      case device.set.on => CliDevicePerformer.on(commands.tail)
+      case device.set.off => CliDevicePerformer.off(commands.tail)
+      case device.refresh => CliDevicePerformer.refresh(commands.tail)
+      case device.state => CliDevicePerformer.state(commands.tail)
+      case device.toggle => CliDevicePerformer.toggle(commands.tail)
+      case other => throw UnknownCommandException(Some(other), device._commands)
     }
   }
 
-  private def createNewDevice(words: List[String]): Unit = {
-    words.headOption match {
-      case Some(address) =>
-        val newDevice = service.deviceOf(address)
-        newDevice.performCommand(GetProps.all)
-        val newCliDevice = CliDevice(newDevice, words.lift(1))
-        insertOrUpdateCliDevice(newCliDevice)
-      case None =>
-    }
+  private def findCliDevice(identifier: String): Option[CliDevice] = cliDevices.collectFirst {
+    case (_, cliDevice) if cliDevice.cliId == identifier || cliDevice.alias.contains(identifier) => cliDevice
   }
 
-  private def setAlias(deviceInternalId: InternalId, alias: String): Unit = {
-    if (!CLI.keywords.contains(alias)) cliDevices.get(deviceInternalId).foreach(_.setAlias(alias))
-    else println("Alias is reserved keyword")
+  private def createNewDevice(words: List[String]): Unit = words.headOption match {
+    case Some(address) =>
+      val newDevice = yeelightService.deviceOf(address)
+      newDevice.performCommand(GetProps.all)
+      val newCliDevice = CliDevice(newDevice, words.lift(1))
+      insertOrUpdateCliDevice(newCliDevice)
+    case None =>
+  }
+
+  def isAliasAvailable(alias: String): Boolean = {
+    if (CliCommands._keywords.contains(alias)) throw AliasReservedKeyWordException(alias)
+    else if (cliDevices.flatMap(_._2.alias).toSet.contains(alias)) throw AliasTaken(alias)
+    else true
   }
 
   private def insertOrUpdateCliDevice(cliDeviceInfo: CliDevice): Unit = {
     cliDevices += cliDeviceInfo.yeelightDevice.internalId -> cliDeviceInfo
   }
 
-}
-
-object CLI {
-  val discover = "discover"
-  val deviceOf = "deviceof"
-  val devices = "devices"
-  val exit = "exit"
-
-  val on = "on"
-  val off = "off"
-  val set = "set"
-  val state = "state"
-  val refresh = "refresh"
-  val alias = "alias"
-  val brightness = "brightness"
-  val temperature = "temperature"
-  val color = "color"
-
-  val unknownCommand = "unknown command"
-
-
-  val keywords: Set[String] = Set(discover, deviceOf, devices, exit, on, off, set, alias)
 }
