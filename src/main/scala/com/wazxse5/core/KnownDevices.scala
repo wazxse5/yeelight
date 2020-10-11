@@ -1,7 +1,6 @@
 package com.wazxse5.core
 
-import com.wazxse5.api.InternalId
-import com.wazxse5.core.connection.NetworkLocation
+import com.wazxse5.connection.NetworkLocation
 
 class KnownDevices {
 

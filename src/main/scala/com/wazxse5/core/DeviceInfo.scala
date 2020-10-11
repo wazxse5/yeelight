@@ -1,9 +1,8 @@
 package com.wazxse5.core
 
-import com.wazxse5.api.InternalId
-import com.wazxse5.api.message.DeviceInfoLike
-import com.wazxse5.api.valuetype._
-import com.wazxse5.core.connection.NetworkLocation
+import com.wazxse5.connection.NetworkLocation
+import com.wazxse5.message.DeviceInfoMessage
+import com.wazxse5.valuetype._
 
 case class DeviceInfo(
   internalId: InternalId,
@@ -99,7 +98,7 @@ case class DeviceInfo(
 
 object DeviceInfo {
 
-  def apply(message: DeviceInfoLike, isConnected: Boolean): DeviceInfo = new DeviceInfo(
+  def apply(message: DeviceInfoMessage, isConnected: Boolean): DeviceInfo = new DeviceInfo(
     InternalId.generate,
     Some(NetworkLocation(message.locationAddress, message.locationPort)),
     isConnected,

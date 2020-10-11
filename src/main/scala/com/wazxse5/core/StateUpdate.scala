@@ -1,8 +1,8 @@
 package com.wazxse5.core
 
-import com.wazxse5.api.command.GetProps
-import com.wazxse5.api.message.{CommandMessage, CommandResultMessage, NotificationMessage}
-import com.wazxse5.api.valuetype._
+import com.wazxse5.command.GetProps
+import com.wazxse5.message.{CommandMessage, CommandResultMessage, NotificationMessage}
+import com.wazxse5.valuetype._
 import play.api.libs.json.JsString
 
 case class StateUpdate(newProps: Seq[Property[_]]) {

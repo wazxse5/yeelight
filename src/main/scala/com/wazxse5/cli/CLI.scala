@@ -1,14 +1,13 @@
 package com.wazxse5.cli
 
-import com.wazxse5.api.InternalId
-import com.wazxse5.api.command._
-import com.wazxse5.api.model.IYeelightService
 import com.wazxse5.cli.CliCommands._
 import com.wazxse5.cli.exception.{AliasReservedKeyWordException, AliasTaken, CliException, UnknownCommandException}
+import com.wazxse5.command._
+import com.wazxse5.core.{InternalId, YeelightService}
 
 import scala.collection.mutable.{Map => MutableMap}
 
-class CLI(yeelightService: IYeelightService) {
+class CLI(yeelightService: YeelightService) {
 
   private var cliDevices: MutableMap[InternalId, CliDevice] = MutableMap.empty
 

@@ -1,7 +1,7 @@
 package com.wazxse5
 
-import com.wazxse5.api.model.YeelightService
 import com.wazxse5.cli.CLI
+import com.wazxse5.core.MYeelightService
 
 import scala.io.StdIn
 
@@ -9,7 +9,7 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val service = new YeelightService
+    val service = new MYeelightService
 
     val cli = new CLI(service)
     cli.perform("deviceof 192.168.0.101 prawa")

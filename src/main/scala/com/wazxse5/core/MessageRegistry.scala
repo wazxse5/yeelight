@@ -1,6 +1,6 @@
 package com.wazxse5.core
 
-import com.wazxse5.api.message.{CommandMessage, CommandResultMessage}
+import com.wazxse5.message.{CommandMessage, CommandResultMessage}
 
 class MessageRegistry {
   private var commandMessages: Map[Int, CommandMessage] = Map.empty

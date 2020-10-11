@@ -1,14 +1,14 @@
 package com.wazxse5.cli
 
-import com.wazxse5.api.model.IYeelightDevice
-import com.wazxse5.api.valuetype.Property
 import com.wazxse5.cli.CliDevice._
+import com.wazxse5.core.YeelightDevice
+import com.wazxse5.valuetype.Property
 
 
-class CliDevice private(_yeelightDevice: IYeelightDevice, _alias: Option[String]) {
+class CliDevice private(_yeelightDevice: YeelightDevice, _alias: Option[String]) {
   val cliId: String = nextCliId
   var alias: Option[String] = _alias
-  val yeelightDevice: IYeelightDevice = _yeelightDevice
+  val yeelightDevice: YeelightDevice = _yeelightDevice
 
   def setAlias(newAlias: Option[String]): Unit = alias = newAlias
 
@@ -32,7 +32,7 @@ class CliDevice private(_yeelightDevice: IYeelightDevice, _alias: Option[String]
 }
 
 object CliDevice {
-  def apply(yeelightDevice: IYeelightDevice, alias: Option[String] = None): CliDevice =
+  def apply(yeelightDevice: YeelightDevice, alias: Option[String] = None): CliDevice =
     new CliDevice(yeelightDevice, alias)
 
   private var cliIdCounter = 0

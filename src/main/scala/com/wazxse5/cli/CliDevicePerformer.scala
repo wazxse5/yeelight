@@ -1,9 +1,9 @@
 package com.wazxse5.cli
 
-import com.wazxse5.api.command.{AdjustBrightness, AdjustTemperature, GetProps, SetBrightness, SetName, SetPower, SetRgb, SetTemperature, Toggle, YeelightCommand}
-import com.wazxse5.api.valuetype._
 import com.wazxse5.cli.CliCommands._
 import com.wazxse5.cli.exception.{InvalidParamValueCommandException, NotImplementedCommandException, UnknownCommandException}
+import com.wazxse5.command.{AdjustBrightness, AdjustTemperature, GetProps, SetBrightness, SetName, SetPower, SetRgb, SetTemperature, Toggle, YeelightCommand}
+import com.wazxse5.valuetype._
 
 object CliDevicePerformer {
 
