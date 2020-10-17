@@ -23,7 +23,7 @@ case class AdvertisementMessage private(
   saturation: Int,
   name: String,
   override val text: String
-) extends InternalUnconnectedMessage with DeviceInfoMessage {
+) extends YeelightUnconnectedMessage with DeviceInfoMessage {
 
   def headerCode: Int = header.substring(9, 12).toInt
 

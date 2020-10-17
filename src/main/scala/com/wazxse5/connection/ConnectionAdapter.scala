@@ -1,7 +1,7 @@
 package com.wazxse5.connection
 
 import com.wazxse5.core.{InternalId, YeelightService}
-import com.wazxse5.message.{CommandMessage, YeelightMessage}
+import com.wazxse5.message.{CommandMessage, Message}
 
 trait ConnectionAdapter {
 
@@ -19,7 +19,7 @@ trait ConnectionAdapter {
 
   def send(message: CommandMessage): Unit
 
-  def handleMessage(message: YeelightMessage): Unit
+  def handleMessage(message: Message): Unit
 
   def exit: Int
 }

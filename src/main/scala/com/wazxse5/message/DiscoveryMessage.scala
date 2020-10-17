@@ -1,7 +1,7 @@
 package com.wazxse5.message
 import play.api.libs.json.{JsNull, JsValue}
 
-object DiscoveryMessage extends InternalUnconnectedMessage {
+object DiscoveryMessage extends YeelightUnconnectedMessage {
 
   override def json: JsValue = JsNull
 

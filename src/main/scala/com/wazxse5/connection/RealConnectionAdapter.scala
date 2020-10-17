@@ -3,7 +3,7 @@ package com.wazxse5.connection
 import akka.actor.{ActorRef, ActorSystem}
 import com.wazxse5.connection.Connector.Send
 import com.wazxse5.core.{InternalId, YeelightService}
-import com.wazxse5.message.{CommandMessage, YeelightMessage}
+import com.wazxse5.message.{CommandMessage, Message}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -34,7 +34,7 @@ class RealConnectionAdapter(val service: YeelightService) extends ConnectionAdap
     connectors.get(message.deviceId) foreach (_ ! Send(message))
   }
 
-  override def handleMessage(message: YeelightMessage): Unit = service.handleMessage(message)
+  override def handleMessage(message: Message): Unit = service.handleMessage(message)
 
   override def exit: Int = {
     Try(Await.result(actorSystem.terminate(), 5 seconds)) match {

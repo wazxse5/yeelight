@@ -11,7 +11,7 @@ case class CommandResultMessage private (
   errorMessage: Option[String] = None,
   json: JsValue,
   isValid: Boolean = true,
-) extends InternalConnectedMessage with Identifiable {
+) extends YeelightConnectedMessage with Identifiable {
 
   override def text: String = Json.stringify(json)
 

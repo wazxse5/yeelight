@@ -5,9 +5,9 @@ import com.wazxse5.core.InternalId
 import com.wazxse5.exception.InvalidMessageException
 import play.api.libs.json.JsValue
 
-trait YeelightMessage extends StrictLogging
+trait Message extends StrictLogging
 
-sealed trait InternalApiMessage extends YeelightMessage {
+sealed trait YeelightMessage extends Message {
   def isValid: Boolean
 
   def json: JsValue
@@ -15,9 +15,9 @@ sealed trait InternalApiMessage extends YeelightMessage {
   def text: String
 }
 
-trait InternalUnconnectedMessage extends InternalApiMessage
+trait YeelightUnconnectedMessage extends YeelightMessage
 
-trait InternalConnectedMessage extends InternalApiMessage {
+trait YeelightConnectedMessage extends YeelightMessage {
   val deviceId: InternalId
 }
 
@@ -26,9 +26,9 @@ trait Identifiable {
 }
 
 
-object InternalConnectedMessage {
+object YeelightConnectedMessage {
 
-  def fromJson(json: JsValue, deviceInternalId: InternalId): InternalConnectedMessage = {
+  def fromJson(json: JsValue, deviceInternalId: InternalId): YeelightConnectedMessage = {
     val id = json \ "id"
     val result = json \ "result"
     val error = json \ "error"

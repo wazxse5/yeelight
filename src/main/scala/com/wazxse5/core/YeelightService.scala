@@ -2,7 +2,7 @@ package com.wazxse5.core
 
 import com.wazxse5.command.YeelightCommand
 import com.wazxse5.connection.ConnectionAdapter
-import com.wazxse5.message.YeelightMessage
+import com.wazxse5.message.Message
 
 trait YeelightService {
 
@@ -22,7 +22,7 @@ trait YeelightService {
 
   def performCommand(internalId: InternalId, command: YeelightCommand): Unit
 
-  def handleMessage(message: YeelightMessage): Unit
+  def handleMessage(message: Message): Unit
 
   def connectionAdapter: ConnectionAdapter
 

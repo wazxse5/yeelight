@@ -97,12 +97,13 @@ object CliCommands {
   }
 
   object message {
-    val emptyCommand = "emptyCommand command"
-    val unknownCommand = "unknown command"
-    val unsupportedCommand = "unsupported command"
-    val unknownDevice = "unknown device"
     val aliasReservedKeyword = "alias is reserved keyword"
     val aliasTaken = "alias is taken"
+    val emptyCommand = "emptyCommand command"
+    val noDevices = "no devices"
+    val unknownCommand = "unknown command"
+    val unknownDevice = "unknown device"
+    val unsupportedCommand = "unsupported command"
   }
 
   val _keywords: Seq[String] = app._commands :++ service._commands :++ device._commands :++ device._keywords

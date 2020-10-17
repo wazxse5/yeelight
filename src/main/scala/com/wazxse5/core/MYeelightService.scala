@@ -19,6 +19,7 @@ class MYeelightService extends YeelightService with StrictLogging {
   override def deviceOf(deviceInfo: DeviceInfo): YeelightDevice = ??? // TODO:
 
   override def deviceOf(address: String, port: Int = 55443): YeelightDevice = {
+    logger.info(s"Adding new device (deviceOf) on address=$address port=$port")
     val location = NetworkLocation(address, port)
     knownDevices.findByLocation(location) match {
       case Some(existingDevice) =>
@@ -32,13 +33,23 @@ class MYeelightService extends YeelightService with StrictLogging {
     }
   }
 
-  override def search(): Unit = connectionAdapter.search()
+  override def search(): Unit = {
+    logger.info(s"Searching for new devices")
+    connectionAdapter.search()
+  }
 
-  override def startListening(): Unit = connectionAdapter.startListening()
+  override def startListening(): Unit = {
+    logger.info("Start listening")
+    connectionAdapter.startListening()
+  }
 
-  override def stopListening(): Unit = connectionAdapter.stopListening()
+  override def stopListening(): Unit = {
+    logger.info("Stop listening")
+    connectionAdapter.stopListening()
+  }
 
   override def performCommand(internalId: InternalId, command: YeelightCommand): Unit = {
+    logger.info(s"Performing command on device internalId=$internalId command=$command")
     if (knownDevices.contains(internalId)) {
       val message = CommandMessage(command, internalId)
       messageRegistry.put(message)
@@ -47,12 +58,12 @@ class MYeelightService extends YeelightService with StrictLogging {
     else logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
   }
 
-  def handleMessage(message: YeelightMessage): Unit = message match {
-    case apiMessage: InternalApiMessage => handleApiMessage(apiMessage)
+  def handleMessage(message: Message): Unit = message match {
+    case yeelightMessage: YeelightMessage => handleYeelightMessage(yeelightMessage)
     case controlMessage: ControlMessage => handleControlMessage(controlMessage)
   }
 
-  private def handleApiMessage(message: InternalApiMessage): Unit = message match {
+  private def handleYeelightMessage(message: YeelightMessage): Unit = message match {
     case deviceInfoMessage: DeviceInfoMessage =>
       handleDeviceInfoMessage(deviceInfoMessage)
     case resultMessage: CommandResultMessage =>
@@ -71,14 +82,16 @@ class MYeelightService extends YeelightService with StrictLogging {
   }
 
   private def handleDeviceInfoMessage(message: DeviceInfoMessage): Unit = {
-    val location = NetworkLocation(message.location, message.locationPort)
+    val location = NetworkLocation(message.locationAddress, message.locationPort)
     knownDevices.findByLocation(location) match {
       case Some(device) =>
         val newDeviceInfo = DeviceInfo(message, isConnected = device.isConnected)
+        logger.info(s"updating device (from deviceInfoMessage) at location=$location")
         device.update(newDeviceInfo)
       case None =>
         val newDeviceInfo = DeviceInfo(message, isConnected = false)
         knownDevices.add(newDeviceInfo)
+        logger.info(s"adding device (from deviceInfoMessage) at location=$location")
         connectionAdapter.connect(newDeviceInfo.internalId, location)
     }
   }

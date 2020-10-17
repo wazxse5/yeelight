@@ -11,7 +11,7 @@ case class CommandMessage private(
   deviceId: InternalId,
   commandName: String,
   arguments: Seq[JsValue]
-) extends InternalConnectedMessage with Identifiable {
+) extends YeelightConnectedMessage with Identifiable {
 
   override def isValid: Boolean = true
 

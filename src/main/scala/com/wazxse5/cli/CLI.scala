@@ -39,7 +39,10 @@ class CLI(yeelightService: YeelightService) {
 
   private def performForService(command: String, tail: List[String]): Unit = command match {
     case service.deviceOf => createNewDevice(tail)
-    case service.devices => cliDevices.foreach(c => println(c._2.simpleInfo))
+    case service.devices =>
+      refreshDevices()
+      if (cliDevices.nonEmpty) cliDevices.foreach(c => println(c._2.simpleInfo))
+      else println(message.noDevices)
     case service.discover => yeelightService.search()
     case service.listen => tail.headOption match {
       case Some(service.listenOff) => yeelightService.stopListening()
@@ -81,10 +84,16 @@ class CLI(yeelightService: YeelightService) {
     case None =>
   }
 
-  def isAliasAvailable(alias: String): Boolean = {
+  private [cli] def isAliasAvailable(alias: String): Boolean = {
     if (CliCommands._keywords.contains(alias)) throw AliasReservedKeyWordException(alias)
     else if (cliDevices.flatMap(_._2.alias).toSet.contains(alias)) throw AliasTaken(alias)
     else true
+  }
+
+  private def refreshDevices(): Unit = {
+    val newDevices = yeelightService.devices.filterNot(d => cliDevices.contains(d.internalId))
+    val newCliDevices = newDevices.map(CliDevice(_))
+    newCliDevices.foreach(insertOrUpdateCliDevice)
   }
 
   private def insertOrUpdateCliDevice(cliDeviceInfo: CliDevice): Unit = {

@@ -34,7 +34,10 @@ class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
 
   private def findLocalInetSocketAddress: Option[InetSocketAddress] = {
     val interfaces = NetworkInterface.getNetworkInterfaces.asScala.toSet
-    val filteredInterfaces = interfaces.filter(i => i.isUp && !i.isLoopback)
+    val filteredInterfaces = {
+      val filtered = interfaces.filter(i => i.isUp && !i.isLoopback)
+      if (filtered.size > 1) filtered.filterNot(_.getDisplayName.toLowerCase.contains("virtual")) else filtered
+    }
     val allAddresses = filteredInterfaces.flatMap(_.getInetAddresses.asScala)
     val reachableLocalAddresses = allAddresses.filter(_.isSiteLocalAddress).filter(_.isReachable(5000))
     reachableLocalAddresses.headOption.map(address => new InetSocketAddress(address, 0))
@@ -44,8 +47,8 @@ class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
 
   override def receive: Receive = {
     case Bound(local) =>
-      context.become(receiveReady(local, sender))
       logger.info(s"${this.getClass.getSimpleName} is ready (bound to $local)")
+      context.become(receiveReady(local, sender))
   }
 
 }

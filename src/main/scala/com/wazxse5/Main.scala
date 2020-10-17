@@ -12,8 +12,6 @@ object Main {
     val service = new MYeelightService
 
     val cli = new CLI(service)
-    cli.perform("deviceof 192.168.0.101 prawa")
-    cli.perform("deviceof 192.168.0.207 lewa")
 
     while (true) {
       val input = StdIn.readLine

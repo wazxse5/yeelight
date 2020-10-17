@@ -8,7 +8,7 @@ import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import com.wazxse5.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
 import com.wazxse5.core.{ControlMessage, InternalId}
-import com.wazxse5.message.{CommandMessage, InternalConnectedMessage}
+import com.wazxse5.message.{CommandMessage, YeelightConnectedMessage}
 import play.api.libs.json.Json
 
 class Connector(location: NetworkLocation, deviceInternalId: InternalId, adapter: ConnectionAdapter) extends ConnectionActor with Stash {
@@ -20,7 +20,7 @@ class Connector(location: NetworkLocation, deviceInternalId: InternalId, adapter
       connection ! Write(ByteString(message.text))
     case Received(data) =>
       val json = Json.parse(data.utf8String.replace("\r\n",""))
-      val message = InternalConnectedMessage.fromJson(json, deviceInternalId)
+      val message = YeelightConnectedMessage.fromJson(json, deviceInternalId)
       if (message.isValid) adapter.handleMessage(message)
     case CommandFailed(write: Write) =>
       val text = write.data.utf8String
