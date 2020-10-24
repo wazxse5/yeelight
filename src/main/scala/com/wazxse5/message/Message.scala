@@ -3,15 +3,14 @@ package com.wazxse5.message
 import com.typesafe.scalalogging.StrictLogging
 import com.wazxse5.core.InternalId
 import com.wazxse5.exception.InvalidMessageException
+import com.wazxse5.snapshot.Snapshotable
 import play.api.libs.json.JsValue
 
 trait Message extends StrictLogging
 
-sealed trait YeelightMessage extends Message {
+sealed trait YeelightMessage extends Message with Snapshotable {
   def isValid: Boolean
-
   def json: JsValue
-
   def text: String
 }
 

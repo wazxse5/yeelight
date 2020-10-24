@@ -2,17 +2,18 @@ package com.wazxse5.valuetype
 
 import play.api.libs.json.{JsNumber, JsValue}
 
-final case class Percent(value: Int) extends Parameter[Int] {
-  override val paramName: String = Percent.paramName
+case class Percent(value: Int) extends Parameter[Int] {
+  override def companion: ParamCompanion = Percent
 
-  override def rawValue: String = value.toString
+  override def strValue: String = value.toString
 
-  override def toJson: JsValue = JsNumber(value)
+  override def paramValue: JsValue = JsNumber(value)
 
   override def isValid: Boolean = -100 <= value && value <= 100
 }
 
-object Percent {
+object Percent extends ParamCompanion {
+  val snapshotName: String = "percent"
   val paramName: String = "percentage"
 }
 

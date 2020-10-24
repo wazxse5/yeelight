@@ -1,6 +1,7 @@
 package com.wazxse5.message
 
 import com.wazxse5.core.InternalId
+import com.wazxse5.snapshot.SnapshotInfo
 import play.api.libs.json.{JsValue, Json}
 
 case class CommandResultMessage private (
@@ -15,9 +16,19 @@ case class CommandResultMessage private (
 
   override def text: String = Json.stringify(json)
 
-  def isOk: Boolean = result.contains("ok")
+  def isOk: Boolean = result.exists(_.contains("ok"))
 
   def isError: Boolean = result.isEmpty && errorCode.nonEmpty && errorMessage.nonEmpty
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(
+    "commandResultMessage", Json.obj(
+      "id" -> id,
+      "deviceId" -> deviceId.snapshotInfo.value,
+      "result" -> result,
+      "errorCode" -> errorCode,
+      "errorMessage" -> errorMessage
+    )
+  )
 }
 
 object CommandResultMessage {

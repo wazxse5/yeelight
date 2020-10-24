@@ -1,43 +1,42 @@
 package com.wazxse5.valuetype
 
+import com.wazxse5.snapshot.{SnapshotInfo, Snapshotable}
 import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue}
 
-sealed trait PropOrParam[A] {
+trait ValueType[A] extends Snapshotable {
   def value: A
-
-  def rawValue: String
+  def strValue: String
+  def companion: ValueTypeCompanion
 
   def isProp: Boolean = false
-
   def isParam: Boolean = false
-
   final def isPropAndParam: Boolean = isProp && isParam
+  final def isPropOrParam: Boolean = isProp || isParam
 }
 
-trait Parameter[A] extends PropOrParam[A] {
-
-  def paramName: String
-
-  def toJson: JsValue
+trait Parameter[A] extends ValueType[A] {
+  def paramName: String = companion.paramName
+  def paramValue: JsValue
+  def companion: ParamCompanion
+  def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, paramValue)
 
   def isValid: Boolean
-
   def isEmptyParam: Boolean = false
-
   override final def isParam: Boolean = true
 }
 
-trait Property[A] extends PropOrParam[A] {
-
-  def propFgName: String
-
-  def propBgName: Option[String]
-
-  final def propName: String = if (isBackground) propBgName.get else propFgName
+trait Property[A] extends ValueType[A] {
+  def propFgName: String = companion.propFgName
+  def propBgName: String = companion.propBgName
+  final def propName: String = if (isBackground) propBgName else propFgName
+  def companion: PropCompanion
 
   def isBackground: Boolean
-
   override final def isProp: Boolean = true
+}
+
+trait PropAndParam[A] extends Property[A] with Parameter[A] {
+  def companion: PropAndParamCompanion
 }
 
 object Property {
@@ -72,33 +71,11 @@ object Property {
     case JsBoolean(bool) => applyByName(name, bool.toString)
   }
 
-  val fgNames: Seq[String] = List(
-    Brightness.propFgName,
-    ColorMode.propFgName,
-    FlowExpression.propFgName,
-    FlowPower.propFgName,
-    Hue.propFgName,
-    MusicPower.propFgName,
-    Name.propFgName,
-    Power.propFgName,
-    Rgb.propFgName,
-    Saturation.propFgName,
-    Temperature.propFgName,
-    TimerValue.propFgName
+  val all = Seq(
+    Brightness, ColorMode, FlowExpression, FlowPower, Hue, MusicPower,
+    Name, Power, Rgb, Saturation, Temperature, TimerValue
   )
-  
-  val bgNames: Seq[String] = List(
-    Brightness.propBgName,
-    ColorMode.propBgName,
-    FlowExpression.propBgName,
-    FlowPower.propBgName,
-    Hue.propBgName,
-    Power.propBgName,
-    Rgb.propBgName,
-    Saturation.propBgName,
-    Temperature.propBgName,
-  )
-
+  val fgNames: Seq[String] = all.map(_.propFgName)
+  val bgNames: Seq[String] = all.map(_.propBgName)
   val names: Seq[String] = fgNames ++ bgNames
-
 }

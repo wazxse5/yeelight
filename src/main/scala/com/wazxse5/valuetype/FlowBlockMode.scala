@@ -1,14 +1,25 @@
 package com.wazxse5.valuetype
 
-sealed trait FlowBlockMode {
-  def value: Int
+import com.wazxse5.snapshot.SnapshotInfo
+import com.wazxse5.valuetype.FlowBlockMode.snapshotName
+import play.api.libs.json.JsNumber
+
+sealed trait FlowBlockMode extends ValueType[Int] {
+
+  override def companion: ValueTypeCompanion = FlowBlockMode
+
+  override def strValue: String = value.toString
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName, JsNumber(value))
 
   def isValid: Boolean = {
     value == 1 || value == 2 || value == 7
   }
 }
 
-object FlowBlockMode {
+object FlowBlockMode extends ValueTypeCompanion {
+  val snapshotName: String = "flowBlockMode"
+
   def rgb: FlowBlockMode = RgbFlowBlockMode
 
   def temperature: FlowBlockMode = TemperatureFlowBlockMode

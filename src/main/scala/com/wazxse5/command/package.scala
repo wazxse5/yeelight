@@ -2,6 +2,8 @@ package com.wazxse5
 
 import com.wazxse5.valuetype.{EmptyParam, Parameter, PropertyName}
 
+import scala.language.implicitConversions
+
 package object command {
   implicit def paramToOpt(param: Parameter[_]): Option[Parameter[_]] = Option(param)
 

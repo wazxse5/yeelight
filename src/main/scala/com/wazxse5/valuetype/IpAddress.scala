@@ -3,16 +3,17 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsString, JsValue}
 
 case class IpAddress(value: String) extends Parameter[String] {
-  override val paramName: String = IpAddress.paramName
+  override def companion: ParamCompanion = IpAddress
 
-  override def rawValue: String = value
+  override def strValue: String = value
 
-  override def toJson: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(value)
 
   override def isValid: Boolean = true // TODO walidacja adresu ip
 
 }
 
-object IpAddress {
+object IpAddress extends ParamCompanion {
+  val snapshotName: String = "ipAddress"
   val paramName: String = "host"
 }

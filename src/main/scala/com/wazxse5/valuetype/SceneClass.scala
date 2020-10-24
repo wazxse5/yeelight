@@ -3,28 +3,24 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsString, JsValue}
 
 sealed trait SceneClass extends Parameter[String] {
-  override val paramName: String = SceneClass.paramName
+  override def companion: ParamCompanion = SceneClass
 
-  override def rawValue: String = value
+  override def strValue: String = value
 
-  override def toJson: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(value)
 
   override def isValid: Boolean = Seq("color","hsv", "ct", "cf", "auto_delay_off").contains(value)
 }
 
-object SceneClass {
+object SceneClass extends ParamCompanion {
+  val snapshotName: String = "sceneClass"
   val paramName: String = "class"
 
   def rgb: SceneClass = RgbSceneClass
-
   def hsv: SceneClass = HsvSceneClass
-
   def temperature: SceneClass = TemperatureSceneClass
-
   def flow: SceneClass = FlowSceneClass
-
   def delayOff: SceneClass = DelayOffSceneClass
-
 }
 
 case object RgbSceneClass extends SceneClass {

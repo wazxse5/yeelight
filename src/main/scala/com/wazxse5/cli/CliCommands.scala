@@ -88,7 +88,7 @@ object CliCommands {
     val ip = "ip"
     val model = "model"
     val music = "music"
-    val name = "name"
+    val name = "commandName"
     val port = "port"
     val power = "power"
     val saturation = "saturation"

@@ -41,7 +41,7 @@ class CLI(yeelightService: YeelightService) {
     case service.deviceOf => createNewDevice(tail)
     case service.devices =>
       refreshDevices()
-      if (cliDevices.nonEmpty) cliDevices.foreach(c => println(c._2.simpleInfo))
+      if (cliDevices.nonEmpty) cliDevices.values.toList.sortBy(_.cliId).foreach(c => println(c.simpleInfo))
       else println(message.noDevices)
     case service.discover => yeelightService.search()
     case service.listen => tail.headOption match {

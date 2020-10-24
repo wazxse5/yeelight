@@ -1,17 +1,19 @@
 package com.wazxse5.valuetype
+import com.wazxse5.snapshot.SnapshotInfo
+import play.api.libs.json.JsNumber
 
 sealed trait FlowPower extends Property[Int] {
-  override val propFgName: String = FlowPower.propFgName
+  override def companion: PropCompanion = FlowPower
 
-  override val propBgName: Option[String] = None
+  override def strValue: String = value.toString
 
-  override def rawValue: String = value.toString
-
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
 }
 
-object FlowPower {
+object FlowPower extends PropCompanion {
+  val snapshotName: String = "flowPower"
   val propFgName: String = "flowing"
-  val propBgName: String = "bg_flowing"
+  override val propBgName: String = "bg_flowing"
 
   def apply(value: Int, isBackground: Boolean = false): FlowPower = value match {
     case 0 => FlowOn(isBackground)

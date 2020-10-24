@@ -1,8 +1,13 @@
 package com.wazxse5.core
 
+import com.wazxse5.snapshot.{SnapshotInfo, Snapshotable}
+import play.api.libs.json.JsString
+
 import scala.util.Random
 
-case class InternalId private(id: String)
+case class InternalId private(id: String) extends Snapshotable {
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo("internalId", JsString(id))
+}
 
 object InternalId {
 

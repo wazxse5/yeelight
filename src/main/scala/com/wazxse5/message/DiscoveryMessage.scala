@@ -1,4 +1,5 @@
 package com.wazxse5.message
+import com.wazxse5.snapshot.SnapshotInfo
 import play.api.libs.json.{JsNull, JsValue}
 
 object DiscoveryMessage extends YeelightUnconnectedMessage {
@@ -8,4 +9,6 @@ object DiscoveryMessage extends YeelightUnconnectedMessage {
   override val text: String = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1982\r\nMAN: \"ssdp:discover\"\r\nST: wifi_bulb\r\n"
 
   override def isValid: Boolean = true
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo("discoveryMessage", JsNull)
 }

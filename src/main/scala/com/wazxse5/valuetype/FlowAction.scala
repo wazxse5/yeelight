@@ -3,22 +3,21 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsNumber, JsValue}
 
 sealed trait FlowAction extends Parameter[Int] {
-  override val paramName: String = FlowAction.paramName
+  override def companion: ParamCompanion = FlowAction
 
-  override def rawValue: String = value.toString
+  override def strValue: String = value.toString
 
-  override def toJson: JsValue = JsNumber(value)
+  override def paramValue: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 0
 }
 
-object FlowAction {
+object FlowAction extends ParamCompanion {
+  val snapshotName: String = "action"
   val paramName: String = "action"
 
   def recover: FlowAction = FlowActionRecover
-
   def stay: FlowAction = FlowActionStay
-
   def turnOff: FlowAction = FlowActionTurnOff
 }
 
@@ -42,5 +41,3 @@ case object FlowActionStay extends FlowAction {
 case object FlowActionTurnOff extends FlowAction {
   override val value: Int = 2
 }
-
-

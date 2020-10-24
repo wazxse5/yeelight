@@ -3,14 +3,15 @@ package com.wazxse5.command
 import com.wazxse5.valuetype._
 
 case class SetHsv(p1: Hue, p2: Saturation, p3: Effect, p4: Duration) extends YeelightCommand4 {
-  override val name: String = "set_hsv"
+  override def companion: YeelightCommandCompanion = SetHsv
 
   override def p1Mandatory: Boolean = true
-
   override def p2Mandatory: Boolean = true
-
   override def p3Mandatory: Boolean = true
-
   override def p4Mandatory: Boolean = true
+}
 
+case object SetHsv extends YeelightCommandCompanion {
+  override val commandName: String = "set_hsv"
+  override val snapshotName: String = "setHsv"
 }

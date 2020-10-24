@@ -3,12 +3,12 @@ package com.wazxse5.command
 import com.wazxse5.valuetype.Name
 
 case class SetName(p1: Name) extends YeelightCommand1 {
-  override val name: String = "set_name"
-
+  def companion: YeelightCommandCompanion = SetName
   override def p1Mandatory: Boolean = true
-
 }
 
-object SetName {
+object SetName extends YeelightCommandCompanion {
+  val commandName: String = "setName"
+  val snapshotName: String = "setName"
   def apply(name: String): SetName = new SetName(Name(name))
 }

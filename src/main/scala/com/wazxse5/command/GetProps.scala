@@ -27,7 +27,7 @@ case class GetProps(
   p22Opt: Option[PropertyName] = None,
   p23Opt: Option[PropertyName] = None
 ) extends YeelightCommand23 {
-  override val name: String = GetProps.name
+  override def companion: YeelightCommandCompanion = GetProps
 
   override def p2: Parameter[_] = p2Opt
   override def p3: Parameter[_] = p3Opt
@@ -53,8 +53,9 @@ case class GetProps(
   override def p23: Parameter[_] = p23Opt
 }
 
-object GetProps {
-  val name: String = "get_prop"
+object GetProps extends YeelightCommandCompanion {
+  override val commandName: String = "get_prop"
+  override val snapshotName: String = "getProps"
 
   def all: GetProps = {
     val propNames = Property.names.map(PropertyName(_))

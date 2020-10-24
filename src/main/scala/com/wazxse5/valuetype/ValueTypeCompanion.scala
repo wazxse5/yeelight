@@ -1,0 +1,17 @@
+package com.wazxse5.valuetype
+
+trait ValueTypeCompanion {
+  def snapshotName: String
+}
+
+trait PropCompanion extends ValueTypeCompanion {
+  def propFgName: String
+  def propBgName: String = "@unsupported"
+  final def supportsBackground: Boolean = propBgName != "@unsupported"
+}
+
+trait ParamCompanion extends ValueTypeCompanion {
+  def paramName: String
+}
+
+trait PropAndParamCompanion extends PropCompanion with ParamCompanion

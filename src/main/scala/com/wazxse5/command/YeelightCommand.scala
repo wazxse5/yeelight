@@ -1,20 +1,28 @@
 package com.wazxse5.command
 
+import com.wazxse5.snapshot.{SnapshotInfo, Snapshotable}
 import com.wazxse5.valuetype.Parameter
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 
-trait YeelightCommand {
-  def name: String
+trait YeelightCommand extends Snapshotable {
+  def companion: YeelightCommandCompanion
+  def name: String = companion.commandName
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(
+    companion.snapshotName,
+    Json.obj(
+      "minParams" -> minParameters,
+      "maxParams" -> maxParameters,
+      "isValid" -> isValid,
+      "params" -> JsArray(params.map(_.snapshotInfo.value))
+    )
+  )
 
   def minParameters: Int
-
   def maxParameters: Int
-
   def params: Seq[Parameter[_]]
-
-  def args: Seq[JsValue] = params.map(_.toJson)
-
+  def args: Seq[JsValue] = params.map(_.paramValue)
   def isValid: Boolean = params.forall(_.isValid)
 }
 

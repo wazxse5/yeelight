@@ -1,6 +1,7 @@
 package com.wazxse5.message
 
 import com.wazxse5.core.{InternalId, StateUpdate}
+import com.wazxse5.snapshot.SnapshotInfo
 import play.api.libs.json.{JsResultException, JsValue, Json}
 
 case class NotificationMessage private(params: Map[String, JsValue], deviceId: InternalId, json: JsValue, isValid: Boolean = true) extends YeelightConnectedMessage {
@@ -8,6 +9,13 @@ case class NotificationMessage private(params: Map[String, JsValue], deviceId: I
   override def text: String = Json.stringify(json)
 
   def toStateUpdate: StateUpdate = StateUpdate(this)
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(
+    "notificationMessage", Json.obj(
+      "deviceId" -> deviceId.snapshotInfo.value,
+      "params" -> params
+    )
+  )
 
 }
 

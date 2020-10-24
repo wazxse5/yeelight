@@ -3,16 +3,17 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsString, JsValue}
 
 case class PropertyName(value: String) extends Parameter[String] {
-  override val paramName: String = PropertyName.paramName
+  override def companion: ParamCompanion = PropertyName
 
-  override def rawValue: String = value
+  override def strValue: String = value
 
-  override def toJson: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(value)
 
   override def isValid: Boolean = Property.names.contains(value)
 }
 
-object PropertyName {
+object PropertyName extends ParamCompanion {
+  val snapshotName: String = "propName"
   val paramName: String = "prop"
 }
 

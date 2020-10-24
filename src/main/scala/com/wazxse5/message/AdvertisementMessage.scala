@@ -1,7 +1,8 @@
 package com.wazxse5.message
 
+import com.wazxse5.snapshot.SnapshotInfo
 import com.wazxse5.valuetype.{DeviceModel, Power}
-import play.api.libs.json.{JsNull, JsValue}
+import play.api.libs.json.{JsNull, JsValue, Json}
 
 case class AdvertisementMessage private(
   header: String,
@@ -31,9 +32,11 @@ case class AdvertisementMessage private(
 
   override def isValid: Boolean = { // TODO: Dorobić prawdziwą walidację
     header == "HTTP/1.1 200 OK" &&
-      DeviceModel.names.contains(model) &&
+      DeviceModel.values.contains(model) &&
       Power.values.contains(power)
   }
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo("advertisementMessage", Json.obj("text" -> text))
 }
 
 object AdvertisementMessage {

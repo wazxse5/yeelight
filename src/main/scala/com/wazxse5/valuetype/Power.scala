@@ -2,24 +2,21 @@ package com.wazxse5.valuetype
 
 import play.api.libs.json.{JsString, JsValue}
 
-sealed trait Power extends Property[String] with Parameter[String] {
-  override val propFgName: String = Power.propFgName
+sealed trait Power extends PropAndParam[String] {
+  override def companion: PropAndParamCompanion = Power
 
-  override val propBgName: Option[String] = Some(Power.propBgName)
+  override def strValue: String = value
 
-  override val paramName: String = Power.paramName
-
-  override def rawValue: String = value
-
-  override def toJson: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(value)
 
   override def isValid: Boolean = Power.values.contains(value)
 }
 
-object Power {
-  val propFgName: String = "power"
-  val propBgName: String = "bg_power"
+object Power extends PropAndParamCompanion {
+  val snapshotName: String = "power"
   val paramName: String = "power"
+  val propFgName: String = "power"
+  override val propBgName: String = "bg_power"
 
   def apply(value: String, isBackground: Boolean = false): Power = value match {
     case "on" => PowerOn(isBackground)

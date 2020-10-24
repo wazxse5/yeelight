@@ -4,17 +4,26 @@ import com.wazxse5.exception.InvalidParamValueException
 import play.api.libs.json.{JsString, JsValue}
 
 sealed trait Effect extends Parameter[String] {
-  override val paramName: String = Effect.paramName
+  override def companion: ParamCompanion = Effect
 
-  override def rawValue: String = value
+  override def strValue: String = value
 
-  override def toJson: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(value)
 
-  override def isValid: Boolean = value == Sudden.value || value == Smooth.value
+  override def isValid: Boolean = Effect.values.contains(value)
 }
 
-object Effect {
-  val paramName = "effect"
+object Effect extends ParamCompanion {
+  val snapshotName: String = "effect"
+  val paramName: String = "effect"
+
+  case object Sudden extends Effect {
+    override val value: String = "sudden"
+  }
+
+  case object Smooth extends Effect {
+    override val value: String = "smooth"
+  }
 
   def apply(value: String): Effect = value match {
     case Sudden.value => Sudden
@@ -23,18 +32,7 @@ object Effect {
   }
 
   def sudden: Effect = Sudden
-
   def smooth: Effect = Smooth
 
   def values = Set(Sudden.value, Smooth.value)
-
 }
-
-case object Sudden extends Effect {
-  override val value: String = "sudden"
-}
-
-case object Smooth extends Effect {
-  override val value: String = "smooth"
-}
-

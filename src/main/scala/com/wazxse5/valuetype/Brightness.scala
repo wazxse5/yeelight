@@ -2,24 +2,21 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsNumber, JsValue}
 
 
-case class Brightness(value: Int, isBackground: Boolean = false) extends Property[Int] with Parameter[Int] {
+case class Brightness(value: Int, isBackground: Boolean = false) extends PropAndParam[Int] {
 
-  override val propFgName: String = Brightness.propFgName
+  override def companion: PropAndParamCompanion = Brightness
 
-  override val propBgName: Option[String] = Some(Brightness.propBgName)
+  override def strValue: String = value.toString
 
-  override val paramName: String = Brightness.paramName
-
-  override def rawValue: String = value.toString
-
-  override def toJson: JsValue = JsNumber(value)
+  override def paramValue: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 1 && value <= 100
 
 }
 
-object Brightness {
-  val propFgName: String = "bright"
-  val propBgName: String = "bg_bright"
+object Brightness extends PropAndParamCompanion {
+  val snapshotName: String = "brightness"
   val paramName: String = "rgb"
+  val propFgName: String = "bright"
+  override val propBgName: String = "bg_bright"
 }

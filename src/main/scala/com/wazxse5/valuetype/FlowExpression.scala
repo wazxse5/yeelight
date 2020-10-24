@@ -1,28 +1,29 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsString, JsValue}
+import com.wazxse5.snapshot.SnapshotInfo
+import com.wazxse5.valuetype.FlowExpression.snapshotName
+import play.api.libs.json.{JsArray, JsString, JsValue}
 
-case class FlowExpression(value: Seq[FlowBlock], isBackground: Boolean) extends Property[Seq[FlowBlock]] with Parameter[Seq[FlowBlock]] {
+case class FlowExpression(value: Seq[FlowBlock], isBackground: Boolean) extends PropAndParam[Seq[FlowBlock]] {
 
-  override val propFgName: String = FlowExpression.propFgName
+  override def companion: PropAndParamCompanion = FlowExpression
 
-  override val propBgName: Option[String] = Some(FlowExpression.propBgName)
+  override def strValue: String = value.map(_.toJsonParam).mkString(",")
 
-  override val paramName: String = FlowExpression.paramName
+  override def paramValue: JsValue = JsString(strValue)
 
-  override def rawValue: String = value.map(_.toJsonValue).mkString(",")
-
-  override def toJson: JsValue = JsString(rawValue)
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName, JsArray(value.map(_.snapshotInfo.value)))
 
   override def isValid: Boolean = {
     value.nonEmpty && value.forall(_.isValid)
   }
 }
 
-object FlowExpression {
-  val propFgName: String = "flow_params"
-  val propBgName: String = "bg_flow_params"
+object FlowExpression extends PropAndParamCompanion {
+  val snapshotName: String = "flowExpression"
   val paramName: String = "flow_expression"
+  val propFgName: String = "flow_params"
+  override val propBgName: String = "bg_flow_params"
 
   def apply(value: String, isBackground: Boolean = false): FlowExpression = new FlowExpression(Seq.empty, isBackground) // TODO
 }

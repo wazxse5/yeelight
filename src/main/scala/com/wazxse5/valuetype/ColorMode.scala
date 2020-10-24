@@ -1,18 +1,20 @@
 package com.wazxse5.valuetype
+import com.wazxse5.snapshot.SnapshotInfo
+import play.api.libs.json.JsNumber
 
 sealed trait ColorMode extends Property[Int] {
 
-  override val propFgName: String = ColorMode.propFgName
+  override def companion: PropCompanion = ColorMode
 
-  override val propBgName: Option[String] = Some(ColorMode.propBgName)
+  override def strValue: String = value.toString
 
-  override def rawValue: String = value.toString
-
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
 }
 
-object ColorMode {
-  val propFgName = "color_mode"
-  val propBgName = "bg_lmode"
+object ColorMode extends PropCompanion {
+  val snapshotName: String = "colorMode"
+  val propFgName: String = "color_mode"
+  override val propBgName: String = "bg_lmode"
 
   def apply(value: Int, isBackground: Boolean = false): ColorMode = value match {
     case 1 => RgbColorMode(isBackground)
@@ -21,12 +23,11 @@ object ColorMode {
   }
 
   def rgb: ColorMode = RgbColorMode(false)
-  def rgb(isBackground: Boolean): ColorMode = RgbColorMode(isBackground)
-
   def temperature: ColorMode = TemperatureColorMode(false)
-  def temperature(isBackground: Boolean): ColorMode = TemperatureColorMode(isBackground)
-
   def hsv: ColorMode = HsvColorMode(false)
+
+  def rgb(isBackground: Boolean): ColorMode = RgbColorMode(isBackground)
+  def temperature(isBackground: Boolean): ColorMode = TemperatureColorMode(isBackground)
   def hsv(isBackground: Boolean): ColorMode = HsvColorMode(isBackground)
 }
 

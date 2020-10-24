@@ -3,28 +3,24 @@ package com.wazxse5.valuetype
 import play.api.libs.json.{JsNumber, JsValue}
 
 sealed trait PowerMode extends Parameter[Int] {
-  override val paramName: String = PowerMode.paramName
+  override def companion: ParamCompanion = PowerMode
 
-  override def rawValue: String = value.toString
+  override def strValue: String = value.toString
 
-  override def toJson: JsValue = JsNumber(value)
+  override def paramValue: JsValue = JsNumber(value)
 
   override def isValid: Boolean = value >= 0 && value <= 5
 }
 
-object PowerMode {
+object PowerMode extends ParamCompanion {
+  val snapshotName: String = "powerMode"
   val paramName: String = "mode"
 
   def normal: PowerMode = NormalPowerMode
-
   def temperature: PowerMode = TemperaturePowerMode
-
   def rgb: PowerMode = RgbPowerMode
-
   def hsv: PowerMode = HsvPowerMode
-
   def flow: PowerMode = FlowPowerMode
-
   def night: PowerMode = NightPowerMode
 }
 

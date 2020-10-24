@@ -39,7 +39,7 @@ object StateUpdate {
   }
 
   def apply(message: CommandMessage, result: CommandResultMessage): StateUpdate = {
-    if (message.commandName == GetProps.name && message.id == result.id) {
+    if (message.commandName == GetProps.commandName && message.id == result.id) {
       val propsNames = message.arguments.map(_.asInstanceOf[JsString]).map(_.value)
       val propsResults = result.result.getOrElse(Seq.empty)
       val pairs = propsNames.zip(propsResults).filter(_._2.nonEmpty)

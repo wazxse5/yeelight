@@ -2,6 +2,7 @@ package com.wazxse5.message
 
 import com.wazxse5.command.YeelightCommand
 import com.wazxse5.core.InternalId
+import com.wazxse5.snapshot.SnapshotInfo
 import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Random
@@ -22,6 +23,15 @@ case class CommandMessage private(
   )
 
   override def text: String = Json.stringify(json) + "\r\n"
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(
+    "commandMessage", Json.obj(
+      "id" -> id,
+      "deviceId" -> deviceId.snapshotInfo.value,
+      "commandName" -> commandName,
+      "arguments" -> arguments
+    )
+  )
 }
 
 object CommandMessage {

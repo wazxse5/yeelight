@@ -1,7 +1,8 @@
 package com.wazxse5.message
 
+import com.wazxse5.snapshot.SnapshotInfo
 import com.wazxse5.valuetype.{DeviceModel, Power}
-import play.api.libs.json.{JsNull, JsValue}
+import play.api.libs.json.{JsNull, JsValue, Json}
 
 case class DiscoveryResponseMessage private(
   header: String,
@@ -33,9 +34,11 @@ case class DiscoveryResponseMessage private(
     header == "HTTP/1.1 200 OK" &&
       date == "" &&
       ext == "" &&
-      DeviceModel.names.contains(model) &&
+      DeviceModel.values.contains(model) &&
       Power.values.contains(power)
   }
+
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo("discoveryResponseMessage", Json.obj("text" -> text))
 }
 
 object DiscoveryResponseMessage {
