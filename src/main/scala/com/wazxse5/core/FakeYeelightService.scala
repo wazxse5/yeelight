@@ -4,7 +4,7 @@ import com.wazxse5.connection.ConnectionAdapter
 import com.wazxse5.message.Message
 
 class FakeYeelightService(val devices: Set[YeelightDevice]) extends YeelightService {
-  override def deviceInfo(internalId: InternalId): Option[DeviceInfo] = ???
+  override def deviceInfo(internalId: InternalId): DeviceInfo = ???
 
   override def deviceOf(deviceInfo: DeviceInfo): YeelightDevice = ???
 

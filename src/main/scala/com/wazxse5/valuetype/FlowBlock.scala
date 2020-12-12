@@ -2,7 +2,7 @@ package com.wazxse5.valuetype
 
 import com.wazxse5.snapshot.{SnapshotInfo, Snapshotable}
 import com.wazxse5.valuetype.FlowBlock.snapshotName
-import play.api.libs.json.{JsNumber, JsObject}
+import play.api.libs.json.Json
 
 case class FlowBlock(
   duration: Duration,
@@ -15,12 +15,12 @@ case class FlowBlock(
   def toJsonParam: String = s"${duration.value},${mode.value},$value,${brightness.value}"
 
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
-    snapshotName, JsObject(Seq(
-      duration.snapshotInfo.pair,
-      mode.snapshotInfo.pair,
-      ("value", JsNumber(value)),
-      brightness.snapshotInfo.pair
-    ))
+    snapshotName, Json.obj(
+      duration.snapshotInfo.pairw,
+      mode.snapshotInfo.pairw,
+      "value" -> value,
+      brightness.snapshotInfo.pairw
+    )
   )
 
   def isValid: Boolean = {
@@ -37,15 +37,19 @@ case class FlowBlock(
 object FlowBlock {
   val snapshotName: String = "flowBlock"
 
+  def apply(d: String, m: String, v: String, b: String): FlowBlock = {
+    new FlowBlock(Duration(d.toInt), FlowBlockMode(m.toInt), v.toInt, Brightness(b.toInt))
+  }
+
   def apply(duration: Int, mode: FlowBlockMode, value: Int, brightness: Int): FlowBlock = {
     new FlowBlock(Duration(duration), mode, value, Brightness(brightness))
   }
 
   def apply(duration: Int, value: Rgb, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.rgb, value.value, Brightness(brightness))
+    new FlowBlock(Duration(duration), FlowBlockMode.rgb, value.value.get, Brightness(brightness))
   }
 
   def apply(duration: Int, value: Temperature, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.temperature, value.value, Brightness(brightness))
+    new FlowBlock(Duration(duration), FlowBlockMode.temperature, value.value.get, Brightness(brightness))
   }
 }

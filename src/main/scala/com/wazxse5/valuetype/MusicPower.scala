@@ -1,22 +1,22 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNull, JsValue}
+import play.api.libs.json.JsValue
 
 sealed trait MusicPower extends PropAndParam[Int] {
   override def companion: PropAndParamCompanion = MusicPower
 
-  override def strValue: String = value.toString
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
   override def isBackground: Boolean = false
 
-  override def paramValue: JsValue = JsNull(value)
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
-  override def isValid: Boolean = value == 0 || value == 1
+  override def isValid: Boolean = value.exists(v => v == 0 || v == 1)
 }
 
 object MusicPower extends PropAndParamCompanion {
-  val snapshotName: String = "musicPowe"
-  val paramName: String = "action" // todo: sprawdzić
+  val snapshotName: String = "musicPower"
+  val paramName: String = "action"
   val propFgName: String = "music_on"
 
   def apply(value: Int): MusicPower = value match {
@@ -26,12 +26,17 @@ object MusicPower extends PropAndParamCompanion {
 
   def on: MusicPower = MusicOn
   def off: MusicPower = MusicOff
+  def unknown: MusicPower = MusicUnknown
 }
 
 case object MusicOn extends MusicPower {
-  override val value: Int = 1
+  override val value: Option[Int] = Some(1)
 }
 
 case object MusicOff extends MusicPower {
-  override val value: Int = 0
+  override val value: Option[Int] = Some(0)
+}
+
+case object MusicUnknown extends MusicPower {
+  override val value: Option[Int] = None
 }

@@ -1,16 +1,17 @@
 package com.wazxse5.valuetype
 
 import com.wazxse5.exception.InvalidParamValueException
+import com.wazxse5.valuetype.ValueType.unknown
 import play.api.libs.json.{JsString, JsValue}
 
 sealed trait Effect extends Parameter[String] {
   override def companion: ParamCompanion = Effect
 
-  override def strValue: String = value
+  override def strValue: String = value.getOrElse(unknown)
 
-  override def paramValue: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(strValue)
 
-  override def isValid: Boolean = Effect.values.contains(value)
+  override def isValid: Boolean = value.isDefined && Effect.values.contains(value.get)
 }
 
 object Effect extends ParamCompanion {
@@ -18,21 +19,21 @@ object Effect extends ParamCompanion {
   val paramName: String = "effect"
 
   case object Sudden extends Effect {
-    override val value: String = "sudden"
+    override val value: Option[String] = Some("sudden")
   }
 
   case object Smooth extends Effect {
-    override val value: String = "smooth"
+    override val value: Option[String] = Some("smooth")
   }
 
   def apply(value: String): Effect = value match {
-    case Sudden.value => Sudden
-    case Smooth.value => Smooth
+    case "sudden" => Sudden
+    case "smooth" => Smooth
     case _ => throw new InvalidParamValueException(value)
   }
 
   def sudden: Effect = Sudden
   def smooth: Effect = Smooth
 
-  def values = Set(Sudden.value, Smooth.value)
+  def values = Set(Sudden.value.get, Smooth.value.get)
 }

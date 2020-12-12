@@ -18,14 +18,18 @@ class CliDevice private(_yeelightDevice: YeelightDevice, _alias: Option[String])
     s"n=$cliId\tmodel=${getPropOrUnknown(yeelightDevice.model)}\talias=${getOrNone(alias)}\tid=${getOrUnknown(yeelightDevice.id)}"
   }
 
-  def state: String = { // TODO dodać pozostałe po dostosowaniu deviceInfo
-    s"""|brightness  = ${getPropOrUnknown(yeelightDevice.state.brightness)}
-        |colorMode   = ${getPropOrUnknown(yeelightDevice.state.colorMode)}
-        |hue         = ${getPropOrUnknown(yeelightDevice.state.hue)}
-        |power       = ${getPropOrUnknown(yeelightDevice.state.power)}
-        |rgb         = ${getPropOrUnknown(yeelightDevice.state.rgb)}
-        |saturation  = ${getPropOrUnknown(yeelightDevice.state.saturation)}
-        |temperature = ${getPropOrUnknown(yeelightDevice.state.temperature)}""".stripMargin
+  def state: String = {
+    s"""|POWER = ${yeelightDevice.state.power.strValue} (last update = ${yeelightDevice.state.lastUpdate})
+        |brightness  = ${yeelightDevice.state.brightness.strValue}
+        |colorMode   = ${yeelightDevice.state.colorMode.strValue}
+        |flow        = ${yeelightDevice.state.flowPower.strValue}
+        |hue         = ${yeelightDevice.state.hue.strValue}
+        |music       = ${yeelightDevice.state.musicPower.strValue}
+        |name        = ${yeelightDevice.state.name.strValue}
+        |rgb         = ${yeelightDevice.state.rgb.strValue}
+        |saturation  = ${yeelightDevice.state.saturation.strValue}
+        |temperature = ${yeelightDevice.state.temperature.strValue}
+        |timer       = ${yeelightDevice.state.timerValue.strValue}""".stripMargin
   }
 
   private def getPropOrUnknown(property: Option[ValueType[_]]): String = property.map(_.strValue).getOrElse("unknown")

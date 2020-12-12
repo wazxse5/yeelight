@@ -1,18 +1,15 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+import play.api.libs.json.JsValue
 
-case class TcpPort(value: Int) extends Parameter[Int] {
+case class TcpPort(value: Option[Int]) extends Parameter[Int] {
   override def companion: ParamCompanion = TcpPort
 
-  override def strValue: String = value.toString
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
-  override def paramValue: JsValue = JsNumber(value)
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
-  override def isValid: Boolean = {
-    0 < value && value <= 65535
-  }
-
+  override def isValid: Boolean = value.exists(v => 0 < v && v <= 65535)
 }
 
 object TcpPort extends ParamCompanion {

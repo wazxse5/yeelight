@@ -14,7 +14,12 @@ class MYeelightService extends YeelightService with StrictLogging {
 
   override def devices: Set[YeelightDevice] = knownDevices.all.map(MYeelightDevice(_)).toSet
 
-  override def deviceInfo(internalId: InternalId): Option[DeviceInfo] = knownDevices.find(internalId)
+  override def deviceInfo(internalId: InternalId): DeviceInfo = {
+    knownDevices.find(internalId) match {
+      case Some(deviceInfo) => deviceInfo
+      case None => throw new NoSuchElementException() // TODO:
+    }
+  }
 
   override def deviceOf(deviceInfo: DeviceInfo): YeelightDevice = ??? // TODO:
 
@@ -99,7 +104,7 @@ class MYeelightService extends YeelightService with StrictLogging {
   private def handleResultMessage(message: CommandResultMessage): Unit = {
     messageRegistry.put(message)
     val relatedCommand = messageRegistry.getCommand(message)
-    val stateUpdate = relatedCommand.map(StateUpdate(_, message))
+    val stateUpdate = relatedCommand.map(PropsUpdate(_, message))
     stateUpdate.foreach(knownDevices.update(message.deviceId, _))
   }
 

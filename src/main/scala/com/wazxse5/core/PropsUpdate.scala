@@ -5,7 +5,7 @@ import com.wazxse5.message.{CommandMessage, CommandResultMessage, NotificationMe
 import com.wazxse5.valuetype._
 import play.api.libs.json.JsString
 
-case class StateUpdate(newProps: Seq[Property[_]]) {
+case class PropsUpdate(newProps: Seq[Property[_]]) {
   def propByName(propName: String): Option[Property[_]] = newProps.find(_.propName == propName)
   //
   def brightness: Option[Brightness] = propByName(Brightness.propFgName).map(_.asInstanceOf[Brightness])
@@ -32,22 +32,22 @@ case class StateUpdate(newProps: Seq[Property[_]]) {
   def bgTemperature: Option[Temperature] = propByName(Temperature.propBgName).map(_.asInstanceOf[Temperature])
 }
 
-object StateUpdate {
-  def apply(notification: NotificationMessage): StateUpdate = {
+object PropsUpdate {
+  def apply(notification: NotificationMessage): PropsUpdate = {
     val newProps = notification.params.map(p => Property.applyFromJsValue(p._1, p._2))
-    new StateUpdate(newProps.toSeq)
+    new PropsUpdate(newProps.toSeq)
   }
 
-  def apply(message: CommandMessage, result: CommandResultMessage): StateUpdate = {
+  def apply(message: CommandMessage, result: CommandResultMessage): PropsUpdate = {
     if (message.commandName == GetProps.commandName && message.id == result.id) {
       val propsNames = message.arguments.map(_.asInstanceOf[JsString]).map(_.value)
       val propsResults = result.result.getOrElse(Seq.empty)
       val pairs = propsNames.zip(propsResults).filter(_._2.nonEmpty)
       val newProps = pairs.map(p => Property.applyByName(p._1, p._2))
-      new StateUpdate(newProps)
+      new PropsUpdate(newProps)
     }
     else empty
   }
 
-  def empty = new StateUpdate(Seq.empty)
+  def empty = new PropsUpdate(Seq.empty)
 }

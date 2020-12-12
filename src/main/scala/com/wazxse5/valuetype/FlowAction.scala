@@ -1,15 +1,15 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+import play.api.libs.json.JsValue
 
 sealed trait FlowAction extends Parameter[Int] {
   override def companion: ParamCompanion = FlowAction
 
-  override def strValue: String = value.toString
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
-  override def paramValue: JsValue = JsNumber(value)
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
-  override def isValid: Boolean = value >= 0
+  override def isValid: Boolean = value.exists(_ >= 0)
 }
 
 object FlowAction extends ParamCompanion {
@@ -25,19 +25,19 @@ object FlowAction extends ParamCompanion {
  * Recover to the state before the color flow started
  */
 case object FlowActionRecover extends FlowAction {
-  override val value: Int = 0
+  override val value: Option[Int] = Some(0)
 }
 
 /**
  * Stay at the state when the flow is stopped
  */
 case object FlowActionStay extends FlowAction {
-  override val value: Int = 1
+  override val value: Option[Int] = Some(1)
 }
 
 /**
  * Turn off the device after the flow is stopped
  */
 case object FlowActionTurnOff extends FlowAction {
-  override val value: Int = 2
+  override val value: Option[Int] = Some(2)
 }

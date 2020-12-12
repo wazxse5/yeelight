@@ -1,15 +1,15 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+import play.api.libs.json.JsValue
 
-case class FlowCount(value: Int) extends Parameter[Int] {
+case class FlowCount(value: Option[Int]) extends Parameter[Int] {
   override def companion: ParamCompanion = FlowCount
 
-  override def strValue: String = value.toString
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
-  override def paramValue: JsValue = JsNumber(value)
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
-  override def isValid: Boolean = value >= 0
+  override def isValid: Boolean = value.exists(_ >= 0)
 
 }
 
@@ -17,5 +17,7 @@ object FlowCount extends ParamCompanion {
   val snapshotName: String = "flowCount"
   val paramName: String = "count"
 
-  def infinite: FlowCount = FlowCount(0)
+  def apply(value: Int): FlowCount = new FlowCount(Some(value))
+
+  def infinite: FlowCount = FlowCount(Some(0))
 }

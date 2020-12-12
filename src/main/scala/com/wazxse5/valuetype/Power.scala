@@ -1,15 +1,16 @@
 package com.wazxse5.valuetype
 
+import com.wazxse5.valuetype.ValueType.unknown
 import play.api.libs.json.{JsString, JsValue}
 
 sealed trait Power extends PropAndParam[String] {
   override def companion: PropAndParamCompanion = Power
 
-  override def strValue: String = value
+  override def strValue: String = value.getOrElse(unknown)
 
-  override def paramValue: JsValue = JsString(value)
+  override def paramValue: JsValue = JsString(strValue)
 
-  override def isValid: Boolean = Power.values.contains(value)
+  override def isValid: Boolean = value.exists(Power.values.contains)
 }
 
 object Power extends PropAndParamCompanion {
@@ -21,6 +22,7 @@ object Power extends PropAndParamCompanion {
   def apply(value: String, isBackground: Boolean = false): Power = value match {
     case "on" => PowerOn(isBackground)
     case "off" => PowerOff(isBackground)
+    case _ => PowerUnknown(isBackground)
   }
 
   def on: Power = PowerOn(false)
@@ -29,13 +31,20 @@ object Power extends PropAndParamCompanion {
   def off: Power = PowerOff(false)
   def off(isBackground: Boolean): Power = PowerOff(isBackground)
 
+  def unknown: Power = PowerUnknown(false)
+  def unknown(isBackground: Boolean): Power = PowerUnknown(isBackground)
+
   val values = Set("on", "off")
 }
 
 final case class PowerOn(isBackground: Boolean) extends Power {
-  override val value: String = "on"
+  override val value: Option[String] = Some("on")
 }
 
 final case class PowerOff(isBackground: Boolean) extends Power {
-  override val value: String = "off"
+  override val value: Option[String] = Some("off")
+}
+
+final case class PowerUnknown(isBackground: Boolean) extends Power {
+  override val value: Option[String] = None
 }

@@ -1,6 +1,7 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNumber, JsString, JsValue}
+import com.wazxse5.valuetype.ValueType.unknown
+import play.api.libs.json.{JsString, JsValue}
 
 sealed trait SceneValue[A] extends Parameter[A] {
   override def companion: ParamCompanion = SceneValue
@@ -12,18 +13,18 @@ object SceneValue extends ParamCompanion {
 }
 
 
-case class StringSceneValue(value: String) extends SceneValue[String] {
-  override def paramValue: JsValue = JsString(value)
+case class StringSceneValue(value: Option[String]) extends SceneValue[String] {
+  override def strValue: String = value.getOrElse(unknown)
 
-  override def strValue: String = value
+  override def paramValue: JsValue = JsString(strValue)
 
   override def isValid: Boolean = true
 }
 
-case class IntSceneValue(value: Int) extends SceneValue[Int] {
-  override def paramValue: JsValue = JsNumber(value)
+case class IntSceneValue(value: Option[Int]) extends SceneValue[Int] {
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
-  override def strValue: String = value.toString
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
   override def isValid: Boolean = true
 }

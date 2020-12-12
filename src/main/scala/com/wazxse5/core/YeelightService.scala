@@ -8,7 +8,7 @@ trait YeelightService {
 
   def devices: Set[YeelightDevice]
 
-  def deviceInfo(internalId: InternalId): Option[DeviceInfo]
+  def deviceInfo(internalId: InternalId): DeviceInfo
 
   def deviceOf(deviceInfo: DeviceInfo): YeelightDevice
 

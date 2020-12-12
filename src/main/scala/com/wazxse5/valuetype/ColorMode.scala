@@ -1,14 +1,10 @@
 package com.wazxse5.valuetype
 import com.wazxse5.snapshot.SnapshotInfo
-import play.api.libs.json.JsNumber
+import com.wazxse5.valuetype.ValueType.{jsValueOrUnknown, unknown}
 
 sealed trait ColorMode extends Property[Int] {
-
   override def companion: PropCompanion = ColorMode
-
-  override def strValue: String = value.toString
-
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, jsValueOrUnknown(value))
 }
 
 object ColorMode extends PropCompanion {
@@ -29,17 +25,28 @@ object ColorMode extends PropCompanion {
   def rgb(isBackground: Boolean): ColorMode = RgbColorMode(isBackground)
   def temperature(isBackground: Boolean): ColorMode = TemperatureColorMode(isBackground)
   def hsv(isBackground: Boolean): ColorMode = HsvColorMode(isBackground)
+
+  def unknown(isBackground: Boolean): ColorMode = UnknownColorMode(isBackground)
+  def unknown: ColorMode = UnknownColorMode(false)
 }
 
 final case class RgbColorMode(isBackground: Boolean) extends ColorMode {
-  override val value: Int = 1
+  override val value: Option[Int] = Some(1)
+  override val strValue: String = "rgb"
 }
 
 final case class TemperatureColorMode(isBackground: Boolean) extends ColorMode {
-  override val value: Int = 2
+  override val value: Option[Int] = Some(2)
+  override val strValue: String = "temperature"
 }
 
 final case class HsvColorMode(isBackground: Boolean) extends ColorMode {
-  override val value: Int = 3
+  override val value: Option[Int] = Some(3)
+  override val strValue: String = "hsv"
+}
+
+final case class UnknownColorMode(isBackground: Boolean) extends ColorMode {
+  override val value: Option[Int] = None
+  override val strValue: String = unknown
 }
 

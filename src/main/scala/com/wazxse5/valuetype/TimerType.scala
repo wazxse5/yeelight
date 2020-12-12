@@ -9,11 +9,11 @@ case object TimerType extends Parameter[Int] with ParamCompanion {
 
   override val paramName: String = "type"
 
-  override val value: Int = 0
+  override val value: Option[Int] = Some(0)
 
-  override def strValue: String = value.toString
+  override def strValue: String = value.get.toString
 
-  override def paramValue: JsValue = JsNumber(value)
+  override def paramValue: JsValue = JsNumber(value.get)
 
-  override def isValid: Boolean = value == 0
+  override def isValid: Boolean = value.contains(0)
 }

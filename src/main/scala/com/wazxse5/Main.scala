@@ -14,7 +14,7 @@ object Main {
     val cli = new CLI(service)
 
     while (true) {
-      val input = StdIn.readLine
+      val input = StdIn.readLine()
       cli.perform(input)
     }
 

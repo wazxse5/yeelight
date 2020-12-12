@@ -1,15 +1,15 @@
 package com.wazxse5.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+import play.api.libs.json.JsValue
 
-case class Saturation(value: Int, isBackground: Boolean = false) extends PropAndParam[Int] {
+case class Saturation(value: Option[Int], isBackground: Boolean) extends PropAndParam[Int] {
   override def companion: PropAndParamCompanion = Saturation
 
-  override def strValue: String = value.toString
+  override def strValue: String = ValueType.strValueOrUnknown(value)
 
-  override def paramValue: JsValue = JsNumber(value)
+  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
 
-  override def isValid: Boolean = value >= 0 && value <= 100
+  override def isValid: Boolean = value.exists(v => v >= 0 && v <= 100)
 }
 
 object Saturation extends PropAndParamCompanion {
@@ -17,4 +17,9 @@ object Saturation extends PropAndParamCompanion {
   val paramName: String = "sat"
   val propFgName: String = "sat"
   override val propBgName: String = "bg_sat"
+
+  def unknown: Saturation = new Saturation(None, isBackground = false)
+  def unknown(isBackground: Boolean): Saturation = new Saturation(None, isBackground)
+  def apply(value: Int): Saturation = new Saturation(Some(value), false)
+  def apply(value: Int, isBackground: Boolean = false): Saturation = new Saturation(Some(value), isBackground)
 }

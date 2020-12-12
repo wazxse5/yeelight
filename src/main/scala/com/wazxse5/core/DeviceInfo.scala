@@ -3,7 +3,9 @@ package com.wazxse5.core
 import com.wazxse5.connection.NetworkLocation
 import com.wazxse5.message.DeviceInfoMessage
 import com.wazxse5.valuetype._
+import org.joda.time.DateTime
 
+// TODO: być może trzeba przerobić na zwykłą klasę ze względu na lastUpdate
 case class DeviceInfo(
   internalId: InternalId,
   location: Option[NetworkLocation],
@@ -14,56 +16,60 @@ case class DeviceInfo(
   firmwareVersion: Option[String],
   supportedCommands: Option[Set[String]],
   //
-  brightness: Option[Brightness] = None,
-  colorMode: Option[ColorMode] = None,
-  flowExpression: Option[FlowExpression] = None,
-  flowPower: Option[FlowPower] = None,
-  hue: Option[Hue] = None,
-  musicPower: Option[MusicPower] = None,
-  name: Option[Name] = None,
-  power: Option[Power] = None,
-  rgb: Option[Rgb] = None,
-  saturation: Option[Saturation] = None,
-  temperature: Option[Temperature] = None,
-  timerValue: Option[TimerValue] = None,
+  brightness: Brightness = Brightness.unknown,
+  colorMode: ColorMode = ColorMode.unknown,
+  flowExpression: FlowExpression = FlowExpression.unknown,
+  flowPower: FlowPower = FlowPower.unknown,
+  hue: Hue = Hue.unknown,
+  musicPower: MusicPower = MusicPower.unknown,
+  name: Name = Name.unknown,
+  power: Power = Power.unknown,
+  rgb: Rgb = Rgb.unknown,
+  saturation: Saturation = Saturation.unknown,
+  temperature: Temperature = Temperature.unknown,
+  timerValue: TimerValue = TimerValue.unknown,
   //
-  bgBrightness: Option[Brightness] = None,
-  bgColorMode: Option[ColorMode] = None,
-  bgFlowExpression: Option[FlowExpression] = None,
-  bgFlowPower: Option[FlowPower] = None,
-  bgHue: Option[Hue] = None,
-  bgPower: Option[Power] = None,
-  bgRgb: Option[Rgb] = None,
-  bgSaturation: Option[Saturation] = None,
-  bgTemperature: Option[Temperature] = None,
+  bgBrightness: Brightness = Brightness.unknown(isBackground = true),
+  bgColorMode: ColorMode = ColorMode.unknown(isBackground = true),
+  bgFlowExpression: FlowExpression = FlowExpression.unknown(isBackground = true),
+  bgFlowPower: FlowPower = FlowPower.unknown(isBackground = true),
+  bgHue: Hue = Hue.unknown(isBackground = true),
+  bgPower: Power = Power.unknown(isBackground = true),
+  bgRgb: Rgb = Rgb.unknown(isBackground = true),
+  bgSaturation: Saturation = Saturation.unknown(isBackground = true),
+  bgTemperature: Temperature = Temperature.unknown(isBackground = true),
+  //
+  lastUpdate: DateTime = DateTime.now()
 ) {
 
-  def withStateUpdate(stateUpdate: StateUpdate): DeviceInfo = copy(
-    brightness = stateUpdate.brightness.orElse(brightness),
-    colorMode = stateUpdate.colorMode.orElse(colorMode),
-    flowExpression = stateUpdate.flowExpression.orElse(flowExpression),
-    flowPower = stateUpdate.flowPower.orElse(flowPower),
-    hue = stateUpdate.hue.orElse(hue),
-    musicPower = stateUpdate.musicPower.orElse(musicPower),
-    name = stateUpdate.name.orElse(name),
-    power = stateUpdate.power.orElse(power),
-    rgb = stateUpdate.rgb.orElse(rgb),
-    saturation = stateUpdate.saturation.orElse(saturation),
-    temperature = stateUpdate.temperature.orElse(temperature),
-    timerValue = stateUpdate.timerValue.orElse(timerValue),
+  def withStateUpdate(stateUpdate: PropsUpdate): DeviceInfo = copy(
+    brightness = stateUpdate.brightness.getOrElse(brightness),
+    colorMode = stateUpdate.colorMode.getOrElse(colorMode),
+    flowExpression = stateUpdate.flowExpression.getOrElse(flowExpression),
+    flowPower = stateUpdate.flowPower.getOrElse(flowPower),
+    hue = stateUpdate.hue.getOrElse(hue),
+    musicPower = stateUpdate.musicPower.getOrElse(musicPower),
+    name = stateUpdate.name.getOrElse(name),
+    power = stateUpdate.power.getOrElse(power),
+    rgb = stateUpdate.rgb.getOrElse(rgb),
+    saturation = stateUpdate.saturation.getOrElse(saturation),
+    temperature = stateUpdate.temperature.getOrElse(temperature),
+    timerValue = stateUpdate.timerValue.getOrElse(timerValue),
     //
-    bgBrightness = stateUpdate.bgBrightness.orElse(bgBrightness),
-    bgColorMode = stateUpdate.bgColorMode.orElse(bgColorMode),
-    bgFlowExpression = stateUpdate.bgFlowExpression.orElse(bgFlowExpression),
-    bgFlowPower = stateUpdate.bgFlowPower.orElse(bgFlowPower),
-    bgHue = stateUpdate.bgHue.orElse(bgHue),
-    bgPower = stateUpdate.bgPower.orElse(bgPower),
-    bgRgb = stateUpdate.bgRgb.orElse(bgRgb),
-    bgSaturation = stateUpdate.bgSaturation.orElse(bgSaturation),
-    bgTemperature = stateUpdate.bgTemperature.orElse(bgTemperature)
+    bgBrightness = stateUpdate.bgBrightness.getOrElse(bgBrightness),
+    bgColorMode = stateUpdate.bgColorMode.getOrElse(bgColorMode),
+    bgFlowExpression = stateUpdate.bgFlowExpression.getOrElse(bgFlowExpression),
+    bgFlowPower = stateUpdate.bgFlowPower.getOrElse(bgFlowPower),
+    bgHue = stateUpdate.bgHue.getOrElse(bgHue),
+    bgPower = stateUpdate.bgPower.getOrElse(bgPower),
+    bgRgb = stateUpdate.bgRgb.getOrElse(bgRgb),
+    bgSaturation = stateUpdate.bgSaturation.getOrElse(bgSaturation),
+    bgTemperature = stateUpdate.bgTemperature.getOrElse(bgTemperature),
+    //
+    lastUpdate = DateTime.now()
   )
   
-  def update(deviceInfo: DeviceInfo): DeviceInfo = copy(
+  def update(deviceInfo: DeviceInfo)(implicit allowUpdateToUnknownIfKnown: Boolean = false): DeviceInfo = copy(
     location = deviceInfo.location.orElse(location),
     //
     id = deviceInfo.id.orElse(id),
@@ -71,29 +77,36 @@ case class DeviceInfo(
     firmwareVersion = deviceInfo.firmwareVersion.orElse(firmwareVersion),
     supportedCommands = deviceInfo.supportedCommands.orElse(supportedCommands),
     //
-    brightness = deviceInfo.brightness.orElse(brightness),
-    colorMode = deviceInfo.colorMode.orElse(colorMode),
-    flowExpression = deviceInfo.flowExpression.orElse(flowExpression),
-    flowPower = deviceInfo.flowPower.orElse(flowPower),
-    hue = deviceInfo.hue.orElse(hue),
-    musicPower = deviceInfo.musicPower.orElse(musicPower),
-    name = deviceInfo.name.orElse(name),
-    power = deviceInfo.power.orElse(power),
-    rgb = deviceInfo.rgb.orElse(rgb),
-    saturation = deviceInfo.saturation.orElse(saturation),
-    temperature = deviceInfo.temperature.orElse(temperature),
-    timerValue = deviceInfo.timerValue.orElse(timerValue),
+    brightness = updateProperty(brightness, deviceInfo.brightness),
+    colorMode = updateProperty(colorMode, deviceInfo.colorMode),
+    flowExpression = updateProperty(flowExpression, deviceInfo.flowExpression),
+    flowPower = updateProperty(flowPower, deviceInfo.flowPower),
+    hue = updateProperty(hue, deviceInfo.hue),
+    musicPower = updateProperty(musicPower, deviceInfo.musicPower),
+    name = updateProperty(name, deviceInfo.name),
+    power = updateProperty(power, deviceInfo.power),
+    rgb = updateProperty(rgb, deviceInfo.rgb),
+    saturation = updateProperty(saturation, deviceInfo.saturation),
+    temperature = updateProperty(temperature, deviceInfo.temperature),
+    timerValue = updateProperty(timerValue, deviceInfo.timerValue),
     //
-    bgBrightness = deviceInfo.bgBrightness.orElse(bgBrightness),
-    bgColorMode = deviceInfo.bgColorMode.orElse(bgColorMode),
-    bgFlowExpression = deviceInfo.bgFlowExpression.orElse(bgFlowExpression),
-    bgFlowPower = deviceInfo.bgFlowPower.orElse(bgFlowPower),
-    bgHue = deviceInfo.bgHue.orElse(bgHue),
-    bgPower = deviceInfo.bgPower.orElse(bgPower),
-    bgRgb = deviceInfo.bgRgb.orElse(bgRgb),
-    bgSaturation = deviceInfo.bgSaturation.orElse(bgSaturation),
-    bgTemperature = deviceInfo.bgTemperature.orElse(bgTemperature)
+    bgBrightness = updateProperty(bgBrightness, deviceInfo.bgBrightness),
+    bgColorMode = updateProperty(bgColorMode, deviceInfo.bgColorMode),
+    bgFlowExpression = updateProperty(bgFlowExpression, deviceInfo.bgFlowExpression),
+    bgFlowPower = updateProperty(bgFlowPower, deviceInfo.bgFlowPower),
+    bgHue = updateProperty(bgHue, deviceInfo.bgHue),
+    bgPower = updateProperty(bgPower, deviceInfo.bgPower),
+    bgRgb = updateProperty(bgRgb, deviceInfo.bgRgb),
+    bgSaturation = updateProperty(bgSaturation, deviceInfo.bgSaturation),
+    bgTemperature = updateProperty(bgTemperature, deviceInfo.bgTemperature),
+    //
+    lastUpdate = DateTime.now()
   )
+
+  private def updateProperty[A <: ValueType[_]](oldValue: A, newValue: A)(implicit allowUpdateToUnknownIfKnown: Boolean): A = {
+    if (oldValue.isKnown && newValue.isUnknown && !allowUpdateToUnknownIfKnown) oldValue
+    else newValue
+  }
 }
 
 object DeviceInfo {
@@ -107,14 +120,14 @@ object DeviceInfo {
     Some(message.firmwareVersion),
     Some(message.supportedCommands),
     //
-    brightness = Some(Brightness(message.brightness)),
-    colorMode = Some(ColorMode(message.colorMode)),
-    hue = Some(Hue(message.hue)),
-    name = Some(Name(message.name)),
-    power = Some(Power(message.power)),
-    rgb = Some(Rgb(message.rgb)),
-    saturation = Some(Saturation(message.saturation)),
-    temperature = Some(Temperature(message.temperature))
+    brightness = Brightness(message.brightness),
+    colorMode = ColorMode(message.colorMode),
+    hue = Hue(message.hue),
+    name = Name(message.name),
+    power = Power(message.power),
+    rgb = Rgb(message.rgb),
+    saturation = Saturation(message.saturation),
+    temperature = Temperature(message.temperature)
   )
 
   def empty: DeviceInfo = new DeviceInfo(

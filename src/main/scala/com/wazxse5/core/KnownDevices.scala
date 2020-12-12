@@ -23,7 +23,7 @@ class KnownDevices {
 
   def all: Iterable[DeviceInfo] = knownDevices.values
 
-  def update(internalId: InternalId, stateUpdate: StateUpdate): Unit = {
+  def update(internalId: InternalId, stateUpdate: PropsUpdate): Unit = {
     if (knownDevices.contains(internalId)) {
       knownDevices += internalId -> get(internalId).withStateUpdate(stateUpdate)
     }

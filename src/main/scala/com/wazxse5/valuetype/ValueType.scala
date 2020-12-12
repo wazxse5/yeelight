@@ -4,14 +4,23 @@ import com.wazxse5.snapshot.{SnapshotInfo, Snapshotable}
 import play.api.libs.json.{JsBoolean, JsNumber, JsString, JsValue}
 
 trait ValueType[A] extends Snapshotable {
-  def value: A
+  def value: Option[A]
   def strValue: String
   def companion: ValueTypeCompanion
 
+  def isKnown: Boolean = value.isDefined
+  def isUnknown: Boolean = !isKnown
   def isProp: Boolean = false
   def isParam: Boolean = false
   final def isPropAndParam: Boolean = isProp && isParam
   final def isPropOrParam: Boolean = isProp || isParam
+}
+
+object ValueType {
+  val unknown = "/unknown/"
+  val undefined = "/undefined/"
+  def strValueOrUnknown(i: Option[Int]): String = i.map(_.toString).getOrElse(unknown)
+  def jsValueOrUnknown(i: Option[Int]): JsValue = i.map(JsNumber(_)).getOrElse(JsString(unknown))
 }
 
 trait Parameter[A] extends ValueType[A] {
@@ -19,7 +28,6 @@ trait Parameter[A] extends ValueType[A] {
   def paramValue: JsValue
   def companion: ParamCompanion
   def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, paramValue)
-
   def isValid: Boolean
   def isEmptyParam: Boolean = false
   override final def isParam: Boolean = true
@@ -30,7 +38,6 @@ trait Property[A] extends ValueType[A] {
   def propBgName: String = companion.propBgName
   final def propName: String = if (isBackground) propBgName else propFgName
   def companion: PropCompanion
-
   def isBackground: Boolean
   override final def isProp: Boolean = true
 }

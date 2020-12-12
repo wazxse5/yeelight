@@ -2,7 +2,7 @@ package com.wazxse5.valuetype
 
 import com.wazxse5.exception.EmptyParamException
 
-case object EmptyParam extends Parameter[String] with ParamCompanion {
+case object EmptyParam extends Parameter[Nothing] with ParamCompanion {
   override def companion: ParamCompanion = this
 
   override def value = throw new EmptyParamException
