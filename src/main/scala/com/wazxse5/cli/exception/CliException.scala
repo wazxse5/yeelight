@@ -2,54 +2,56 @@ package com.wazxse5.cli.exception
 
 import com.wazxse5.cli.CliDevice
 
-trait CliException extends Exception {
-  def cliMessage: String
-}
+trait CliException extends Exception
 
-case class AliasReservedKeyWordException(alias: String) extends CliException{
-  override def cliMessage: String = s"""alias "$alias" is reserved keywords"""
-}
-
-case class AliasTaken(alias: String) extends CliException {
-  override def cliMessage: String = s"""alias "$alias" is taken"""
+case class AliasUnavailableException(alias: String, reason: String) extends CliException {
+  override def getMessage: String = s"""alias "$alias" is $reason"""
 }
 
 case class DeviceNotFoundException(deviceIdentifier: String) extends CliException {
-  override def cliMessage: String = s"""not found device identified by "$deviceIdentifier""""
+  override def getMessage: String = s"""not found device identified by "$deviceIdentifier""""
 }
 
-case class InvalidParamValueCommandException(paramName: String, invalidValue: Option[String] = None) extends CliException {
-  override def cliMessage: String = {
-    if (invalidValue.isEmpty) s"value of param $paramName is emptyCommand"
+case class InvalidParamValueCommandException(paramName: String, invalidValue: Option[String]) extends CliException {
+  override def getMessage: String = {
+    if (invalidValue.isEmpty) s"empty value of param $paramName"
     else s"""invalid value "${invalidValue.get}" of param $paramName"""
   }
 }
 
-object InvalidParamValueCommandException {
-  def apply(paramName: String, invalidValue: List[String]): InvalidParamValueCommandException = new InvalidParamValueCommandException(paramName, invalidValue.headOption)
-}
-
 case class NotImplementedCommandException(commandName: String) extends CliException {
-  override def cliMessage: String = s"$commandName is not implemented yet"
+  override def getMessage: String = s"$commandName command is not implemented yet"
 }
 
-case class UnknownCommandException(unknownCommand: Option[String], expectedValues: Seq[String], after: Option[String]) extends CliException {
-  override def cliMessage: String = {
-    val commandS = if (unknownCommand.isDefined) s"""unknown command "$unknownCommand"""" else "emptyCommand command "
-    val afterS = if (after.isDefined) s""" after "${after.get}"""" else ""
+case class InvalidCommandException(unknownCommand: Option[String], expectedValues: Seq[String] = Seq.empty) extends CliException {
+  override def getMessage: String = {
     val expectedS = if (expectedValues.nonEmpty) s" - expected {${expectedValues.mkString(",")}}" else ""
-    commandS + afterS + expectedS
+    val commandS = if (unknownCommand.isEmpty) "empty command" else s"""unknown command "${unknownCommand.get}""""
+    commandS + expectedS
   }
 }
 
-object UnknownCommandException {
-  def apply(unknown: String): UnknownCommandException = new UnknownCommandException(Some(unknown), Seq.empty, None)
-  def apply(unknown: String, expectedValues: Seq[String]): UnknownCommandException = new UnknownCommandException(Some(unknown), expectedValues, None)
-  def apply(unknown: Option[String], expectedValues: Seq[String]): UnknownCommandException = new UnknownCommandException(unknown, expectedValues, None)
-  def expectedNothing(unknown: String): UnknownCommandException = new UnknownCommandException(Some(unknown), Seq("'nothing'"), None)
-  def emptyCommand: UnknownCommandException = new UnknownCommandException(None, Seq.empty, None)
+case class UnsupportedCommandException(commandName: String, cliDevice: CliDevice) extends CliException {
+  override def getMessage: String = s"$commandName is not supported by device ${cliDevice.alias getOrElse cliDevice.cliId}"
 }
 
-case class UnsupportedCommandException(commandName: String, cliDevice: CliDevice) extends CliException {
-  override def cliMessage: String = s"$commandName is not supported by device ${cliDevice.alias getOrElse cliDevice.cliId}"
+object AliasUnavailableException {
+  def taken(alias: String): AliasUnavailableException = AliasUnavailableException(alias, "taken")
+  def reservedKeyword(alias: String): AliasUnavailableException = AliasUnavailableException(alias, "reserved keyword")
+}
+
+object InvalidParamValueCommandException {
+  def apply(paramName: String, invalidValue: String): InvalidParamValueCommandException = {
+    new InvalidParamValueCommandException(paramName, Some(invalidValue))
+  }
+}
+
+object InvalidCommandException {
+  def apply(command: String): InvalidCommandException = new InvalidCommandException(Some(command))
+  def apply(command: List[String]): InvalidCommandException = {
+    new InvalidCommandException(if (command.nonEmpty) Some(command.mkString(" ")) else None)
+  }
+  def expectedNothing(command: String): InvalidCommandException = {
+    new InvalidCommandException(Some(command), Seq("nothing"))
+  }
 }

@@ -14,6 +14,7 @@ object CliCommands {
     val listenOn = "on"
     val listenOff = "off"
     val _commands = Seq(deviceOf, devices, discover, listen)
+    val keeywords_ = Seq("a")
   }
 
   val allDevices_ = "all"
@@ -99,11 +100,11 @@ object CliCommands {
   object message {
     val aliasReservedKeyword = "alias is reserved keyword"
     val aliasTaken = "alias is taken"
-    val emptyCommand = "emptyCommand command"
+    val emptyCommand = "emptyCommand cliCommand"
     val noDevices = "no devices"
-    val unknownCommand = "unknown command"
+    val unknownCommand = "unknown cliCommand"
     val unknownDevice = "unknown device"
-    val unsupportedCommand = "unsupported command"
+    val unsupportedCommand = "unsupported cliCommand"
   }
 
   val _keywords: Seq[String] = app._commands :++ service._commands :++ device._commands :++ device._keywords

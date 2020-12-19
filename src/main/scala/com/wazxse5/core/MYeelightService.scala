@@ -54,13 +54,13 @@ class MYeelightService extends YeelightService with StrictLogging {
   }
 
   override def performCommand(internalId: InternalId, command: YeelightCommand): Unit = {
-    logger.info(s"Performing command on device internalId=$internalId command=$command")
+    logger.info(s"Performing cliCommand on device internalId=$internalId cliCommand=$command")
     if (knownDevices.contains(internalId)) {
       val message = CommandMessage(command, internalId)
       messageRegistry.put(message)
       connectionAdapter.send(message)
     }
-    else logger.warn(s"Cannot perform command $command") // TODO: Do refaktoryzacji na później
+    else logger.warn(s"Cannot perform cliCommand $command") // TODO: Do refaktoryzacji na później
   }
 
   def handleMessage(message: Message): Unit = message match {

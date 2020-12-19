@@ -18,6 +18,8 @@ object Main {
       cli.perform(input)
     }
 
+    println("DUpa")
+
   }
 }
  
