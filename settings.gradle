@@ -1,2 +1,3 @@
 rootProject.name = 'yeelight'
 
+include 'yeelight-core', 'yeelight-cli', 'yeelight-gui'

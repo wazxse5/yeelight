@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+javafx {
+    version = "14.0.2.1"
+    modules = [ 'javafx.controls' ]
+}
+
+dependencies {
+    implementation project(':yeelight-core')
+
+//    implementation 'org.scalafx:scalafx_2.13:12.0.2-R18'
+//    compile group: 'org.openjfx', name: 'javafx', version: '14.0.2.1', ext: 'pom'
+}

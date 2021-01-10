@@ -1,0 +1,9 @@
+plugins {
+    id 'scala'
+}
+
+sourceCompatibility = 1.8
+
+dependencies {
+    implementation project(':yeelight-core')
+}
