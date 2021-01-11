@@ -1,6 +1,12 @@
 # Project exclude paths
 /.gradle/
+/.idea/workspace.xml
+/notes/
 /build/
 /out/
-/out/production/classes/
-/notes/
+yeelight-core/build/
+yeelight-core/out/
+yeelight-cli/build/
+yeelight-cli/out/
+yeelight-gui/build/
+yeelight-gui/out/

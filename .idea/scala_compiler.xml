@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="Gradle 1" modules="yeelight,yeelight.main,yeelight.test,yeelight.yeelight-cli.main,yeelight.yeelight-cli.test,yeelight.yeelight-core.main,yeelight.yeelight-core.test">
+    <profile name="Gradle 1" modules="yeelight.yeelight-cli.main,yeelight.yeelight-cli.test,yeelight.yeelight-core.main,yeelight.yeelight-core.test">
       <option name="deprecationWarnings" value="true" />
       <option name="uncheckedWarnings" value="true" />
       <parameters>
