@@ -1,39 +1,36 @@
 package com.wazxse5.yeelight.valuetype
 
-import com.wazxse5.yeelight.exception.InvalidParamValueException
-import com.wazxse5.yeelight.valuetype.ValueType.unknown
 import play.api.libs.json.{JsString, JsValue}
 
-sealed trait Effect extends Parameter[String] {
-  override def companion: ParamCompanion = Effect
+import scala.util.Try
 
-  override def strValue: String = value.getOrElse(unknown)
-
+sealed trait Effect extends ParamValueType[String] {
+  override def strValue: String = value
   override def paramValue: JsValue = JsString(strValue)
-
-  override def isValid: Boolean = value.isDefined && Effect.values.contains(value.get)
+  override def companion: ParamCompanion = Effect
 }
 
 object Effect extends ParamCompanion {
-  val snapshotName: String = "effect"
-  val paramName: String = "effect"
+  override val snapshotName = "effect"
+  override val paramName = "effect"
 
-  case object Sudden extends Effect {
-    override val value: Option[String] = Some("sudden")
+  def sudden: Effect = EffectSudden
+  def smooth: Effect = EffectSmooth
+
+  val typeByValue: Map[String, Effect] = Seq(sudden, smooth).map(v => v.value -> v).toMap
+  val values: Seq[String] = typeByValue.keys.toSeq
+
+  def fromString(str: String): Option[Effect] = Try(typeByValue(str)).toOption
+  def fromJsValue(jsValue: JsValue): Option[Effect] = jsValue match {
+    case JsString(value) => fromString(value)
+    case _ => None
   }
+}
 
-  case object Smooth extends Effect {
-    override val value: Option[String] = Some("smooth")
-  }
+case object EffectSudden extends Effect {
+  override val value = "sudden"
+}
 
-  def apply(value: String): Effect = value match {
-    case "sudden" => Sudden
-    case "smooth" => Smooth
-    case _ => throw new InvalidParamValueException(value)
-  }
-
-  def sudden: Effect = Sudden
-  def smooth: Effect = Smooth
-
-  def values = Set(Sudden.value.get, Smooth.value.get)
+case object EffectSmooth extends Effect {
+  override val value = "smooth"
 }

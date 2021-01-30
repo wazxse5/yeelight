@@ -2,13 +2,13 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype._
 
-case class SetHsv(p1: Hue, p2: Saturation, p3: Effect, p4: Duration) extends YeelightCommand4 {
+case class SetHsv(
+  p1: MandatoryParameter[Hue],
+  p2: MandatoryParameter[Saturation],
+  p3: MandatoryParameter[Effect],
+  p4: MandatoryParameter[Duration]
+) extends YeelightCommand4 {
   override def companion: YeelightCommandCompanion = SetHsv
-
-  override def p1Mandatory: Boolean = true
-  override def p2Mandatory: Boolean = true
-  override def p3Mandatory: Boolean = true
-  override def p4Mandatory: Boolean = true
 }
 
 case object SetHsv extends YeelightCommandCompanion {

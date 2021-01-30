@@ -7,13 +7,12 @@ object CliCommands {
   }
 
   object service {
-    val deviceOf = "deviceof"
     val devices = "devices"
     val discover = "discover"
     val listen = "listen"
     val listenOn = "on"
     val listenOff = "off"
-    val _commands = Seq(deviceOf, devices, discover, listen)
+    val _commands = Seq(devices, discover, listen)
     val keeywords_ = Seq("a")
   }
 

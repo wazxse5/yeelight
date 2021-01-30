@@ -2,12 +2,12 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype.{Duration, Effect, Temperature}
 
-case class SetTemperature(p1: Temperature, p2: Effect, p3: Duration) extends YeelightCommand3 {
+case class SetTemperature(
+  p1: MandatoryParameter[Temperature],
+  p2: MandatoryParameter[Effect],
+  p3: MandatoryParameter[Duration]
+) extends YeelightCommand3 {
   def companion: YeelightCommandCompanion = SetTemperature
-
-  override def p1Mandatory: Boolean = true
-  override def p2Mandatory: Boolean = true
-  override def p3Mandatory: Boolean = true
 }
 
 object SetTemperature extends YeelightCommandCompanion {

@@ -1,18 +1,23 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class TcpPort(value: Option[Int]) extends Parameter[Int] {
+import scala.util.Try
+
+case class TcpPort(value: Int) extends ParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: ParamCompanion = TcpPort
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => 0 < v && v <= 65535)
+  override def isValid: Boolean = 0 < value && value <= 65535
 }
 
 object TcpPort extends ParamCompanion {
-  val snapshotName: String = "port"
-  val paramName: String = "port"
+  override val snapshotName = "port"
+  override val paramName = "port"
+
+  def fromString(str: String): Option[TcpPort] = Try(TcpPort(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[TcpPort] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

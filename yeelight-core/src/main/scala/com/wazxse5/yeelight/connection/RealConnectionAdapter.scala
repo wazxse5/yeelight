@@ -2,8 +2,9 @@ package com.wazxse5.yeelight.connection
 
 import akka.actor.{ActorRef, ActorSystem}
 import com.wazxse5.yeelight.connection.Connector.Send
-import com.wazxse5.yeelight.core.{InternalId, YeelightService}
+import com.wazxse5.yeelight.core.YeelightService
 import com.wazxse5.yeelight.message.{CommandMessage, Message}
+import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -15,7 +16,7 @@ class RealConnectionAdapter(val service: YeelightService) extends ConnectionAdap
   private implicit val actorSystem: ActorSystem = ActorSystem("yeelight-actor-system")
   private val discoverer: ActorRef = actorSystem.actorOf(Discoverer.props(this))
   private val listener: ActorRef = actorSystem.actorOf(Listener.props(this))
-  private var connectors: Map[InternalId, ActorRef] = Map.empty
+  private var connectors: Map[String, ActorRef] = Map.empty
 
   override def search(): Unit = discoverer ! Discoverer.Search
 
@@ -23,12 +24,12 @@ class RealConnectionAdapter(val service: YeelightService) extends ConnectionAdap
 
   override def stopListening(): Unit = listener ! Listener.Stop
 
-  override def connect(internalId: InternalId, location: NetworkLocation): Unit = {
-    val connector = actorSystem.actorOf(Connector.props(location, internalId, this))
-    this.connectors += internalId -> connector
+  override def connect(deviceId: String, address: IpAddress, port: TcpPort): Unit = {
+    val connector = actorSystem.actorOf(Connector.props(deviceId, address, port, this))
+    this.connectors += deviceId -> connector
   }
 
-  override def isConnected(internalId: InternalId): Boolean = connectors.contains(internalId)
+  override def isConnected(deviceId: String): Boolean = connectors.contains(deviceId)
 
   override def send(message: CommandMessage): Unit = {
     connectors.get(message.deviceId) foreach (_ ! Send(message))

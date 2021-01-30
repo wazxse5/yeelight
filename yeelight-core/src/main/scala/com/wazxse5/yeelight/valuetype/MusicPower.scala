@@ -1,42 +1,37 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-sealed trait MusicPower extends PropAndParam[Int] {
+import scala.util.Try
+
+sealed trait MusicPower extends PropAndParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = MusicPower
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def isBackground: Boolean = false
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => v == 0 || v == 1)
 }
 
 object MusicPower extends PropAndParamCompanion {
-  val snapshotName: String = "musicPower"
-  val paramName: String = "action"
-  val propFgName: String = "music_on"
-
-  def apply(value: Int): MusicPower = value match {
-    case 0 => MusicOn
-    case 1 => MusicOff
-  }
+  override val snapshotName = "musicPower"
+  override val paramName = "action"
+  override val propFgName = "music_on"
 
   def on: MusicPower = MusicOn
   def off: MusicPower = MusicOff
-  def unknown: MusicPower = MusicUnknown
+
+  val typeByValue: Map[Int, MusicPower] = Seq(on, off).map(v => v.value -> v).toMap
+  val values: Seq[Int] = typeByValue.keys.toSeq
+
+  def fromString(str: String): Option[MusicPower] = Try(typeByValue(str.toInt)).toOption
+  def fromJsValue(jsValue: JsValue): Option[MusicPower] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }
 
 case object MusicOn extends MusicPower {
-  override val value: Option[Int] = Some(1)
+  override val value = 1
 }
 
 case object MusicOff extends MusicPower {
-  override val value: Option[Int] = Some(0)
-}
-
-case object MusicUnknown extends MusicPower {
-  override val value: Option[Int] = None
+  override val value = 0
 }

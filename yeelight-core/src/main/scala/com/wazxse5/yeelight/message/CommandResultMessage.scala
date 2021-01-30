@@ -1,18 +1,17 @@
 package com.wazxse5.yeelight.message
 
-import com.wazxse5.yeelight.core.InternalId
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import play.api.libs.json.{JsValue, Json}
 
 case class CommandResultMessage private (
   id: Int,
-  deviceId: InternalId,
+  deviceId: String,
   result: Option[Seq[String]] = None,
   errorCode: Option[Int] = None,
   errorMessage: Option[String] = None,
   json: JsValue,
   isValid: Boolean = true,
-) extends YeelightConnectedMessage with Identifiable {
+) extends YeelightConnectedMessage {
 
   override def text: String = Json.stringify(json)
 
@@ -23,7 +22,7 @@ case class CommandResultMessage private (
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
     "commandResultMessage", Json.obj(
       "id" -> id,
-      "deviceId" -> deviceId.snapshotInfo.value,
+      "deviceId" -> deviceId,
       "result" -> result,
       "errorCode" -> errorCode,
       "errorMessage" -> errorMessage
@@ -33,12 +32,12 @@ case class CommandResultMessage private (
 
 object CommandResultMessage {
 
-  def apply(json: JsValue, deviceInternalId: InternalId): CommandResultMessage = {
+  def apply(json: JsValue, deviceId: String): CommandResultMessage = {
     val id = (json \ "id").as[Int]
     val errorCode = (json \ "error" \ "code").asOpt[Int]
     val errorMessage = (json \ "error" \ "cliCommand").asOpt[String]
     val result = (json \ "result").asOpt[Seq[String]]
-    new CommandResultMessage(id, deviceInternalId, result, errorCode, errorMessage, json)
+    new CommandResultMessage(id, deviceId, result, errorCode, errorMessage, json)
   }
 
 }

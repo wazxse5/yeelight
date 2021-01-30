@@ -1,55 +1,58 @@
 package com.wazxse5.yeelight.valuetype
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import com.wazxse5.yeelight.valuetype.DeviceModel.snapshotName
-import com.wazxse5.yeelight.valuetype.ValueType.unknown
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, JsValue}
+
+import scala.util.Try
 
 sealed trait DeviceModel extends ValueType[String] {
-
+  override def strValue: String = value
   override def companion: ValueTypeCompanion = DeviceModel
-
-  override def strValue: String = value.getOrElse(unknown)
-
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName, JsString(strValue))
 }
 
 object DeviceModel extends ValueTypeCompanion {
-  val snapshotName: String = "deviceModel"
+  override val snapshotName = "deviceModel"
 
-  final case object Mono extends DeviceModel {
-    override val value: Option[String] = Some("mono")
+  def mono: DeviceModel = MonoDeviceModel
+  def color: DeviceModel = ColorDeviceModel
+  def stripe: DeviceModel = StripeDeviceModel
+  def ceiling: DeviceModel = CeilingDeviceModel
+  def deskLamp: DeviceModel = DeskLampDeviceModel
+  def bsLamp: DeviceModel = BsLampDeviceModel
+
+  val typeByValue: Map[String, DeviceModel] = Seq(mono, color, stripe, ceiling, deskLamp, bsLamp).map(v => v.value -> v).toMap
+  val values: Seq[String] = typeByValue.keys.toSeq
+
+  def fromString(str: String): Option[DeviceModel] = Try(typeByValue(str)).toOption
+  def fromJsValue(jsValue: JsValue): Option[DeviceModel] = jsValue match {
+    case JsString(value) => fromString(value)
+    case _ => None
   }
+}
 
-  final case object Color extends DeviceModel {
-    override val value: Option[String] = Some("color")
-  }
+case object MonoDeviceModel extends DeviceModel {
+  override val value = "mono"
+}
 
-  final case object Stripe extends DeviceModel {
-    override val value: Option[String] = Some("stripe")
-  }
+case object ColorDeviceModel extends DeviceModel {
+  override val value = "color"
+}
 
-  final case object Ceiling extends DeviceModel {
-    override val value: Option[String] = Some("ceiling")
-  }
+case object StripeDeviceModel extends DeviceModel {
+  override val value = "stripe"
+}
 
-  final case object DeskLamp extends DeviceModel {
-    override val value: Option[String] = Some("desklamp")
-  }
+case object CeilingDeviceModel extends DeviceModel {
+  override val value = "ceiling"
+}
 
-  final case object BsLamp extends DeviceModel {
-    override val value: Option[String] = Some("bslamp")
-  }
+case object DeskLampDeviceModel extends DeviceModel {
+  override val value = "desklamp"
+}
 
-  def apply(name: String): DeviceModel = name match {
-    case "mono" => Mono
-    case "color" => Color
-    case "stripe" => Stripe
-    case "ceiling" => Ceiling
-    case "desklamp" => DeskLamp
-    case "bslamp" => BsLamp
-  }
-
-  val values: Set[String] = Set(Mono, Color, Stripe, Ceiling, DeskLamp, BsLamp).map(_.value.get)
+case object BsLampDeviceModel extends DeviceModel {
+  override val value = "bslamp"
 }
 
 

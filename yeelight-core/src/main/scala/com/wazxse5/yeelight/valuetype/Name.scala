@@ -1,29 +1,22 @@
 package com.wazxse5.yeelight.valuetype
 
-import com.wazxse5.yeelight.valuetype.ValueType.{undefined, unknown}
 import play.api.libs.json.{JsString, JsValue}
 
-case class Name(value: Option[String]) extends PropAndParam[String] {
-  override def companion: PropAndParamCompanion = Name
-
-  override def strValue: String = value match {
-    case Some(v) if v.isEmpty => undefined
-    case Some(v) => v
-    case None => unknown
-  }
-
-  override def isBackground: Boolean = false
-
+case class Name(value: String) extends PropAndParamValueType[String] {
+  override def strValue: String = value
   override def paramValue: JsValue = JsString(strValue)
-
+  override def companion: PropAndParamCompanion = Name
   override def isValid: Boolean = value.nonEmpty
 }
 
 object Name extends PropAndParamCompanion {
-  val snapshotName: String = "commandName"
-  val paramName: String = "commandName"
-  val propFgName: String = "commandName"
+  override val snapshotName = "commandName"
+  override val paramName = "commandName"
+  override val propFgName = "commandName"
 
-  def apply(value: String): Name = new Name(Some(value))
-  def unknown: Name = new Name(None)
+  def fromString(str: String): Option[Name] = Some(Name(str)).filter(_.isValid)
+  def fromJsValue(jsValue: JsValue): Option[Name] = jsValue match {
+    case JsString(value) => fromString(value)
+    case _ => None
+  }
 }

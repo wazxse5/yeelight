@@ -1,25 +1,25 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class Hue(value: Option[Int], isBackground: Boolean) extends PropAndParam[Int] {
+import scala.util.Try
+
+case class Hue(value: Int) extends PropAndParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = Hue
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => v >= 0 && v <= 359)
+  override def isValid: Boolean = value >= 0 && value <= 359
 }
 
 object Hue extends PropAndParamCompanion {
-  val snapshotName: String = "hue"
-  val paramName: String = "hue"
-  val propFgName: String = "hue"
-  override val propBgName: String = "bg_hue"
+  override val snapshotName = "hue"
+  override val paramName = "hue"
+  override val propFgName = "hue"
+  override val propBgName = "bg_hue"
 
-  def unknown: Hue = new Hue(None, isBackground = false)
-  def unknown(isBackground: Boolean): Hue = new Hue(None, isBackground)
-  def apply(value: Int) = new Hue(Some(value), false)
-  def apply(value: Int, isBackground: Boolean) = new Hue(Some(value), isBackground)
+  def fromString(str: String): Option[Hue] = Try(Hue(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[Hue] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

@@ -1,25 +1,25 @@
 package com.wazxse5.yeelight.valuetype
-import play.api.libs.json.JsValue
 
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class Brightness(value: Option[Int], isBackground: Boolean) extends PropAndParam[Int] {
+import scala.util.Try
 
+case class Brightness(value: Int) extends PropAndParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = Brightness
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => v >= 1 && v <= 100)
+  override def isValid: Boolean = value >= 1 && value <= 100
 }
 
 object Brightness extends PropAndParamCompanion {
-  val snapshotName: String = "brightness"
-  val paramName: String = "rgb"
-  val propFgName: String = "bright"
-  override val propBgName: String = "bg_bright"
+  override val snapshotName = "brightness"
+  override val paramName = "brightness"
+  override val propFgName = "bright"
+  override val propBgName = "bg_bright"
 
-  def apply(value: Int, isBackground: Boolean = false): Brightness = new Brightness(Some(value), isBackground)
-  def unknown(isBackground: Boolean): Brightness = new Brightness(None, isBackground)
-  def unknown: Brightness = new Brightness(None, isBackground = false)
+  def fromString(str: String): Option[Brightness] = Try(Brightness(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[Brightness] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

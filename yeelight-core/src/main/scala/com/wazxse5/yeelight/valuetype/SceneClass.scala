@@ -1,46 +1,52 @@
 package com.wazxse5.yeelight.valuetype
 
-import com.wazxse5.yeelight.valuetype.ValueType.unknown
 import play.api.libs.json.{JsString, JsValue}
 
-sealed trait SceneClass extends Parameter[String] {
+import scala.util.Try
+
+sealed trait SceneClass extends ParamValueType[String] {
+  override def strValue: String = value
+  override def paramValue: JsValue = JsString(value)
   override def companion: ParamCompanion = SceneClass
-
-  override def strValue: String = value.getOrElse(unknown)
-
-  override def paramValue: JsValue = JsString(strValue)
-
-  override def isValid: Boolean = value.exists(Seq("color","hsv", "ct", "cf", "auto_delay_off").contains)
 }
 
 object SceneClass extends ParamCompanion {
-  val snapshotName: String = "sceneClass"
-  val paramName: String = "class"
+  override val snapshotName = "sceneClass"
+  override val paramName = "class"
 
   def rgb: SceneClass = RgbSceneClass
   def hsv: SceneClass = HsvSceneClass
   def temperature: SceneClass = TemperatureSceneClass
   def flow: SceneClass = FlowSceneClass
   def delayOff: SceneClass = DelayOffSceneClass
+
+  val typeByValue: Map[String, SceneClass] = Seq(rgb, hsv, temperature, flow, delayOff).map(v => v.value -> v).toMap
+  val values: Seq[String] = typeByValue.keys.toSeq
+
+  def fromString(str: String): Option[SceneClass] = Try(typeByValue(str)).toOption
+  def fromJsValue(jsValue: JsValue): Option[SceneClass] = jsValue match {
+    case JsString(value) => fromString(value)
+    case _ => None
+  }
 }
 
 case object RgbSceneClass extends SceneClass {
-  override val value: Option[String] = Some("color")
+  override val value = "color"
 }
 
 case object HsvSceneClass extends SceneClass {
-  override val value: Option[String] = Some("hsv")
+  override val value = "hsv"
 }
 
 case object TemperatureSceneClass extends SceneClass {
-  override val value: Option[String] = Some("ct")
+  override val value = "ct"
 }
 
 case object FlowSceneClass extends SceneClass {
-  override val value: Option[String] = Some("cf")
+  override val value = "cf"
 }
 
 case object DelayOffSceneClass extends SceneClass {
-  override val value: Option[String] = Some("auto_delay_off")
+  override val value = "auto_delay_off"
 }
 

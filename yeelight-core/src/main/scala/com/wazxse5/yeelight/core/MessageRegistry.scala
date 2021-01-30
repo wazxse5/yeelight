@@ -1,17 +1,18 @@
 package com.wazxse5.yeelight.core
 
-import com.wazxse5.yeelight.message.{CommandMessage, CommandResultMessage}
+import com.wazxse5.yeelight.message.{CommandMessage, CommandResultMessage, YeelightMessage}
 
 class MessageRegistry {
   private var commandMessages: Map[Int, CommandMessage] = Map.empty
   private var resultMessages: Map[Int, CommandResultMessage] = Map.empty
+  private var otherMessages: Seq[YeelightMessage] = Seq.empty
 
-  def put(commandMessage: CommandMessage): Unit = {
-    commandMessages += commandMessage.id -> commandMessage
-  }
-
-  def put(resultMessage: CommandResultMessage): Unit = {
-    resultMessages += resultMessage.id -> resultMessage
+  def add(message: YeelightMessage): Unit = {
+    message match {
+      case command: CommandMessage => commandMessages += command.id -> command
+      case result: CommandResultMessage => resultMessages += result.id -> result
+      case m => otherMessages = otherMessages :+ m
+    }
   }
 
   def getCommand(id: Int): Option[CommandMessage] = commandMessages.get(id)

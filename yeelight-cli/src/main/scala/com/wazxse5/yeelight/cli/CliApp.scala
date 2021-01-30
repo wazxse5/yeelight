@@ -4,14 +4,14 @@ import com.wazxse5.yeelight.cli.CliCommand.CommandOperations
 import com.wazxse5.yeelight.cli.CliCommands._
 import com.wazxse5.yeelight.cli.exception.{CliException, InvalidCommandException}
 import com.wazxse5.yeelight.cli.performer.{CliAppPerformer, CliDevicePerformer, CliServicePerformer}
-import com.wazxse5.yeelight.core.{InternalId, YeelightService}
+import com.wazxse5.yeelight.core.YeelightService
 
 import scala.collection.mutable.{Map => MutableMap}
 
 class CliApp(yeelightService: YeelightService) {
 
   private implicit val ylService: YeelightService = yeelightService
-  private implicit val cliDevices: MutableMap[InternalId, CliDevice] = MutableMap.empty
+  private implicit val cliDevices: MutableMap[String, CliDevice] = MutableMap.empty
 
   def perform(string: String): Unit = {
     try {

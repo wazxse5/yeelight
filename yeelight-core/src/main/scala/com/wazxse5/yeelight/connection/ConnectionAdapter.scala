@@ -1,7 +1,8 @@
 package com.wazxse5.yeelight.connection
 
-import com.wazxse5.yeelight.core.{InternalId, YeelightService}
+import com.wazxse5.yeelight.core.YeelightService
 import com.wazxse5.yeelight.message.{CommandMessage, Message}
+import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
 
 trait ConnectionAdapter {
 
@@ -13,9 +14,9 @@ trait ConnectionAdapter {
 
   def stopListening(): Unit
 
-  def connect(internalId: InternalId, location: NetworkLocation): Unit
+  def connect(deviceId: String, address: IpAddress, port: TcpPort): Unit
 
-  def isConnected(internalId: InternalId): Boolean
+  def isConnected(deviceId: String): Boolean
 
   def send(message: CommandMessage): Unit
 

@@ -2,12 +2,12 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype._
 
-case class SetMusic(p1: MusicPower, p2: IpAddress, p3: TcpPort) extends YeelightCommand3 {
+case class SetMusic(
+  p1: MandatoryParameter[MusicPower],
+  p2: MandatoryParameter[IpAddress],
+  p3: MandatoryParameter[TcpPort]
+) extends YeelightCommand3 {
   def companion: YeelightCommandCompanion = SetMusic
-
-  override def p1Mandatory: Boolean = true
-  override def p2Mandatory: Boolean = false
-  override def p3Mandatory: Boolean = false
 }
 
 case object SetMusic extends YeelightCommandCompanion {

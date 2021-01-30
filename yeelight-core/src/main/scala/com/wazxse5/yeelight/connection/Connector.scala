@@ -5,28 +5,29 @@ import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import com.wazxse5.yeelight.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
-import com.wazxse5.yeelight.core.{ControlMessage, InternalId}
+import com.wazxse5.yeelight.core.ControlMessage
 import com.wazxse5.yeelight.message.{CommandMessage, YeelightConnectedMessage}
+import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
 import play.api.libs.json.Json
 
 import java.net.InetSocketAddress
 
-class Connector(location: NetworkLocation, deviceInternalId: InternalId, adapter: ConnectionAdapter) extends ConnectionActor with Stash {
+class Connector(deviceId: String, address: IpAddress, port: TcpPort, adapter: ConnectionAdapter) extends ConnectionActor with Stash {
 
-  IO(Tcp) ! Connect(new InetSocketAddress(location.address, location.port))
+  IO(Tcp) ! Connect(new InetSocketAddress(address.value, port.value))
 
   def ready(connection: ActorRef): Receive = {
     case Send(message, _) =>
       connection ! Write(ByteString(message.text))
     case Received(data) =>
       val json = Json.parse(data.utf8String.replace("\r\n",""))
-      val message = YeelightConnectedMessage.fromJson(json, deviceInternalId)
+      val message = YeelightConnectedMessage.fromJson(json, deviceId)
       if (message.isValid) adapter.handleMessage(message)
     case CommandFailed(write: Write) =>
       val text = write.data.utf8String
       // TODO: wyciągnięcie internalId komendy i zwrócenie do serwisu
     case _: ConnectionClosed =>
-      adapter.handleMessage(Disconnected(deviceInternalId))
+      adapter.handleMessage(Disconnected(deviceId))
       context.stop(self)
   }
 
@@ -34,9 +35,9 @@ class Connector(location: NetworkLocation, deviceInternalId: InternalId, adapter
 
   override def receive: Receive = {
     case Send(_, true) => stash
-    case CommandFailed => adapter.handleMessage(ConnectionFailed(deviceInternalId))
+    case CommandFailed => adapter.handleMessage(ConnectionFailed(deviceId))
     case Connected(_, _) =>
-      adapter.handleMessage(ConnectionSucceeded(deviceInternalId))
+      adapter.handleMessage(ConnectionSucceeded(deviceId))
       sender ! Register(self)
       unstashAll()
       context.become(ready(sender))
@@ -47,11 +48,11 @@ object Connector {
   final case class Send(message: CommandMessage, stash: Boolean = true) extends ControlMessage
   final case object Disconnect extends ControlMessage
 
-  final case class ConnectionFailed(deviceInternalId: InternalId) extends ControlMessage
-  final case class ConnectionSucceeded(deviceInternalId: InternalId) extends ControlMessage
-  final case class SendFailed(deviceInternalId: InternalId, commandId: Int) extends ControlMessage
-  final case class Disconnected(deviceInternalId: InternalId) extends ControlMessage
+  final case class ConnectionFailed(deviceId: String) extends ControlMessage
+  final case class ConnectionSucceeded(deviceId: String) extends ControlMessage
+  final case class SendFailed(deviceId: String, commandId: Int) extends ControlMessage
+  final case class Disconnected(deviceId: String) extends ControlMessage
 
-  def props(location: NetworkLocation, deviceInternalId: InternalId, adapter: ConnectionAdapter): Props =
-    Props(new Connector(location, deviceInternalId, adapter))
+  def props(deviceId: String, address: IpAddress, port: TcpPort, adapter: ConnectionAdapter): Props =
+    Props(new Connector(deviceId, address, port, adapter))
 }

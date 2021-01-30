@@ -1,19 +1,30 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+import play.api.libs.json.{JsNumber, JsString, JsValue}
 
-case object TimerType extends Parameter[Int] with ParamCompanion {
-  override def companion: ParamCompanion = this
+import scala.util.Try
 
-  override val snapshotName: String = "timerType"
+trait TimerType extends ParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
+  override def companion: ParamCompanion = TimerType
+}
 
-  override val paramName: String = "type"
+object TimerType extends ParamCompanion {
+  override val snapshotName = "timerType"
+  override val paramName = "type"
 
-  override val value: Option[Int] = Some(0)
+  def default: TimerType = TimerTypeDefault
 
-  override def strValue: String = value.get.toString
+  val typeByValue: Map[Int, TimerType] = Map(0 -> TimerTypeDefault)
+  def fromString(str: String): Option[TimerType] = Try(typeByValue(str.toInt)).toOption
+  def fromJsValue(jsValue: JsValue): Option[TimerType] = jsValue match {
+    case JsNumber(n) => fromString(n.toString)
+    case JsString(s) => fromString(s)
+    case _ => None
+  }
+}
 
-  override def paramValue: JsValue = JsNumber(value.get)
-
-  override def isValid: Boolean = value.contains(0)
+case object TimerTypeDefault extends TimerType {
+  override val value = 0
 }

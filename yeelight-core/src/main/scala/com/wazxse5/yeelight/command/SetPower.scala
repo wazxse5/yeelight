@@ -2,21 +2,23 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype._
 
-case class SetPower(p1: Power, p2: Effect, p3: Duration, p4Opt: PowerMode = PowerMode.normal) extends YeelightCommand4 {
+case class SetPower(
+  p1: MandatoryParameter[Power],
+  p2: MandatoryParameter[Effect],
+  p3: MandatoryParameter[Duration],
+  p4: OptionalParameter[PowerMode]
+) extends YeelightCommand4 {
   override def companion: YeelightCommandCompanion = SetPower
-
-  override def p4: Parameter[_] = p4Opt
-  override def p1Mandatory: Boolean = true
-  override def p2Mandatory: Boolean = true
-  override def p3Mandatory: Boolean = true
-  override def p4Mandatory: Boolean = false
 }
 
 object SetPower extends YeelightCommandCompanion {
   override val commandName: String = "set_power"
   override val snapshotName: String = "setPower"
 
-  def apply(power: Power): SetPower = new SetPower(power, Effect.smooth, Duration(500), PowerMode.normal)
+  def apply(power: Power, effect: Effect, duration: Duration): SetPower = {
+    new SetPower(power, effect, duration, Parameter.empty)
+  }
 
-  def apply(power: String): SetPower = apply(Power(power))
+  def apply(power: Power): SetPower = apply(power, Effect.smooth, Duration(500))
+
 }

@@ -4,6 +4,8 @@ import com.wazxse5.yeelight.snapshot.{SnapshotInfo, Snapshotable}
 import com.wazxse5.yeelight.valuetype.FlowBlock.snapshotName
 import play.api.libs.json.Json
 
+import scala.util.Try
+
 case class FlowBlock(
   duration: Duration,
   mode: FlowBlockMode,
@@ -35,10 +37,14 @@ case class FlowBlock(
 }
 
 object FlowBlock {
-  val snapshotName: String = "flowBlock"
+  val snapshotName = "flowBlock"
 
   def apply(d: String, m: String, v: String, b: String): FlowBlock = {
-    new FlowBlock(Duration(d.toInt), FlowBlockMode(m.toInt), v.toInt, Brightness(b.toInt))
+    val duration = Duration.fromString(d)
+    val mode = FlowBlockMode.fromString(m)
+    val value = Try(v.toInt).toOption
+    val brightness = Brightness.fromString(b)
+    new FlowBlock(duration.get, mode.get, value.get, brightness.get)
   }
 
   def apply(duration: Int, mode: FlowBlockMode, value: Int, brightness: Int): FlowBlock = {
@@ -46,10 +52,10 @@ object FlowBlock {
   }
 
   def apply(duration: Int, value: Rgb, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.rgb, value.value.get, Brightness(brightness))
+    new FlowBlock(Duration(duration), FlowBlockMode.rgb, value.value, Brightness(brightness))
   }
 
   def apply(duration: Int, value: Temperature, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.temperature, value.value.get, Brightness(brightness))
+    new FlowBlock(Duration(duration), FlowBlockMode.temperature, value.value, Brightness(brightness))
   }
 }

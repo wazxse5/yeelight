@@ -2,12 +2,12 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype.{Brightness, Duration, Effect}
 
-case class SetBrightness(p1: Brightness, p2: Effect, p3: Duration) extends YeelightCommand3 {
+case class SetBrightness(
+  p1: MandatoryParameter[Brightness],
+  p2: MandatoryParameter[Effect],
+  p3: MandatoryParameter[Duration]
+) extends YeelightCommand3 {
   def companion: YeelightCommandCompanion = SetBrightness
-
-  override def p1Mandatory: Boolean = true
-  override def p2Mandatory: Boolean = true
-  override def p3Mandatory: Boolean = true
 }
 
 object SetBrightness extends YeelightCommandCompanion {

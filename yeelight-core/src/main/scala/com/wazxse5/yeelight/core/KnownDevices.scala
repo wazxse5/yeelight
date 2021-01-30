@@ -1,41 +1,36 @@
 package com.wazxse5.yeelight.core
 
-import com.wazxse5.yeelight.connection.NetworkLocation
+import com.wazxse5.yeelight.valuetype.IpAddress
 
 class KnownDevices {
 
-  private var knownDevices: Map[InternalId, DeviceInfo] = Map.empty
+  private var knownDevices: Map[String, DeviceInfo] = Map.empty
 
-  def find(internalId: InternalId): Option[DeviceInfo] = knownDevices.get(internalId)
+  def find(deviceId: String): Option[DeviceInfo] = knownDevices.get(deviceId)
 
-  def findByLocation(location: NetworkLocation): Option[DeviceInfo] =
-    knownDevices.find(pair => pair._2.location.contains(location)).map(_._2)
+  def findByIp(ipAddress: IpAddress): Option[DeviceInfo] =
+    knownDevices.find(pair => pair._2.ipAddress.contains(ipAddress)).map(_._2)
 
-  def get(internalId: InternalId): DeviceInfo = knownDevices(internalId)
+  def get(deviceId: String): DeviceInfo = knownDevices(deviceId)
 
-  def contains(internalId: InternalId): Boolean = knownDevices.contains(internalId)
+  def contains(deviceId: String): Boolean = knownDevices.contains(deviceId)
 
-  def contains(location: NetworkLocation): Boolean = findByLocation(location).isDefined
+  def contains(ipAddress: IpAddress): Boolean = findByIp(ipAddress).isDefined
 
-  def add(knownDevice: DeviceInfo): Unit = knownDevices += knownDevice.internalId -> knownDevice
+  def add(knownDevice: DeviceInfo): Unit = knownDevices += knownDevice.deviceId -> knownDevice
 
-  def remove(internalId: InternalId): Unit = knownDevices -= internalId
+  def remove(deviceId: String): Unit = knownDevices -= deviceId
 
   def all: Iterable[DeviceInfo] = knownDevices.values
 
-  def update(internalId: InternalId, stateUpdate: PropsUpdate): Unit = {
-    if (knownDevices.contains(internalId)) {
-      knownDevices += internalId -> get(internalId).withStateUpdate(stateUpdate)
+  def update(deviceId: String, change: DeviceInfoChange): Unit = {
+    if (knownDevices.contains(deviceId)) {
+      knownDevices += deviceId -> get(deviceId).update(change)
     }
   }
 
-  def update(internalId: InternalId, deviceInfo: DeviceInfo): Unit = knownDevices.get(internalId) match {
-    case Some(value) => knownDevices += internalId -> value.update(deviceInfo)
-    case None =>
-  }
-
-  def update(internalId: InternalId, isConnected: Boolean): Unit = knownDevices.get(internalId) match {
-    case Some(value) => knownDevices += internalId -> value.copy(isConnected = isConnected)
+  def update(deviceId: String, isConnected: Boolean): Unit = knownDevices.get(deviceId) match {
+    case Some(value) => knownDevices += deviceId -> value.copy(isConnected = isConnected)
     case None =>
   }
 

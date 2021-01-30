@@ -4,40 +4,32 @@ import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import com.wazxse5.yeelight.valuetype.FlowExpression.snapshotName
 import play.api.libs.json.{JsArray, JsString, JsValue}
 
-case class FlowExpression(value: Option[Seq[FlowBlock]], isBackground: Boolean) extends PropAndParam[Seq[FlowBlock]] {
+import scala.util.Try
 
-  override def companion: PropAndParamCompanion = FlowExpression
-
-  override def strValue: String = value match {
-    case Some(v) => v.map(_.toJsonParam).mkString(",")
-    case None => ValueType.unknown
-  }
-
+case class FlowExpression(value: Seq[FlowBlock]) extends PropAndParamValueType[Seq[FlowBlock]] {
+  override def strValue: String = value.map(_.toJsonParam).mkString(",")
   override def paramValue: JsValue = JsString(strValue)
-
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName,
-    value match {
-      case Some(v) => JsArray(v.map(_.snapshotInfo.value))
-      case None => JsString(ValueType.unknown)
-    }
-  )
-
-  override def isValid: Boolean = value.nonEmpty && value.get.forall(_.isValid)
+  override def companion: PropAndParamCompanion = FlowExpression
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName, JsArray(value.map(_.snapshotInfo.value)))
+  override def isValid: Boolean = value.forall(_.isValid)
 }
 
 object FlowExpression extends PropAndParamCompanion {
-  val snapshotName: String = "flowExpression"
-  val paramName: String = "flow_expression"
-  val propFgName: String = "flow_params"
-  override val propBgName: String = "bg_flow_params"
+  override val snapshotName = "flowExpression"
+  override val paramName = "flow_expression"
+  override val propFgName = "flow_params"
+  override val propBgName = "bg_flow_params"
 
-  def unknown: FlowExpression = new FlowExpression(None, isBackground = false)
-  def unknown(isBackground: Boolean): FlowExpression = new FlowExpression(None, isBackground)
-
-  def apply(value: String, isBackground: Boolean = false): FlowExpression = {
-    val flowBlocksGroups = value.split(",").grouped(4).toSeq
-    val flowBlocks = flowBlocksGroups.map(f => FlowBlock(f(0), f(1), f(2), f(3)))
-    new FlowExpression(Some(flowBlocks), isBackground)
+  def fromString(str: String): Option[FlowExpression] = {
+    Try {
+      val flowBlocksGroups = str.split(",").grouped(4).toSeq
+      val flowBlocks = flowBlocksGroups.map(f => FlowBlock(f(0), f(1), f(2), f(3)))
+      new FlowExpression(flowBlocks)
+    }.filter(_.isValid).toOption
+  }
+  def fromJsValue(jsValue: JsValue): Option[FlowExpression] = jsValue match {
+    case JsString(value) => fromString(value)
+    case _ => None
   }
 }
 

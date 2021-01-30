@@ -128,16 +128,19 @@ object CliDevicePerformer {
 
   private def setPower(cliCommand: CliCommand)(implicit cliDevice: CliDevice): Unit = {
     val power = cliCommand.popOpt match {
-      case Some(p) if Power.values.contains(p) => Power(p)
+      case Some(p) => Power.fromString(p)
       case o => throw InvalidParamValueCommandException(Power.paramName, o)
     }
 
     val (effect, duration) = cliCommand.pop2 match {
-      case d :: Nil if isNumber(d) => (Effect.smooth, Duration(d.toInt))
-      case Nil => (Effect.sudden, Duration(0))
+      case d :: Nil  => (Effect.smooth, Duration.fromString(d))
+      case Nil => (Effect.sudden, Some(Duration(0)))
       case other => throw InvalidCommandException(other.mkString(" "))
     }
-    performCommand(SetPower(power, effect, duration))
+
+    if (power.nonEmpty && duration.nonEmpty) {
+      performCommand(SetPower(power.get, effect, duration.get))
+    }
   }
 
   def refresh(cliCommand: CliCommand)(implicit cliDevice: CliDevice): Unit = {

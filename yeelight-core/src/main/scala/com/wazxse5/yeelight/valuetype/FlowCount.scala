@@ -1,23 +1,25 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class FlowCount(value: Option[Int]) extends Parameter[Int] {
+import scala.util.Try
+
+case class FlowCount(value: Int) extends ParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: ParamCompanion = FlowCount
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(_ >= 0)
-
+  override def isValid: Boolean = value >= 0
 }
 
 object FlowCount extends ParamCompanion {
-  val snapshotName: String = "flowCount"
-  val paramName: String = "count"
+  override val snapshotName = "flowCount"
+  override val paramName = "count"
+  
+  def infinite: FlowCount = FlowCount(0)
 
-  def apply(value: Int): FlowCount = new FlowCount(Some(value))
-
-  def infinite: FlowCount = FlowCount(Some(0))
+  def fromString(str: String): Option[FlowCount] = Try(FlowCount(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[FlowCount] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

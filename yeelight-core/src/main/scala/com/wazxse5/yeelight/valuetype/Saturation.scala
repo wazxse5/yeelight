@@ -1,25 +1,25 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class Saturation(value: Option[Int], isBackground: Boolean) extends PropAndParam[Int] {
+import scala.util.Try
+
+case class Saturation(value: Int) extends PropAndParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = Saturation
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => v >= 0 && v <= 100)
+  override def isValid: Boolean = 0 <= value && value <= 100
 }
 
 object Saturation extends PropAndParamCompanion {
-  val snapshotName: String = "saturation"
-  val paramName: String = "sat"
-  val propFgName: String = "sat"
-  override val propBgName: String = "bg_sat"
+  override val snapshotName = "saturation"
+  override val paramName = "sat"
+  override val propFgName = "sat"
+  override val propBgName = "bg_sat"
 
-  def unknown: Saturation = new Saturation(None, isBackground = false)
-  def unknown(isBackground: Boolean): Saturation = new Saturation(None, isBackground)
-  def apply(value: Int): Saturation = new Saturation(Some(value), false)
-  def apply(value: Int, isBackground: Boolean = false): Saturation = new Saturation(Some(value), isBackground)
+  def fromString(str: String): Option[Saturation] = Try(Saturation(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[Saturation] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

@@ -1,27 +1,23 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-import scala.concurrent.duration._
-import scala.language.implicitConversions
+import scala.util.Try
 
-case class Duration(value: Option[Int]) extends Parameter[Int] {
+case class Duration(value: Int) extends ParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: ParamCompanion = Duration
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(_ >= 30)
+  override def isValid: Boolean = value >= 30
 }
 
 object Duration extends ParamCompanion {
-  val snapshotName: String = "duration"
-  val paramName: String = "duration"
+  override val snapshotName = "duration"
+  override val paramName = "duration"
 
-  def apply(value: Int): Duration = new Duration(Some(value))
-
-  implicit def finiteDurationToDuration(finiteDuration: FiniteDuration): Duration = {
-    Duration(finiteDuration.toMillis.toInt)
+  def fromString(str: String): Option[Duration] = Try(Duration(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[Duration] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
   }
 }

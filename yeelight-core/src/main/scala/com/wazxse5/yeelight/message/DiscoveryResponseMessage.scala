@@ -4,29 +4,30 @@ import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import com.wazxse5.yeelight.valuetype.{DeviceModel, Power}
 import play.api.libs.json.{JsNull, JsValue, Json}
 
-case class DiscoveryResponseMessage private(
+case class DiscoveryResponseMessage(
   header: String,
   cacheControl: Int,
-  date: String = "",
-  ext: String = "",
+  date: String, // unimportant
+  ext: String, // unimportant
   location: String,
-  server: String,
+  server: String, // unimportant
   deviceId: String,
   model: String,
   firmwareVersion: String,
   supportedCommands: Set[String],
   power: String,
-  brightness: Int,
-  colorMode: Int,
-  temperature: Int,
-  rgb: Int,
-  hue: Int,
-  saturation: Int,
+  brightness: String,
+  colorMode: String,
+  temperature: String,
+  rgb: String,
+  hue: String,
+  saturation: String,
   name: String,
   text: String
-) extends YeelightUnconnectedMessage with DeviceInfoMessage {
+) extends YeelightUnconnectedMessage {
 
-  def headerCode: Int = header.substring(9, 12).toInt
+  def locationAddress: String = location.split(':')(0)
+  def locationPort: String = location.split(':')(1)
 
   override def json: JsValue = JsNull
 
@@ -57,12 +58,12 @@ object DiscoveryResponseMessage {
     val firmwareVersion = messageLines(8).substring(8)
     val supportedCommands = messageLines(9).substring(9).split(' ').toSet
     val power = messageLines(10).substring(7)
-    val brightness = messageLines(11).substring(8).toInt
-    val colorMode = messageLines(12).substring(12).toInt
-    val temperature = messageLines(13).substring(4).toInt
-    val rgb = messageLines(14).substring(5).toInt
-    val hue = messageLines(15).substring(5).toInt
-    val saturation = messageLines(16).substring(5).toInt
+    val brightness = messageLines(11).substring(8)
+    val colorMode = messageLines(12).substring(12)
+    val temperature = messageLines(13).substring(4)
+    val rgb = messageLines(14).substring(5)
+    val hue = messageLines(15).substring(5)
+    val saturation = messageLines(16).substring(5)
     val name = messageLines(17).substring(6)
 
     new DiscoveryResponseMessage(header, cacheControl, date, ext, location, server, id, model, firmwareVersion,

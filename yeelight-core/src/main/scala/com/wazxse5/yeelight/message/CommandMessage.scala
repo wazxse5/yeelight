@@ -1,7 +1,6 @@
 package com.wazxse5.yeelight.message
 
 import com.wazxse5.yeelight.command.YeelightCommand
-import com.wazxse5.yeelight.core.InternalId
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import play.api.libs.json.{JsValue, Json}
 
@@ -9,10 +8,10 @@ import scala.util.Random
 
 case class CommandMessage private(
   id: Int,
-  deviceId: InternalId,
+  deviceId: String,
   commandName: String,
   arguments: Seq[JsValue]
-) extends YeelightConnectedMessage with Identifiable {
+) extends YeelightConnectedMessage {
 
   override def isValid: Boolean = true
 
@@ -27,7 +26,7 @@ case class CommandMessage private(
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
     "commandMessage", Json.obj(
       "id" -> id,
-      "deviceId" -> deviceId.snapshotInfo.value,
+      "deviceId" -> deviceId,
       "commandName" -> commandName,
       "arguments" -> arguments
     )
@@ -37,6 +36,6 @@ case class CommandMessage private(
 object CommandMessage {
   def randomId: Int = Random.nextInt(Int.MaxValue)
 
-  def apply(command: YeelightCommand, deviceInternalId: InternalId): CommandMessage =
-    new CommandMessage(randomId, deviceInternalId, command.name, command.args)
+  def apply(deviceId: String, command: YeelightCommand): CommandMessage =
+    new CommandMessage(randomId, deviceId, command.name, command.args)
 }

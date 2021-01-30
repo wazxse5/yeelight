@@ -15,4 +15,10 @@ case class NetworkLocation(address: String, port: Int) extends Snapshotable {
 
 object NetworkLocation {
   val snapshotName = "networkLocation"
+
+  def apply(string: String): NetworkLocation = {
+    val array = string.split(':')
+    NetworkLocation(array(0), array(1).toInt)
+  }
+
 }

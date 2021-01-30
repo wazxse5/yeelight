@@ -1,17 +1,14 @@
 package com.wazxse5.yeelight.core
 
 import com.wazxse5.yeelight.command.YeelightCommand
-import com.wazxse5.yeelight.connection.NetworkLocation
 import com.wazxse5.yeelight.core.YeelightDevice.snapshotName
 import com.wazxse5.yeelight.snapshot.{SnapshotInfo, Snapshotable}
-import com.wazxse5.yeelight.valuetype.DeviceModel
+import com.wazxse5.yeelight.valuetype.{DeviceModel, IpAddress, TcpPort}
 import play.api.libs.json.Json
 
 trait YeelightDevice extends Snapshotable {
 
-  val internalId: InternalId
-
-  def id: Option[String]
+  def deviceId: String
 
   def model: Option[DeviceModel]
 
@@ -19,7 +16,9 @@ trait YeelightDevice extends Snapshotable {
 
   def supportedCommands: Option[Set[String]]
 
-  def location: Option[NetworkLocation]
+  def address: Option[IpAddress]
+
+  def port: Option[TcpPort]
 
   def isConnected: Boolean
 
@@ -31,12 +30,12 @@ trait YeelightDevice extends Snapshotable {
 
   override final def snapshotInfo: SnapshotInfo = SnapshotInfo(
     snapshotName, Json.obj(
-      internalId.snapshotInfo.pairw,
-      "id" -> id,
+      "deviceId" -> deviceId,
       DeviceModel.snapshotName -> model.map(_.snapshotInfo.value),
       "firmwareVersion" -> firmwareVersion,
       "supportedCommands" -> supportedCommands,
-      NetworkLocation.snapshotName -> location.map(_.snapshotInfo.value),
+      IpAddress.snapshotName -> address.map(_.snapshotInfo.value),
+      TcpPort.snapshotName -> port.map(_.snapshotInfo.value),
       "isConnected" -> isConnected,
       state.snapshotInfo.pairw
     )

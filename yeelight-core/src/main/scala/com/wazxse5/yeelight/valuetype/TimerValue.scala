@@ -1,24 +1,24 @@
 package com.wazxse5.yeelight.valuetype
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsNumber, JsValue}
 
-case class TimerValue(value: Option[Int]) extends PropAndParam[Int] {
+import scala.util.Try
+
+case class TimerValue(value: Int) extends PropAndParamValueType[Int] {
+  override def strValue: String = value.toString
+  override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = TimerValue
-
-  override def strValue: String = ValueType.strValueOrUnknown(value)
-
-  override def isBackground: Boolean = false
-
-  override def paramValue: JsValue = ValueType.jsValueOrUnknown(value)
-
-  override def isValid: Boolean = value.exists(v => 0 < v && v <= 60)
+  override def isValid: Boolean = 0 <= value && value <= 60
 }
 
 object TimerValue extends PropAndParamCompanion {
-  val snapshotName: String = "timerValue"
-  val paramName: String = "value"
-  val propFgName: String = "delayoff"
+  override val snapshotName = "timerValue"
+  override val paramName = "value"
+  override val propFgName = "delayoff"
 
-  def unknown: TimerValue = TimerValue(None)
-  def apply(value: Int): TimerValue = new TimerValue(Some(value))
+  def fromString(str: String): Option[TimerValue] = Try(TimerValue(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[TimerValue] = jsValue match {
+    case JsNumber(value) => fromString(value.toString)
+    case _ => None
+  }
 }

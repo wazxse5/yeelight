@@ -8,11 +8,9 @@ trait YeelightService {
 
   def devices: Set[YeelightDevice]
 
-  def deviceInfo(internalId: InternalId): DeviceInfo
+  def deviceInfo(deviceId: String): DeviceInfo
 
   def deviceOf(deviceInfo: DeviceInfo): YeelightDevice
-
-  def deviceOf(address: String, port: Int = 55443): YeelightDevice
 
   def search(): Unit
 
@@ -20,7 +18,7 @@ trait YeelightService {
 
   def stopListening(): Unit
 
-  def performCommand(internalId: InternalId, command: YeelightCommand): Unit
+  def performCommand(deviceId: String, command: YeelightCommand): Unit
 
   def handleMessage(message: Message): Unit
 
