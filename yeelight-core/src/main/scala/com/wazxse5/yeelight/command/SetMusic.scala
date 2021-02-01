@@ -5,7 +5,7 @@ import com.wazxse5.yeelight.valuetype._
 case class SetMusic(
   p1: MandatoryParameter[MusicPower],
   p2: MandatoryParameter[IpAddress],
-  p3: MandatoryParameter[TcpPort]
+  p3: MandatoryParameter[Port]
 ) extends YeelightCommand3 {
   def companion: YeelightCommandCompanion = SetMusic
 }

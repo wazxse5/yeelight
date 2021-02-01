@@ -13,8 +13,6 @@ case class CommandMessage private(
   arguments: Seq[JsValue]
 ) extends YeelightConnectedMessage {
 
-  override def isValid: Boolean = true
-
   override def json: JsValue = Json.obj(
     "id" -> id,
     "method" -> commandName,

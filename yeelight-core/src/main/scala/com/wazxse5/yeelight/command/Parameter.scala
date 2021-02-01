@@ -5,21 +5,19 @@ import com.wazxse5.yeelight.valuetype.ParamValueType
 import scala.language.implicitConversions
 
 sealed trait Parameter[A <: ParamValueType[_]] {
-  def value: A
-  def isEmpty: Boolean
+  def value: Option[A]
+  def isEmpty: Boolean = value.isEmpty
   def isOptional: Boolean
   final def nonEmpty: Boolean = !isEmpty
   final def isMandatory: Boolean = !isOptional
 }
 
-case class MandatoryParameter[A <: ParamValueType[_]](value: A) extends Parameter[A] {
-  override val isEmpty: Boolean = false
+case class MandatoryParameter[A <: ParamValueType[_]](getValue: A) extends Parameter[A] {
+  override def value: Option[A] = Some(getValue)
   override val isOptional: Boolean = false
 }
 
-case class OptionalParameter[A <: ParamValueType[_]](valueOpt: Option[A]) extends Parameter[A] {
-  override def value: A = valueOpt.get // TODO
-  override def isEmpty: Boolean = valueOpt.isEmpty
+case class OptionalParameter[A <: ParamValueType[_]](value: Option[A]) extends Parameter[A] {
   override val isOptional: Boolean = true
 }
 

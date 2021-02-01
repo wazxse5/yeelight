@@ -3,21 +3,15 @@ package com.wazxse5.yeelight.message
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
 import play.api.libs.json.{JsValue, Json}
 
-case class CommandResultMessage private (
-  id: Int,
-  deviceId: String,
-  result: Option[Seq[String]] = None,
-  errorCode: Option[Int] = None,
-  errorMessage: Option[String] = None,
-  json: JsValue,
-  isValid: Boolean = true,
-) extends YeelightConnectedMessage {
+import scala.util.Try
 
-  override def text: String = Json.stringify(json)
+case class CommandResultMessage private (id: Int, deviceId: String, json: JsValue) extends YeelightConnectedMessage {
 
-  def isOk: Boolean = result.exists(_.contains("ok"))
-
-  def isError: Boolean = result.isEmpty && errorCode.nonEmpty && errorMessage.nonEmpty
+ val result: Option[Seq[String]] = (json \ "result").asOpt[Seq[String]]
+ val errorCode: Option[Int] = (json \ "error" \ "code").asOpt[Int]
+ val errorMessage: Option[String] = (json \ "error" \ "message").asOpt[String]
+ val isOk: Boolean = result.exists(_.contains("ok"))
+ val isError: Boolean = result.isEmpty && errorCode.nonEmpty && errorMessage.nonEmpty
 
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
     "commandResultMessage", Json.obj(
@@ -32,12 +26,11 @@ case class CommandResultMessage private (
 
 object CommandResultMessage {
 
-  def apply(json: JsValue, deviceId: String): CommandResultMessage = {
-    val id = (json \ "id").as[Int]
-    val errorCode = (json \ "error" \ "code").asOpt[Int]
-    val errorMessage = (json \ "error" \ "cliCommand").asOpt[String]
-    val result = (json \ "result").asOpt[Seq[String]]
-    new CommandResultMessage(id, deviceId, result, errorCode, errorMessage, json)
+  def fromJson(json: JsValue, deviceId: String): Option[CommandResultMessage] = {
+    Try {
+      val id = (json \ "id").as[Int]
+      new CommandResultMessage(id, deviceId, json)
+    }.toOption
   }
 
 }

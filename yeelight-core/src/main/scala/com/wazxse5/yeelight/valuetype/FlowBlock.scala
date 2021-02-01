@@ -12,7 +12,6 @@ case class FlowBlock(
   value: Int,
   brightness: Brightness)
   extends Snapshotable {
-  // todo: Rozważyć rozszerzenie ValueType
 
   def toJsonParam: String = s"${duration.value},${mode.value},$value,${brightness.value}"
 

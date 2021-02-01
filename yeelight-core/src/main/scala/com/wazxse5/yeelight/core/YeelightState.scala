@@ -29,7 +29,9 @@ trait YeelightState extends Snapshotable {
   def bgRgb: Property[Rgb]
   def bgSaturation: Property[Saturation]
   def bgTemperature: Property[Temperature]
-  // TODO: nl_br, active_mode
+
+  def nlBrightness: Property[Brightness]
+  def activeMode: Property[ActiveMode]
 
   def lastUpdate: DateTime
 
@@ -46,8 +48,7 @@ trait YeelightState extends Snapshotable {
       Rgb.snapshotName -> rgb.strValueOrUnknown,
       Saturation.snapshotName -> saturation.strValueOrUnknown,
       Temperature.snapshotName -> temperature.strValueOrUnknown,
-      TimerValue.snapshotName -> timerValue.strValueOrUnknown,
-      // TODO: co z background
+      TimerValue.snapshotName -> timerValue.strValueOrUnknown
     )
   )
 }

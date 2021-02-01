@@ -2,7 +2,7 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.snapshot.{SnapshotInfo, Snapshotable}
 import com.wazxse5.yeelight.valuetype.ParamValueType
-import play.api.libs.json.{JsArray, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 
 
 trait YeelightCommand extends Snapshotable {
@@ -10,11 +10,14 @@ trait YeelightCommand extends Snapshotable {
   def name: String = companion.commandName
 
   type PARAM = Parameter[_ <: ParamValueType[_]]
+
   def params: Seq[PARAM]
-  def args: Seq[JsValue] = params.filterNot(_.isEmpty).map(_.value.paramValue)
+  def nonEmptyParams: Seq[PARAM] = params.filter(_.nonEmpty)
+  def isValid: Boolean = nonEmptyParams.forall(_.value.get.isValid)
+  def args: Seq[JsValue] = nonEmptyParams.map(_.value.get.paramValue)
+
   def minParameters: Int = params.count(_.isMandatory)
   def maxParameters: Int = params.size
-  def isValid: Boolean = params.forall(_.value.isValid)
 
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
     companion.snapshotName,
@@ -22,7 +25,7 @@ trait YeelightCommand extends Snapshotable {
       "minParams" -> minParameters,
       "maxParams" -> maxParameters,
       "isValid" -> isValid,
-      "args" -> JsArray(params.map(_.value.paramValue))
+      "args" -> args
     )
   )
 }

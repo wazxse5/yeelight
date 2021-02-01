@@ -28,6 +28,15 @@ class YeelightStateImpl(deviceId: String, yeelightService: YeelightService) exte
   private var _bgSaturation = Property.emptyBackground[Saturation]
   private var _bgTemperature = Property.emptyBackground[Temperature]
 
+  private var _nlBrightness = Property.empty[Brightness]
+  private var _activeMode = Property.empty[ActiveMode]
+
+  private def all: Seq[Property[_]] = Seq(
+    _brightness, _colorMode, _flowExpression, _flowPower, _hue, _musicPower, _name, _power,
+    _rgb, _saturation, _temperature, _timerValue, _bgBrightness, _bgColorMode, _bgFlowExpression,
+    _bgFlowPower, _bgHue, _bgPower, _bgRgb, _bgSaturation, _bgTemperature, _nlBrightness, _activeMode
+  )
+
   override def brightness: Property[Brightness] = {
     _brightness = _brightness.withValue(yeelightService.deviceInfo(deviceId).brightness)
     _brightness
@@ -126,10 +135,17 @@ class YeelightStateImpl(deviceId: String, yeelightService: YeelightService) exte
     _bgTemperature
   }
 
-  override def lastUpdate: DateTime = {
-    DateTime.now()
-    // TODO latest from all lastUpdate
+  override def nlBrightness: Property[Brightness] = {
+    _nlBrightness = _nlBrightness.withValue(yeelightService.deviceInfo(deviceId).nlBrightness)
+    _nlBrightness
   }
+
+  override def activeMode: Property[ActiveMode] = {
+    _activeMode = _activeMode.withValue(yeelightService.deviceInfo(deviceId).activeMode)
+    _activeMode
+  }
+
+  override def lastUpdate: DateTime = all.maxBy(_.lastUpdate).lastUpdate
 }
 
 object YeelightStateImpl {

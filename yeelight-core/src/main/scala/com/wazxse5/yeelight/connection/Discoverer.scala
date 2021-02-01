@@ -1,7 +1,5 @@
 package com.wazxse5.yeelight.connection
 
-import java.net.{InetSocketAddress, NetworkInterface}
-
 import akka.actor.{ActorRef, Props}
 import akka.io.Udp._
 import akka.io.{IO, Udp}
@@ -9,6 +7,7 @@ import akka.util.ByteString
 import com.wazxse5.yeelight.connection.Discoverer.Search
 import com.wazxse5.yeelight.message.{DiscoveryMessage, DiscoveryResponseMessage}
 
+import java.net.{InetSocketAddress, NetworkInterface}
 import scala.jdk.CollectionConverters._
 
 class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
@@ -23,8 +22,8 @@ class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
     case Search =>
       connection ! Send(ByteString(DiscoveryMessage.text), remote)
     case Received(data, sender) =>
-      val discoveryMessage = DiscoveryResponseMessage(data.utf8String)
-      if (discoveryMessage.isValid) adapter.handleMessage(discoveryMessage)
+      val message = DiscoveryResponseMessage.fromString(data.utf8String)
+      message.map(adapter.handleMessage)
     case Unbind =>
       connection ! Unbind
     case Unbound =>

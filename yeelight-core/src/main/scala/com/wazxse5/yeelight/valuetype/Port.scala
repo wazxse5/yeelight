@@ -4,20 +4,22 @@ import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Try
 
-case class TcpPort(value: Int) extends ParamValueType[Int] {
+case class Port(value: Int) extends ParamValueType[Int] {
   override def strValue: String = value.toString
   override def paramValue: JsValue = JsNumber(value)
-  override def companion: ParamCompanion = TcpPort
+  override def companion: ParamCompanion = Port
   override def isValid: Boolean = 0 < value && value <= 65535
 }
 
-object TcpPort extends ParamCompanion {
+object Port extends ParamCompanion {
   override val snapshotName = "port"
   override val paramName = "port"
 
-  def fromString(str: String): Option[TcpPort] = Try(TcpPort(str.toInt)).filter(_.isValid).toOption
-  def fromJsValue(jsValue: JsValue): Option[TcpPort] = jsValue match {
+  def fromString(str: String): Option[Port] = Try(Port(str.toInt)).filter(_.isValid).toOption
+  def fromJsValue(jsValue: JsValue): Option[Port] = jsValue match {
     case JsNumber(value) => fromString(value.toString)
     case _ => None
   }
+
+  def default: Port = Port(55443)
 }

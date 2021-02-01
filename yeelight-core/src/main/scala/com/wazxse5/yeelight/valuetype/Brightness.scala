@@ -16,6 +16,7 @@ object Brightness extends PropAndParamCompanion {
   override val paramName = "brightness"
   override val propFgName = "bright"
   override val propBgName = "bg_bright"
+  val propNlName = "nl_br"
 
   def fromString(str: String): Option[Brightness] = Try(Brightness(str.toInt)).filter(_.isValid).toOption
   def fromJsValue(jsValue: JsValue): Option[Brightness] = jsValue match {

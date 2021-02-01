@@ -10,7 +10,7 @@ trait YeelightService {
 
   def deviceInfo(deviceId: String): DeviceInfo
 
-  def deviceOf(deviceInfo: DeviceInfo): YeelightDevice
+  def deviceOf(deviceInfo: DeviceInfo): Option[YeelightDevice]
 
   def search(): Unit
 

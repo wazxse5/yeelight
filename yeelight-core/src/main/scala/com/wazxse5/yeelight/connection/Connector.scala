@@ -7,12 +7,12 @@ import akka.util.ByteString
 import com.wazxse5.yeelight.connection.Connector.{ConnectionFailed, ConnectionSucceeded, Disconnected, Send}
 import com.wazxse5.yeelight.core.ControlMessage
 import com.wazxse5.yeelight.message.{CommandMessage, YeelightConnectedMessage}
-import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
+import com.wazxse5.yeelight.valuetype.{IpAddress, Port}
 import play.api.libs.json.Json
 
 import java.net.InetSocketAddress
 
-class Connector(deviceId: String, address: IpAddress, port: TcpPort, adapter: ConnectionAdapter) extends ConnectionActor with Stash {
+class Connector(deviceId: String, address: IpAddress, port: Port, adapter: ConnectionAdapter) extends ConnectionActor with Stash {
 
   IO(Tcp) ! Connect(new InetSocketAddress(address.value, port.value))
 
@@ -22,7 +22,7 @@ class Connector(deviceId: String, address: IpAddress, port: TcpPort, adapter: Co
     case Received(data) =>
       val json = Json.parse(data.utf8String.replace("\r\n",""))
       val message = YeelightConnectedMessage.fromJson(json, deviceId)
-      if (message.isValid) adapter.handleMessage(message)
+      message.map(adapter.handleMessage)
     case CommandFailed(write: Write) =>
       val text = write.data.utf8String
       // TODO: wyciągnięcie internalId komendy i zwrócenie do serwisu
@@ -53,6 +53,6 @@ object Connector {
   final case class SendFailed(deviceId: String, commandId: Int) extends ControlMessage
   final case class Disconnected(deviceId: String) extends ControlMessage
 
-  def props(deviceId: String, address: IpAddress, port: TcpPort, adapter: ConnectionAdapter): Props =
+  def props(deviceId: String, address: IpAddress, port: Port, adapter: ConnectionAdapter): Props =
     Props(new Connector(deviceId, address, port, adapter))
 }

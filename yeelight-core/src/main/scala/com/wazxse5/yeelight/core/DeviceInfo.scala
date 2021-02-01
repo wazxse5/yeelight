@@ -11,7 +11,7 @@ case class DeviceInfo(
   supportedCommands: Option[Set[String]],
   //
   ipAddress: Option[IpAddress],
-  tcpPort: Option[TcpPort],
+  port: Option[Port],
   isConnected: Boolean,
   //
   brightness: Option[Brightness],
@@ -36,6 +36,9 @@ case class DeviceInfo(
   bgRgb: Option[Rgb],
   bgSaturation: Option[Saturation],
   bgTemperature: Option[Temperature],
+  //
+  nlBrightness: Option[Brightness],
+  activeMode: Option[ActiveMode]
 ) {
 
   def update(update: DeviceInfoChange): DeviceInfo = copy(
@@ -65,6 +68,9 @@ case class DeviceInfo(
     bgRgb = bgRgb.withChange(update.bgRgb),
     bgSaturation = bgSaturation.withChange(update.bgSaturation),
     bgTemperature = bgTemperature.withChange(update.bgTemperature),
+    //
+    nlBrightness = nlBrightness.withChange(update.nlBrightness),
+    activeMode = activeMode.withChange(update.activeMode)
   )
 }
 
@@ -77,7 +83,7 @@ object DeviceInfo {
     Some(message.supportedCommands),
     //
     IpAddress.fromString(message.location),
-    TcpPort.fromString(message.location),
+    Port.fromString(message.location),
     isConnected = false,
     //
     brightness = Brightness.fromString(message.brightness),
@@ -90,7 +96,7 @@ object DeviceInfo {
     rgb = Rgb.fromString(message.rgb),
     saturation = Saturation.fromString(message.saturation),
     temperature = Temperature.fromString(message.temperature),
-    timerValue = None, bgBrightness = None, bgColorMode = None, bgFlowExpression = None, bgFlowPower = None, bgHue = None, bgPower = None, bgRgb = None, bgSaturation = None, bgTemperature = None
+    timerValue = None, bgBrightness = None, bgColorMode = None, bgFlowExpression = None, bgFlowPower = None, bgHue = None, bgPower = None, bgRgb = None, bgSaturation = None, bgTemperature = None, nlBrightness = None, activeMode = None
   )
 
   def fromAdvertisement(message: AdvertisementMessage): DeviceInfo = new DeviceInfo(
@@ -100,7 +106,7 @@ object DeviceInfo {
     Some(message.supportedCommands),
     //
     IpAddress.fromString(message.location),
-    TcpPort.fromString(message.location),
+    Port.fromString(message.location),
     isConnected = false,
     //
     brightness = Brightness.fromString(message.brightness),
@@ -113,7 +119,7 @@ object DeviceInfo {
     rgb = Rgb.fromString(message.rgb),
     saturation = Saturation.fromString(message.saturation),
     temperature = Temperature.fromString(message.temperature),
-    timerValue = None, bgBrightness = None, bgColorMode = None, bgFlowExpression = None, bgFlowPower = None, bgHue = None, bgPower = None, bgRgb = None, bgSaturation = None, bgTemperature = None
+    timerValue = None, bgBrightness = None, bgColorMode = None, bgFlowExpression = None, bgFlowPower = None, bgHue = None, bgPower = None, bgRgb = None, bgSaturation = None, bgTemperature = None, nlBrightness = None, activeMode = None
   )
 
 }

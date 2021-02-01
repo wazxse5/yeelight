@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.core
 
 import com.wazxse5.yeelight.command.YeelightCommand
-import com.wazxse5.yeelight.valuetype.{DeviceModel, IpAddress, TcpPort}
+import com.wazxse5.yeelight.valuetype.{DeviceModel, IpAddress, Port}
 
 class YeelightDeviceImpl private(
   val deviceId: String,
@@ -13,7 +13,7 @@ class YeelightDeviceImpl private(
 
   override def address: Option[IpAddress] = service.deviceInfo(deviceId).ipAddress
 
-  override def port: Option[TcpPort] = service.deviceInfo(deviceId).tcpPort
+  override def port: Option[Port] = service.deviceInfo(deviceId).port
 
   override def firmwareVersion: Option[String] = service.deviceInfo(deviceId).firmwareVersion
 

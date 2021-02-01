@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import com.wazxse5.yeelight.connection.Connector.Send
 import com.wazxse5.yeelight.core.YeelightService
 import com.wazxse5.yeelight.message.{CommandMessage, Message}
-import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
+import com.wazxse5.yeelight.valuetype.{IpAddress, Port}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -24,7 +24,7 @@ class RealConnectionAdapter(val service: YeelightService) extends ConnectionAdap
 
   override def stopListening(): Unit = listener ! Listener.Stop
 
-  override def connect(deviceId: String, address: IpAddress, port: TcpPort): Unit = {
+  override def connect(deviceId: String, address: IpAddress, port: Port): Unit = {
     val connector = actorSystem.actorOf(Connector.props(deviceId, address, port, this))
     this.connectors += deviceId -> connector
   }

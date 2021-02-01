@@ -6,7 +6,7 @@ class KnownDevices {
 
   private var knownDevices: Map[String, DeviceInfo] = Map.empty
 
-  def find(deviceId: String): Option[DeviceInfo] = knownDevices.get(deviceId)
+  def findById(deviceId: String): Option[DeviceInfo] = knownDevices.get(deviceId)
 
   def findByIp(ipAddress: IpAddress): Option[DeviceInfo] =
     knownDevices.find(pair => pair._2.ipAddress.contains(ipAddress)).map(_._2)

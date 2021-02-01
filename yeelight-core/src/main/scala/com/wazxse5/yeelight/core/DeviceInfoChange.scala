@@ -32,6 +32,9 @@ case class DeviceInfoChange(
   bgRgb: Change[Rgb] = Keep,
   bgSaturation: Change[Saturation] = Keep,
   bgTemperature: Change[Temperature] = Keep,
+  //
+  nlBrightness: Change[Brightness] = Keep,
+  activeMode: Change[ActiveMode] = Keep
 )
 
 object DeviceInfoChange {
@@ -106,6 +109,9 @@ object DeviceInfoChange {
       bgRgb = find(Rgb.propBgName, Rgb.fromString),
       bgSaturation = find(Saturation.propBgName, Saturation.fromString),
       bgTemperature = find(Temperature.propBgName, Temperature.fromString),
+      //
+      nlBrightness = find(Brightness.propNlName, Brightness.fromString),
+      activeMode = find(ActiveMode.propFgName, ActiveMode.fromString)
     )
   }
 
@@ -142,6 +148,9 @@ object DeviceInfoChange {
       bgRgb = find(Rgb.propBgName, Rgb.fromJsValue),
       bgSaturation = find(Saturation.propBgName, Saturation.fromJsValue),
       bgTemperature = find(Temperature.propBgName, Temperature.fromJsValue),
+      //
+      nlBrightness = find(Brightness.propNlName, Brightness.fromJsValue),
+      activeMode = find(ActiveMode.propFgName, ActiveMode.fromJsValue)
     )
   }
 }

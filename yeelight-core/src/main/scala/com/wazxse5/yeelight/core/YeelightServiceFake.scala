@@ -7,7 +7,7 @@ import com.wazxse5.yeelight.message.Message
 class YeelightServiceFake(val devices: Set[YeelightDevice]) extends YeelightService {
   override def deviceInfo(deviceId: String): DeviceInfo = ???
 
-  override def deviceOf(deviceInfo: DeviceInfo): YeelightDevice = ???
+  override def deviceOf(deviceInfo: DeviceInfo): Option[YeelightDevice] = ???
 
   override def search(): Unit = ???
 

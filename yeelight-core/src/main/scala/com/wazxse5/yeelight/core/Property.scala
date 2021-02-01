@@ -16,20 +16,14 @@ class Property[A <: PropValueType[_]] private (
 
   def strValueOrUnknown: String = value.map(_.strValue).getOrElse("unknown")
 
-  def withValue(newValue: A): Property[A] = {
-    val newLastChange = if (value.contains(newValue)) _lastChange else DateTime.now
-    new Property(Some(newValue), DateTime.now, newLastChange, _isBackground)
+  def withValue(newValue: Option[A]): Property[A] =  {
+    val newLastChange = if (value == newValue) _lastChange else DateTime.now
+    new Property(newValue, DateTime.now, newLastChange, _isBackground)
   }
 
-  def withoutValue: Property[A] = {
-    val newLastChange = if (value.isEmpty) _lastChange else DateTime.now
-    new Property(None, DateTime.now, newLastChange, isBackground)
-  }
+  def withValue(newValue: A): Property[A] = withValue(Some(newValue))
 
-  def withValue(newValue: Option[A]): Property[A] = newValue match {
-    case Some(value) => withValue(value)
-    case None => withoutValue
-  }
+  def withoutValue: Property[A] = withValue(None)
 
 }
 

@@ -3,8 +3,9 @@ package com.wazxse5.yeelight.core
 import com.typesafe.scalalogging.StrictLogging
 import com.wazxse5.yeelight.command.{GetProps, YeelightCommand}
 import com.wazxse5.yeelight.connection.{ConnectionAdapter, Connector, RealConnectionAdapter}
+import com.wazxse5.yeelight.exception.NoSuchDeviceException
 import com.wazxse5.yeelight.message._
-import com.wazxse5.yeelight.valuetype.{IpAddress, TcpPort}
+import com.wazxse5.yeelight.valuetype.{IpAddress, Port}
 
 class YeelightServiceImpl extends YeelightService with StrictLogging {
   private implicit val service: YeelightServiceImpl = this
@@ -16,13 +17,27 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
   override def devices: Set[YeelightDevice] = knownDevices.all.map(YeelightDeviceImpl(_)).toSet
 
   override def deviceInfo(deviceId: String): DeviceInfo = {
-    knownDevices.find(deviceId) match {
+    knownDevices.findById(deviceId) match {
       case Some(deviceInfo) => deviceInfo
-      case None => throw new NoSuchElementException() // TODO:
+      case None => throw new NoSuchDeviceException(deviceId)
     }
   }
 
-  override def deviceOf(deviceInfo: DeviceInfo): YeelightDevice = ??? // TODO:
+  override def deviceOf(deviceInfo: DeviceInfo): Option[YeelightDevice] = {
+    devices.find(_.deviceId == deviceInfo.deviceId) match {
+      case Some(knownDevice) => Some(knownDevice)
+      case None if deviceInfo.ipAddress.nonEmpty =>
+        knownDevices.findByIp(deviceInfo.ipAddress.get) match {
+          case Some(byIp) if byIp.isConnected => None
+          case _ =>
+            val (address, port) = (deviceInfo.ipAddress.get, deviceInfo.port.getOrElse(Port.default))
+            knownDevices.add(deviceInfo)
+            connectionAdapter.connect(deviceInfo.deviceId, address, port)
+            devices.find(_.deviceId == deviceInfo.deviceId)
+        }
+      case _ => None
+    }
+  }
 
   override def search(): Unit = {
     logger.info(s"Searching for new devices")
@@ -45,7 +60,7 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
       messageRegistry.add(message)
       connectionAdapter.send(message)
     }
-    else logger.warn(s"Cannot perform cliCommand $command") // TODO: Do refaktoryzacji na później
+    else throw new NoSuchDeviceException(deviceId)
   }
 
   def handleMessage(message: Message): Unit = message match {
@@ -73,7 +88,7 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
 
   private def handleAdvertisementMessage(message: AdvertisementMessage): Unit = {
     val address = IpAddress.fromString(message.locationAddress)
-    val port = TcpPort.fromString(message.locationPort)
+    val port = Port.fromString(message.locationPort)
     if (address.nonEmpty && port.nonEmpty) handleAD(
       address.get, port.get,
       DeviceInfo.fromAdvertisement(message),
@@ -83,7 +98,7 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
 
   private def handleDiscoveryResponseMessage(message: DiscoveryResponseMessage): Unit = {
     val address = IpAddress.fromString(message.locationAddress)
-    val port = TcpPort.fromString(message.locationPort)
+    val port = Port.fromString(message.locationPort)
     if (address.nonEmpty && port.nonEmpty) handleAD(
       address.get, port.get,
       DeviceInfo.fromDiscoveryResponse(message),
@@ -91,7 +106,7 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
     )
   }
 
-  private def handleAD(address: IpAddress, port: TcpPort, di: => DeviceInfo, dic: => DeviceInfoChange): Unit = {
+  private def handleAD(address: IpAddress, port: Port, di: => DeviceInfo, dic: => DeviceInfoChange): Unit = {
     knownDevices.findByIp(address) match {
       case Some(device) =>
         device.update(dic)

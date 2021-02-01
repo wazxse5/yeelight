@@ -3,7 +3,7 @@ package com.wazxse5.yeelight.core
 import com.wazxse5.yeelight.command.YeelightCommand
 import com.wazxse5.yeelight.core.YeelightDevice.snapshotName
 import com.wazxse5.yeelight.snapshot.{SnapshotInfo, Snapshotable}
-import com.wazxse5.yeelight.valuetype.{DeviceModel, IpAddress, TcpPort}
+import com.wazxse5.yeelight.valuetype.{DeviceModel, IpAddress, Port}
 import play.api.libs.json.Json
 
 trait YeelightDevice extends Snapshotable {
@@ -18,7 +18,7 @@ trait YeelightDevice extends Snapshotable {
 
   def address: Option[IpAddress]
 
-  def port: Option[TcpPort]
+  def port: Option[Port]
 
   def isConnected: Boolean
 
@@ -35,7 +35,7 @@ trait YeelightDevice extends Snapshotable {
       "firmwareVersion" -> firmwareVersion,
       "supportedCommands" -> supportedCommands,
       IpAddress.snapshotName -> address.map(_.snapshotInfo.value),
-      TcpPort.snapshotName -> port.map(_.snapshotInfo.value),
+      Port.snapshotName -> port.map(_.snapshotInfo.value),
       "isConnected" -> isConnected,
       state.snapshotInfo.pairw
     )

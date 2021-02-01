@@ -5,7 +5,7 @@ import akka.io.Udp.{Bound, Received}
 import com.wazxse5.yeelight.connection.Listener.{Start, Stop}
 import com.wazxse5.yeelight.message.AdvertisementMessage
 
-class Listener(adapter  : ConnectionAdapter) extends ConnectionActor {
+class Listener(adapter: ConnectionAdapter) extends ConnectionActor {
   val opts = List(Inet6ProtocolFamily, MultiCastGroup("239.255.255.250"))
 
 //  IO(Udp) ! Bind(self, new InetSocketAddress(1982), opts) // TODO: do zrobienia
@@ -13,8 +13,8 @@ class Listener(adapter  : ConnectionAdapter) extends ConnectionActor {
   def receiveReady(connection: ActorRef): Receive = {
     case Received(data, sender) =>
       logger.info(s"${this.getClass.getSimpleName} received from $sender")
-      val advertisementMessage = AdvertisementMessage(data.utf8String)
-      if (advertisementMessage.isValid) adapter.handleMessage(advertisementMessage)
+      val message = AdvertisementMessage.fromString(data.utf8String)
+      message.map(adapter.handleMessage)
     case Stop =>
       context.become(receiveReadyStop(connection))
   }

@@ -1,16 +1,13 @@
 package com.wazxse5.yeelight.message
 
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
-import play.api.libs.json.{JsResultException, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 
-case class NotificationMessage private(
-  params: Map[String, JsValue],
-  deviceId: String,
-  json: JsValue,
-  isValid: Boolean = true
-) extends YeelightConnectedMessage {
+import scala.util.Try
 
-  override def text: String = Json.stringify(json)
+case class NotificationMessage private(deviceId: String, json: JsValue) extends YeelightConnectedMessage {
+
+  def params: Map[String, JsValue] = (json \ "params").as[Map[String, JsValue]]
 
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(
     "notificationMessage", Json.obj(
@@ -23,17 +20,11 @@ case class NotificationMessage private(
 
 object NotificationMessage {
 
-  def apply(json: JsValue, deviceId: String): NotificationMessage = {
-    try {
+  def fromJson(json: JsValue, deviceId: String): Option[NotificationMessage] = {
+    Try {
       val method = (json \ "method").as[String]
-      val params = (json \ "params").as[Map[String, JsValue]]
-      new NotificationMessage(params, deviceId, json)
-    } catch {
-      case _: JsResultException =>
-        println(Json.prettyPrint(json))
-        new NotificationMessage(Map.empty, deviceId, json, false)
-    }
-
+      new NotificationMessage(deviceId, json)
+    }.toOption
   }
 
 }

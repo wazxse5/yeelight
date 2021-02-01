@@ -5,7 +5,6 @@ import play.api.libs.json.{JsNumber, JsValue}
 import scala.util.Try
 
 sealed trait MusicPower extends PropAndParamValueType[Int] {
-  override def strValue: String = value.toString
   override def paramValue: JsValue = JsNumber(value)
   override def companion: PropAndParamCompanion = MusicPower
 }
@@ -30,8 +29,10 @@ object MusicPower extends PropAndParamCompanion {
 
 case object MusicOn extends MusicPower {
   override val value = 1
+  override val strValue = "on"
 }
 
 case object MusicOff extends MusicPower {
   override val value = 0
+  override val strValue = "off"
 }
