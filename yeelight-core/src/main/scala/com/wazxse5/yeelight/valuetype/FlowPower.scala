@@ -7,11 +7,11 @@ import scala.util.Try
 sealed trait FlowPower extends PropValueType[Int] {
   override def strValue: String = value.toString
   override def companion: PropCompanion = FlowPower
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, JsNumber(value))
 }
 
 object FlowPower extends PropCompanion {
-  override val snapshotName = "flowPower"
+  override val name = "flowPower"
   override val propFgName = "flowing"
   override val propBgName = "bg_flowing"
   

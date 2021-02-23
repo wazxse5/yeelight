@@ -11,7 +11,7 @@ sealed trait Effect extends ParamValueType[String] {
 }
 
 object Effect extends ParamCompanion {
-  override val snapshotName = "effect"
+  override val name = "effect"
   override val paramName = "effect"
 
   def sudden: Effect = EffectSudden

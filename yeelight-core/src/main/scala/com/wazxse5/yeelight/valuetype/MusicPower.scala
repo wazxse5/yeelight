@@ -10,7 +10,7 @@ sealed trait MusicPower extends PropAndParamValueType[Int] {
 }
 
 object MusicPower extends PropAndParamCompanion {
-  override val snapshotName = "musicPower"
+  override val name = "musicPower"
   override val paramName = "action"
   override val propFgName = "music_on"
 

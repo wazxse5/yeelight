@@ -12,7 +12,7 @@ case class Hue(value: Int) extends PropAndParamValueType[Int] {
 }
 
 object Hue extends PropAndParamCompanion {
-  override val snapshotName = "hue"
+  override val name = "hue"
   override val paramName = "hue"
   override val propFgName = "hue"
   override val propBgName = "bg_hue"

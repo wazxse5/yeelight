@@ -9,7 +9,7 @@ class CliCommand private (val stack: mutable.Stack[String]) {
   def pop2: List[String] = popN(2)
   def pop3: List[String] = popN(3)
   def popN(n: Int): List[String] = {
-    if (size <= n) stack.popAll().toList
+    if (size <= n) stack.popAll().reverse.toList
     else (1 to n).foldLeft(List.empty[String])((l, _) => l :+ pop)
   }
   def popOpt: Option[String] = if (isEmpty) None else Some(pop)

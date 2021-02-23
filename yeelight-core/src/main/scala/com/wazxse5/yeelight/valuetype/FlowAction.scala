@@ -12,7 +12,7 @@ sealed trait FlowAction extends ParamValueType[Int] {
 }
 
 object FlowAction extends ParamCompanion {
-  override val snapshotName = "action"
+  override val name = "action"
   override val paramName = "action"
 
   def recover: FlowAction = FlowActionRecover

@@ -12,7 +12,7 @@ case class Temperature(value: Int) extends PropAndParamValueType[Int] {
 }
 
 object Temperature extends PropAndParamCompanion {
-  override val snapshotName = "temperature"
+  override val name = "temperature"
   override val paramName = "ct_value"
   override val propFgName = "ct"
   override val propBgName = "bg_ct"

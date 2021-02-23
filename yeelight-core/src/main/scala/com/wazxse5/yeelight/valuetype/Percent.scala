@@ -12,7 +12,7 @@ case class Percent(value: Int) extends ParamValueType[Int] {
 }
 
 object Percent extends ParamCompanion {
-  override val snapshotName = "percent"
+  override val name = "percent"
   override val paramName = "percentage"
 
   def fromString(str: String): Option[Percent] = Try(Percent(str.toInt)).filter(_.isValid).toOption

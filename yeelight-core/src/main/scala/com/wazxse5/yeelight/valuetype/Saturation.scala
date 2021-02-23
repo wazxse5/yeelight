@@ -12,7 +12,7 @@ case class Saturation(value: Int) extends PropAndParamValueType[Int] {
 }
 
 object Saturation extends PropAndParamCompanion {
-  override val snapshotName = "saturation"
+  override val name = "saturation"
   override val paramName = "sat"
   override val propFgName = "sat"
   override val propBgName = "bg_sat"

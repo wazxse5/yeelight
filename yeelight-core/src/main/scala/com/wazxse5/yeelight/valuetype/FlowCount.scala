@@ -12,7 +12,7 @@ case class FlowCount(value: Int) extends ParamValueType[Int] {
 }
 
 object FlowCount extends ParamCompanion {
-  override val snapshotName = "flowCount"
+  override val name = "flowCount"
   override val paramName = "count"
   
   def infinite: FlowCount = FlowCount(0)

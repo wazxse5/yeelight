@@ -11,7 +11,7 @@ case class IpAddress(value: String) extends ParamValueType[String] {
 }
 
 object IpAddress extends ParamCompanion {
-  override val snapshotName = "address"
+  override val name = "address"
   override val paramName = "host"
 
   def fromString(str: String): Option[IpAddress] = Some(IpAddress(str)).filter(_.isValid)

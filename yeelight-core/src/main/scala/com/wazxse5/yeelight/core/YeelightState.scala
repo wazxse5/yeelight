@@ -37,18 +37,18 @@ trait YeelightState extends Snapshotable {
 
   override final def snapshotInfo: SnapshotInfo = SnapshotInfo(
     snapshotName, Json.obj(
-      Brightness.snapshotName -> brightness.strValueOrUnknown,
-      ColorMode.snapshotName -> colorMode.strValueOrUnknown,
-      FlowExpression.snapshotName -> flowExpression.strValueOrUnknown,
-      FlowPower.snapshotName -> flowPower.strValueOrUnknown,
-      Hue.snapshotName -> hue.strValueOrUnknown,
-      MusicPower.snapshotName -> musicPower.strValueOrUnknown,
-      Name.snapshotName -> name.strValueOrUnknown,
-      Power.snapshotName -> power.strValueOrUnknown,
-      Rgb.snapshotName -> rgb.strValueOrUnknown,
-      Saturation.snapshotName -> saturation.strValueOrUnknown,
-      Temperature.snapshotName -> temperature.strValueOrUnknown,
-      TimerValue.snapshotName -> timerValue.strValueOrUnknown
+      Brightness.name -> brightness.strValueOrUnknown,
+      ColorMode.name -> colorMode.strValueOrUnknown,
+      FlowExpression.name -> flowExpression.strValueOrUnknown,
+      FlowPower.name -> flowPower.strValueOrUnknown,
+      Hue.name -> hue.strValueOrUnknown,
+      MusicPower.name -> musicPower.strValueOrUnknown,
+      Name.name -> name.strValueOrUnknown,
+      Power.name -> power.strValueOrUnknown,
+      Rgb.name -> rgb.strValueOrUnknown,
+      Saturation.name -> saturation.strValueOrUnknown,
+      Temperature.name -> temperature.strValueOrUnknown,
+      TimerValue.name -> timerValue.strValueOrUnknown
     )
   )
 }

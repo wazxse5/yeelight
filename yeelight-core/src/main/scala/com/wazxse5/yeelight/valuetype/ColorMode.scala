@@ -6,17 +6,17 @@ import scala.util.Try
 
 sealed trait ColorMode extends PropValueType[Int] {
   override def companion: PropCompanion = ColorMode
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, JsNumber(value))
 }
 
 object ColorMode extends PropCompanion {
-  override val snapshotName = "colorMode"
+  override val name = "colorMode"
   override val propFgName = "color_mode"
   override val propBgName = "bg_lmode"
 
-  def rgb: ColorMode = RgbColorMode
-  def temperature: ColorMode = TemperatureColorMode
-  def hsv: ColorMode = HsvColorMode
+  def rgb: ColorMode = ColorModeRgb
+  def temperature: ColorMode = ColorModeTemperature
+  def hsv: ColorMode = ColorModeHsv
 
   val typeByValue: Map[Int, ColorMode] = Seq(rgb, temperature, hsv).map(v => v.value -> v).toMap
   val values: Seq[Int] = typeByValue.keys.toSeq
@@ -28,17 +28,17 @@ object ColorMode extends PropCompanion {
   }
 }
 
-case object RgbColorMode extends ColorMode {
+case object ColorModeRgb extends ColorMode {
   override val value = 1
   override val strValue = "rgb"
 }
 
-case object TemperatureColorMode extends ColorMode {
+case object ColorModeTemperature extends ColorMode {
   override val value = 2
   override val strValue = "temperature"
 }
 
-case object HsvColorMode extends ColorMode {
+case object ColorModeHsv extends ColorMode {
   override val value = 3
   override val strValue = "hsv"
 }

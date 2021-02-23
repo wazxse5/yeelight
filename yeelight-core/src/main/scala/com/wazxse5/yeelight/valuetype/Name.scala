@@ -10,7 +10,7 @@ case class Name(value: String) extends PropAndParamValueType[String] {
 }
 
 object Name extends PropAndParamCompanion {
-  override val snapshotName = "commandName"
+  override val name = "commandName"
   override val paramName = "commandName"
   override val propFgName = "commandName"
 

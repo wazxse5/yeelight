@@ -63,7 +63,19 @@ object CliDevicePerformer {
       SetBrightness(brightness, effect, duration)
     }
 
-    def setColorCommand: SetRgb = throw NotImplementedCommandException(device.set.colorMode)
+    def setColorCommand: SetRgb = {
+      val (color, effect, duration) = cliCommand.pop3 match {
+        case c :: d :: Nil =>
+          if (isNotNumber(c)) throw InvalidParamValueCommandException(Rgb.paramName, c)
+          else if (isNotNumber(d)) throw InvalidParamValueCommandException(Duration.paramName, d)
+          else (Rgb(c.toInt), Effect.smooth, Duration(d.toInt))
+        case b :: Nil =>
+          if (isNotNumber(b)) throw InvalidParamValueCommandException(Brightness.paramName, b)
+          else (Rgb(b.toInt), Effect.sudden, Duration(0))
+        case other => throw InvalidCommandException(other)
+      }
+      SetRgb(color, effect, duration)
+    }
 
     def setColorModeCommand: YeelightCommand = throw NotImplementedCommandException(device.set.colorMode)
 

@@ -11,7 +11,7 @@ sealed trait Power extends PropAndParamValueType[String] {
 }
 
 object Power extends PropAndParamCompanion {
-  override val snapshotName = "power"
+  override val name = "power"
   override val paramName = "power"
   override val propFgName = "power"
   override val propBgName = "bg_power"

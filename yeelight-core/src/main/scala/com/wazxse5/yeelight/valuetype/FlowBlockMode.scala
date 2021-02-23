@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.valuetype
 
 import com.wazxse5.yeelight.snapshot.SnapshotInfo
-import com.wazxse5.yeelight.valuetype.FlowBlockMode.snapshotName
+import com.wazxse5.yeelight.valuetype.FlowBlockMode.name
 import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Try
@@ -9,15 +9,15 @@ import scala.util.Try
 sealed trait FlowBlockMode extends ValueType[Int] {
   override def strValue: String = value.toString
   override def companion: ValueTypeCompanion = FlowBlockMode
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(snapshotName, JsNumber(value))
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(name, JsNumber(value))
 }
 
 object FlowBlockMode extends ValueTypeCompanion {
-  override val snapshotName = "flowBlockMode"
+  override val name = "flowBlockMode"
 
-  def rgb: FlowBlockMode = RgbFlowBlockMode
-  def temperature: FlowBlockMode = TemperatureFlowBlockMode
-  def sleep: FlowBlockMode = SleepFlowBlockMode
+  def rgb: FlowBlockMode = FlowBlockModeRgb
+  def temperature: FlowBlockMode = FlowBlockModeTemperature
+  def sleep: FlowBlockMode = FlowBlockModeSleep
 
   val typeByValue: Map[Int, FlowBlockMode] = Seq(rgb, temperature, sleep).map(v => v.value -> v).toMap
   val values: Seq[Int] = typeByValue.keys.toSeq
@@ -29,14 +29,14 @@ object FlowBlockMode extends ValueTypeCompanion {
   }
 }
 
-case object RgbFlowBlockMode extends FlowBlockMode {
+case object FlowBlockModeRgb extends FlowBlockMode {
   override val value = 1
 }
 
-case object TemperatureFlowBlockMode extends FlowBlockMode {
+case object FlowBlockModeTemperature extends FlowBlockMode {
   override val value = 2
 }
 
-case object SleepFlowBlockMode extends FlowBlockMode {
+case object FlowBlockModeSleep extends FlowBlockMode {
   override val value = 7
 }

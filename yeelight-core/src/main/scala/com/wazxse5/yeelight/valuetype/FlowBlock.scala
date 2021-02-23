@@ -29,9 +29,9 @@ case class FlowBlock(
   }
 
   private def isValueValid: Boolean = mode match {
-    case RgbFlowBlockMode => Rgb(value).isValid
-    case TemperatureFlowBlockMode => Temperature(value).isValid
-    case SleepFlowBlockMode => true
+    case FlowBlockModeRgb => Rgb(value).isValid
+    case FlowBlockModeTemperature => Temperature(value).isValid
+    case FlowBlockModeSleep => true
   }
 }
 
@@ -50,11 +50,15 @@ object FlowBlock {
     new FlowBlock(Duration(duration), mode, value, Brightness(brightness))
   }
 
-  def apply(duration: Int, value: Rgb, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.rgb, value.value, Brightness(brightness))
+  def rgb(duration: Int, rgb: Int, brightness: Int): FlowBlock = {
+    new FlowBlock(Duration(duration), FlowBlockMode.rgb, rgb, Brightness(brightness))
   }
 
-  def apply(duration: Int, value: Temperature, brightness: Int): FlowBlock = {
-    new FlowBlock(Duration(duration), FlowBlockMode.temperature, value.value, Brightness(brightness))
+  def temperature(duration: Int, temperature: Int, brightness: Int): FlowBlock = {
+    new FlowBlock(Duration(duration), FlowBlockMode.temperature, temperature, Brightness(brightness))
+  }
+
+  def sleep(duration: Int): FlowBlock = {
+    new FlowBlock(Duration(duration), FlowBlockMode.sleep, 0, Brightness(1))
   }
 }

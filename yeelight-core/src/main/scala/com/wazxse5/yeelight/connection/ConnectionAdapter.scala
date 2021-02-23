@@ -20,7 +20,7 @@ trait ConnectionAdapter {
 
   def send(message: CommandMessage): Unit
 
-  def handleMessage(message: Message): Unit
+  def handleMessage(message: Message): Unit = service.handleMessage(message)
 
   def exit: Int
 }

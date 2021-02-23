@@ -8,7 +8,7 @@ case class DeviceInfo(
   deviceId: String,
   model: Option[DeviceModel],
   firmwareVersion: Option[String],
-  supportedCommands: Option[Set[String]],
+  supportedCommands: Option[Seq[String]],
   //
   ipAddress: Option[IpAddress],
   port: Option[Port],

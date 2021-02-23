@@ -10,7 +10,7 @@ case class PropertyName(value: String) extends ParamValueType[String] {
 }
 
 object PropertyName extends ParamCompanion {
-  override val snapshotName = "propName"
+  override val name = "propName"
   override val paramName = "prop"
 
   def fromString(str: String): Option[PropertyName] = Some(PropertyName(str)).filter(_.isValid)

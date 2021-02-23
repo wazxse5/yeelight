@@ -6,6 +6,7 @@ import com.wazxse5.yeelight.connection.{ConnectionAdapter, Connector, RealConnec
 import com.wazxse5.yeelight.exception.NoSuchDeviceException
 import com.wazxse5.yeelight.message._
 import com.wazxse5.yeelight.valuetype.{IpAddress, Port}
+import play.api.libs.json.Json
 
 class YeelightServiceImpl extends YeelightService with StrictLogging {
   private implicit val service: YeelightServiceImpl = this
@@ -58,21 +59,26 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
     if (knownDevices.contains(deviceId)) {
       val message = CommandMessage(deviceId, command)
       messageRegistry.add(message)
+      println("s - " + Json.prettyPrint(message.json))
       connectionAdapter.send(message)
     }
     else throw new NoSuchDeviceException(deviceId)
   }
 
-  def handleMessage(message: Message): Unit = message match {
-    case controlMessage: ControlMessage => handleControlMessage(controlMessage)
-    case yeelightMessage: YeelightMessage => handleYeelightMessage(yeelightMessage)
+  def handleMessage(message: Message): Unit = {
+    message match {
+      case controlMessage: ControlMessage => handleControlMessage(controlMessage)
+      case yeelightMessage: YeelightMessage => handleYeelightMessage(yeelightMessage)
+    }
   }
 
-  private def handleControlMessage(message: ControlMessage): Unit = message match {
-    case Connector.ConnectionSucceeded(deviceId) =>
-      knownDevices.update(deviceId, isConnected = true)
-    case Connector.Disconnected(deviceId) =>
-      knownDevices.update(deviceId, isConnected = false)
+  private def handleControlMessage(message: ControlMessage): Unit = {
+    message match {
+      case Connector.ConnectionSucceeded(deviceId) =>
+        knownDevices.update(deviceId, isConnected = true)
+      case Connector.Disconnected(deviceId) =>
+        knownDevices.update(deviceId, isConnected = false)
+    }
   }
 
   private def handleYeelightMessage(message: YeelightMessage): Unit = {
@@ -126,6 +132,7 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
   }
 
   private def handleNotificationMessage(message: NotificationMessage): Unit = {
+    println("n - " + Json.prettyPrint(message.json))
     val deviceInfoChange = DeviceInfoChange.fromNotification(message)
     knownDevices.update(message.deviceId, deviceInfoChange)
   }

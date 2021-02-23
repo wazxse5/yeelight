@@ -17,7 +17,7 @@ class YeelightDeviceImpl private(
 
   override def firmwareVersion: Option[String] = service.deviceInfo(deviceId).firmwareVersion
 
-  override def supportedCommands: Option[Set[String]] = service.deviceInfo(deviceId).supportedCommands
+  override def supportedCommands: Option[Seq[String]] = service.deviceInfo(deviceId).supportedCommands
 
   override def isConnected: Boolean = service.deviceInfo(deviceId).isConnected
 

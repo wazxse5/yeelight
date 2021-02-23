@@ -2,6 +2,8 @@ package com.wazxse5.yeelight.command
 
 import com.wazxse5.yeelight.valuetype.{PropValueType, PropertyName}
 
+import scala.util.{Failure, Success, Try}
+
 case class GetProps(
   p1: MandatoryParameter[PropertyName],
   p2: OptionalParameter[PropertyName],
@@ -36,30 +38,17 @@ object GetProps extends YeelightCommandCompanion {
 
   def all: GetProps = {
     val propNames = PropValueType.names.map(PropertyName(_))
+
+    def get(i: Int): OptionalParameter[PropertyName] = Try(propNames(i)) match {
+      case Success(propertyName) => OptionalParameter(Some(propertyName))
+      case Failure(_) => Parameter.empty
+    }
+
     new GetProps(
       propNames.head,
-      propNames(1),
-      propNames(2),
-      propNames(3),
-      propNames(4),
-      propNames(5),
-      propNames(6),
-      propNames(7),
-      propNames(8),
-      propNames(9),
-      propNames(10),
-      propNames(11),
-      propNames(12),
-      propNames(13),
-      propNames(14),
-      propNames(15),
-      propNames(16),
-      propNames(17),
-      propNames(18),
-      propNames(19),
-      propNames(20),
-      propNames(21),
-      propNames(22)
+      get(1), get(2), get(3), get(4), get(5), get(6), get(7),
+      get(8), get(9), get(10), get(11), get(12), get(13), get(14),
+      get(15), get(16), get(17), get(18), get(19), get(20), get(21), get(22)
     )
   }
 }

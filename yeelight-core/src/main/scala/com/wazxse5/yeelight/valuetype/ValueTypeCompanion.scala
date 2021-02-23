@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.valuetype
 
 trait ValueTypeCompanion {
-  def snapshotName: String
+  def name: String
 }
 
 trait PropCompanion extends ValueTypeCompanion {

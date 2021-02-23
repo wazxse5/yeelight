@@ -12,7 +12,7 @@ case class Brightness(value: Int) extends PropAndParamValueType[Int] {
 }
 
 object Brightness extends PropAndParamCompanion {
-  override val snapshotName = "brightness"
+  override val name = "brightness"
   override val paramName = "brightness"
   override val propFgName = "bright"
   override val propBgName = "bg_bright"

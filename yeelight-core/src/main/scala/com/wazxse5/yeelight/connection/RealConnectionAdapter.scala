@@ -35,8 +35,6 @@ class RealConnectionAdapter(val service: YeelightService) extends ConnectionAdap
     connectors.get(message.deviceId) foreach (_ ! Send(message))
   }
 
-  override def handleMessage(message: Message): Unit = service.handleMessage(message)
-
   override def exit: Int = {
     Try(Await.result(actorSystem.terminate(), 5 seconds)) match {
       case Success(_) => 0

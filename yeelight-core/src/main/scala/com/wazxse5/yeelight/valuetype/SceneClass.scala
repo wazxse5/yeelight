@@ -11,14 +11,14 @@ sealed trait SceneClass extends ParamValueType[String] {
 }
 
 object SceneClass extends ParamCompanion {
-  override val snapshotName = "sceneClass"
+  override val name = "sceneClass"
   override val paramName = "class"
 
-  def rgb: SceneClass = RgbSceneClass
-  def hsv: SceneClass = HsvSceneClass
-  def temperature: SceneClass = TemperatureSceneClass
-  def flow: SceneClass = FlowSceneClass
-  def delayOff: SceneClass = DelayOffSceneClass
+  def rgb: SceneClass = SceneClassRgb
+  def hsv: SceneClass = SceneClassHsv
+  def temperature: SceneClass = SceneClassTemperature
+  def flow: SceneClass = SceneClassFlow
+  def delayOff: SceneClass = SceneClassDelayOff
 
   val typeByValue: Map[String, SceneClass] = Seq(rgb, hsv, temperature, flow, delayOff).map(v => v.value -> v).toMap
   val values: Seq[String] = typeByValue.keys.toSeq
@@ -30,23 +30,23 @@ object SceneClass extends ParamCompanion {
   }
 }
 
-case object RgbSceneClass extends SceneClass {
+case object SceneClassRgb extends SceneClass {
   override val value = "color"
 }
 
-case object HsvSceneClass extends SceneClass {
+case object SceneClassHsv extends SceneClass {
   override val value = "hsv"
 }
 
-case object TemperatureSceneClass extends SceneClass {
+case object SceneClassTemperature extends SceneClass {
   override val value = "ct"
 }
 
-case object FlowSceneClass extends SceneClass {
+case object SceneClassFlow extends SceneClass {
   override val value = "cf"
 }
 
-case object DelayOffSceneClass extends SceneClass {
+case object SceneClassDelayOff extends SceneClass {
   override val value = "auto_delay_off"
 }
 

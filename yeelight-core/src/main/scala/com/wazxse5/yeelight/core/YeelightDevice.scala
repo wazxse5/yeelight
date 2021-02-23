@@ -14,7 +14,7 @@ trait YeelightDevice extends Snapshotable {
 
   def firmwareVersion: Option[String]
 
-  def supportedCommands: Option[Set[String]]
+  def supportedCommands: Option[Seq[String]]
 
   def address: Option[IpAddress]
 
@@ -31,11 +31,11 @@ trait YeelightDevice extends Snapshotable {
   override final def snapshotInfo: SnapshotInfo = SnapshotInfo(
     snapshotName, Json.obj(
       "deviceId" -> deviceId,
-      DeviceModel.snapshotName -> model.map(_.snapshotInfo.value),
+      DeviceModel.name -> model.map(_.snapshotInfo.value),
       "firmwareVersion" -> firmwareVersion,
       "supportedCommands" -> supportedCommands,
-      IpAddress.snapshotName -> address.map(_.snapshotInfo.value),
-      Port.snapshotName -> port.map(_.snapshotInfo.value),
+      IpAddress.name -> address.map(_.snapshotInfo.value),
+      Port.name -> port.map(_.snapshotInfo.value),
       "isConnected" -> isConnected,
       state.snapshotInfo.pairw
     )

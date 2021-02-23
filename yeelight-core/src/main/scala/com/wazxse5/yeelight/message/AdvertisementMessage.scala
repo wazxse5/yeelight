@@ -8,14 +8,14 @@ import scala.util.Try
 case class AdvertisementMessage private(
   header: String,
   host: String,
-  cacheControl: Int,
+  cacheControl: String,
   location: String,
   nts: String,
   server: String,
   deviceId: String,
   model: String,
   firmwareVersion: String,
-  supportedCommands: Set[String],
+  supportedCommands: Seq[String],
   power: String,
   brightness: String,
   colorMode: String,
@@ -23,17 +23,40 @@ case class AdvertisementMessage private(
   rgb: String,
   hue: String,
   saturation: String,
-  name: String,
-  override val text: String
+  name: String
 ) extends YeelightUnconnectedMessage {
 
   def locationAddress: String = location.split(':')(0)
   def locationPort: String = location.split(':')(1)
 
   override def snapshotInfo: SnapshotInfo = SnapshotInfo("advertisementMessage", Json.obj("text" -> text))
+
+  override def text: String = {
+    s"""|$header
+        |Host: $host
+        |Cache-Control: max-age=$cacheControl
+        |Location: yeelight://$location
+        |NTS: $nts
+        |Server: $server
+        |id: $deviceId
+        |model: $model
+        |fw_ver: $firmwareVersion
+        |support: ${supportedCommands.mkString(" ")}
+        |power: $power
+        |bright: $brightness
+        |color_mode: $colorMode
+        |ct: $temperature
+        |rgb: $rgb
+        |hue: $hue
+        |sat: $saturation
+        |name: $name
+        |""".stripMargin
+  }
 }
 
 object AdvertisementMessage {
+  val defaultHeader = "NOTIFY * HTTP/1.1"
+  val defaultServer = "POSIX UPnP/1.0 YGLC/1"
 
   def fromString(message: String): Option[AdvertisementMessage] = {
     Try {
@@ -41,14 +64,14 @@ object AdvertisementMessage {
 
       val header = messageLines(0)
       val host = messageLines(1).substring(6)
-      val cacheControl = messageLines(2).substring(23).toInt
+      val cacheControl = messageLines(2).substring(23)
       val location = messageLines(3).substring(21)
       val nts = messageLines(4).substring(5)
       val server = messageLines(5).substring(8)
-      val id = messageLines(6).substring(6)
+      val id = messageLines(6).substring(4)
       val model = messageLines(7).substring(7)
       val firmwareVersion = messageLines(8).substring(8)
-      val supportedCommands = messageLines(9).substring(9).split(' ').toSet
+      val supportedCommands = messageLines(9).substring(9).split(' ').toSeq
       val power = messageLines(10).substring(7)
       val brightness = messageLines(11).substring(8)
       val colorMode = messageLines(12).substring(12)
@@ -59,7 +82,7 @@ object AdvertisementMessage {
       val name = messageLines(17).substring(6)
 
       new AdvertisementMessage(header, host, cacheControl, location, nts, server, id, model, firmwareVersion,
-        supportedCommands, power, brightness, colorMode, temperature, rgb, hue, saturation, name, message
+        supportedCommands, power, brightness, colorMode, temperature, rgb, hue, saturation, name
       )
     }.toOption
   }

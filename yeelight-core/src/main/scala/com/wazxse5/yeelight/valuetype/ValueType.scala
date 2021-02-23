@@ -8,7 +8,7 @@ trait ValueType[A] extends Snapshotable {
   def strValue: String
 
   def companion: ValueTypeCompanion
-  def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsString(strValue))
+  def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, JsString(strValue))
 
   def isValid: Boolean = true
   def isForProp: Boolean = false
@@ -29,7 +29,7 @@ trait ParamValueType[A] extends ValueType[A] {
   def paramName: String = companion.paramName
 
   def companion: ParamCompanion
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, paramValue)
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, paramValue)
 
   override final def isForParam: Boolean = true
 }
@@ -53,6 +53,6 @@ object PropValueType {
     Name, Power, Rgb, Saturation, Temperature, TimerValue
   )
   val fgNames: Seq[String] = all.map(_.propFgName)
-  val bgNames: Seq[String] = all.map(_.propBgName)
+  val bgNames: Seq[String] = all.filter(_.supportsBackground).map(_.propBgName)
   val names: Seq[String] = fgNames ++ bgNames
 }

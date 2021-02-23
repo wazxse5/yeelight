@@ -10,15 +10,15 @@ sealed trait PowerMode extends ParamValueType[Int] {
 }
 
 object PowerMode extends ParamCompanion {
-  override val snapshotName = "powerMode"
+  override val name = "powerMode"
   override val paramName = "mode"
 
-  def normal: PowerMode = NormalPowerMode
-  def temperature: PowerMode = TemperaturePowerMode
-  def rgb: PowerMode = RgbPowerMode
-  def hsv: PowerMode = HsvPowerMode
-  def flow: PowerMode = FlowPowerMode
-  def night: PowerMode = NightPowerMode
+  def normal: PowerMode = PowerModeNormal
+  def temperature: PowerMode = PowerModeTemperature
+  def rgb: PowerMode = PowerModeRgb
+  def hsv: PowerMode = PowerModeHsv
+  def flow: PowerMode = PowerModeFlow
+  def night: PowerMode = PowerModeNight
 
   val typeByValue: Map[Int, PowerMode] = Seq(normal, temperature, rgb, hsv, flow, night).map(v => v.value -> v).toMap
   val values: Seq[Int] = typeByValue.keys.toSeq
@@ -30,32 +30,32 @@ object PowerMode extends ParamCompanion {
   }
 }
 
-case object NormalPowerMode extends PowerMode {
+case object PowerModeNormal extends PowerMode {
   override val value = 0
   override val strValue = "normal"
 }
 
-case object TemperaturePowerMode extends PowerMode {
+case object PowerModeTemperature extends PowerMode {
   override val value = 1
   override val strValue = "temperature"
 }
 
-case object RgbPowerMode extends PowerMode {
+case object PowerModeRgb extends PowerMode {
   override val value = 2
   override val strValue = "rgb"
 }
 
-case object HsvPowerMode extends PowerMode {
+case object PowerModeHsv extends PowerMode {
   override val value = 3
   override val strValue = "hsv"
 }
 
-case object FlowPowerMode extends PowerMode {
+case object PowerModeFlow extends PowerMode {
   override val value = 4
   override val strValue = "flow"
 }
 
-case object NightPowerMode extends PowerMode {
+case object PowerModeNight extends PowerMode {
   override val value = 5
   override val strValue = "night"
 }

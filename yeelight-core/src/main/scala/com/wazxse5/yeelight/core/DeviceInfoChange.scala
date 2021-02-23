@@ -1,14 +1,15 @@
 package com.wazxse5.yeelight.core
 
-import com.wazxse5.yeelight.core.Change.OptionChange
 import com.wazxse5.yeelight.message._
 import com.wazxse5.yeelight.valuetype._
 import play.api.libs.json.{JsString, JsValue}
 
+import scala.language.implicitConversions
+
 case class DeviceInfoChange(
   model: Change[DeviceModel] = Keep,
   firmwareVersion: Change[String] = Keep,
-  supportedCommands: Change[Set[String]] = Keep,
+  supportedCommands: Change[Seq[String]] = Keep,
   //
   brightness: Change[Brightness] = Keep,
   colorMode: Change[ColorMode] = Keep,
@@ -40,35 +41,35 @@ case class DeviceInfoChange(
 object DeviceInfoChange {
   def fromDiscoveryResponse(message: DiscoveryResponseMessage): DeviceInfoChange = {
     DeviceInfoChange(
-      model = DeviceModel.fromString(message.model).toChangeModifyOrKeep,
+      model = DeviceModel.fromString(message.model),
       firmwareVersion = Modify(message.firmwareVersion),
       supportedCommands = Modify(message.supportedCommands),
       //
-      brightness = Brightness.fromString(message.brightness).toChangeModifyOrKeep,
-      colorMode = ColorMode.fromString(message.colorMode).toChangeModifyOrKeep,
-      hue = Hue.fromString(message.hue).toChangeModifyOrKeep,
-      name = Name.fromString(message.name).toChangeModifyOrKeep,
-      power = Power.fromString(message.power).toChangeModifyOrKeep,
-      rgb = Rgb.fromString(message.rgb).toChangeModifyOrKeep,
-      saturation = Saturation.fromString(message.saturation).toChangeModifyOrKeep,
-      temperature = Temperature.fromString(message.temperature).toChangeModifyOrKeep,
+      brightness = Brightness.fromString(message.brightness),
+      colorMode = ColorMode.fromString(message.colorMode),
+      hue = Hue.fromString(message.hue),
+      name = Name.fromString(message.name),
+      power = Power.fromString(message.power),
+      rgb = Rgb.fromString(message.rgb),
+      saturation = Saturation.fromString(message.saturation),
+      temperature = Temperature.fromString(message.temperature),
     )
   }
 
   def fromAdvertisement(message: AdvertisementMessage): DeviceInfoChange = {
     DeviceInfoChange(
-      model = DeviceModel.fromString(message.model).toChangeModifyOrKeep,
+      model = DeviceModel.fromString(message.model),
       firmwareVersion = Modify(message.firmwareVersion),
       supportedCommands = Modify(message.supportedCommands),
       //
-      brightness = Brightness.fromString(message.brightness).toChangeModifyOrKeep,
-      colorMode = ColorMode.fromString(message.colorMode).toChangeModifyOrKeep,
-      hue = Hue.fromString(message.hue).toChangeModifyOrKeep,
-      name = Name.fromString(message.name).toChangeModifyOrKeep,
-      power = Power.fromString(message.power).toChangeModifyOrKeep,
-      rgb = Rgb.fromString(message.rgb).toChangeModifyOrKeep,
-      saturation = Saturation.fromString(message.saturation).toChangeModifyOrKeep,
-      temperature = Temperature.fromString(message.temperature).toChangeModifyOrKeep,
+      brightness = Brightness.fromString(message.brightness),
+      colorMode = ColorMode.fromString(message.colorMode),
+      hue = Hue.fromString(message.hue),
+      name = Name.fromString(message.name),
+      power = Power.fromString(message.power),
+      rgb = Rgb.fromString(message.rgb),
+      saturation = Saturation.fromString(message.saturation),
+      temperature = Temperature.fromString(message.temperature),
     )
   }
 
@@ -153,4 +154,9 @@ object DeviceInfoChange {
       activeMode = find(ActiveMode.propFgName, ActiveMode.fromJsValue)
     )
   }
+
+  def empty = new DeviceInfoChange()
+
+  private implicit def optionToChange[A](opt: Option[A]): Change[A] = Change.fromOption(opt)
+
 }

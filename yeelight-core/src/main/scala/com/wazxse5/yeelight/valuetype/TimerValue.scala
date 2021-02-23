@@ -12,7 +12,7 @@ case class TimerValue(value: Int) extends PropAndParamValueType[Int] {
 }
 
 object TimerValue extends PropAndParamCompanion {
-  override val snapshotName = "timerValue"
+  override val name = "timerValue"
   override val paramName = "value"
   override val propFgName = "delayoff"
 

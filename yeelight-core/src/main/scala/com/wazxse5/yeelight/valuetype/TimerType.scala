@@ -11,7 +11,7 @@ trait TimerType extends ParamValueType[Int] {
 }
 
 object TimerType extends ParamCompanion {
-  override val snapshotName = "timerType"
+  override val name = "timerType"
   override val paramName = "type"
 
   def default: TimerType = TimerTypeDefault

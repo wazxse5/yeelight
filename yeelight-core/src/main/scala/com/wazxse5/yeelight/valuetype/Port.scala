@@ -8,11 +8,11 @@ case class Port(value: Int) extends ParamValueType[Int] {
   override def strValue: String = value.toString
   override def paramValue: JsValue = JsNumber(value)
   override def companion: ParamCompanion = Port
-  override def isValid: Boolean = 0 < value && value <= 65535
+  override def isValid: Boolean = 0 <= value && value <= 65535
 }
 
 object Port extends ParamCompanion {
-  override val snapshotName = "port"
+  override val name = "port"
   override val paramName = "port"
 
   def fromString(str: String): Option[Port] = Try(Port(str.toInt)).filter(_.isValid).toOption

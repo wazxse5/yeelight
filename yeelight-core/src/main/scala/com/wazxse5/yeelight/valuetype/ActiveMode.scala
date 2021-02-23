@@ -7,15 +7,15 @@ import scala.util.Try
 
 sealed trait ActiveMode extends PropValueType[Int] {
   override def companion: PropCompanion = ActiveMode
-  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.snapshotName, JsNumber(value))
+  override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, JsNumber(value))
 }
 
 object ActiveMode extends PropCompanion {
-  override val snapshotName = "activeMode"
+  override val name = "activeMode"
   override val propFgName = "active_mode"
 
-  def daylight: ActiveMode = DaylightActiveMode
-  def moonlight: ActiveMode = MoonlightActiveMode
+  def daylight: ActiveMode = ActiveModeDaylight
+  def moonlight: ActiveMode = ActiveModeMoonlight
 
   val typeByValue: Map[Int, ActiveMode] = Seq(daylight, moonlight).map(v => v.value -> v).toMap
   val values: Seq[Int] = typeByValue.keys.toSeq
@@ -27,12 +27,12 @@ object ActiveMode extends PropCompanion {
   }
 }
 
-case object DaylightActiveMode extends ActiveMode {
+case object ActiveModeDaylight extends ActiveMode {
   override val value = 0
   override val strValue = "daylight"
 }
 
-case object MoonlightActiveMode extends ActiveMode {
+case object ActiveModeMoonlight extends ActiveMode {
   override val value = 1
   override val strValue = "moonlight"
 }

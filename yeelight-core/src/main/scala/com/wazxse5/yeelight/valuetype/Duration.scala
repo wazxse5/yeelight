@@ -12,7 +12,7 @@ case class Duration(value: Int) extends ParamValueType[Int] {
 }
 
 object Duration extends ParamCompanion {
-  override val snapshotName = "duration"
+  override val name = "duration"
   override val paramName = "duration"
 
   def fromString(str: String): Option[Duration] = Try(Duration(str.toInt)).filter(_.isValid).toOption
