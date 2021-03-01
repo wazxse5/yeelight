@@ -1,6 +1,6 @@
 package com.wazxse5.yeelight.command
 
-import com.wazxse5.yeelight.valuetype._
+import com.wazxse5.yeelight.valuetype.{PowerMode, _}
 
 case class SetPower(
   p1: MandatoryParameter[Power],
@@ -14,6 +14,10 @@ case class SetPower(
 object SetPower extends YeelightCommandCompanion {
   override val commandName: String = "set_power"
   override val snapshotName: String = "setPower"
+
+  def apply(power: Power, effect: Effect, duration: Duration, powerMode: PowerMode): SetPower = {
+    new SetPower(power, effect, duration, powerMode)
+  }
 
   def apply(power: Power, effect: Effect, duration: Duration): SetPower = {
     new SetPower(power, effect, duration, Parameter.empty)

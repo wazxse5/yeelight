@@ -6,7 +6,6 @@ import com.wazxse5.yeelight.connection.{ConnectionAdapter, Connector, RealConnec
 import com.wazxse5.yeelight.exception.NoSuchDeviceException
 import com.wazxse5.yeelight.message._
 import com.wazxse5.yeelight.valuetype.{IpAddress, Port}
-import play.api.libs.json.Json
 
 class YeelightServiceImpl extends YeelightService with StrictLogging {
   private implicit val service: YeelightServiceImpl = this
@@ -59,7 +58,6 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
     if (knownDevices.contains(deviceId)) {
       val message = CommandMessage(deviceId, command)
       messageRegistry.add(message)
-      println("s - " + Json.prettyPrint(message.json))
       connectionAdapter.send(message)
     }
     else throw new NoSuchDeviceException(deviceId)
@@ -132,7 +130,6 @@ class YeelightServiceImpl extends YeelightService with StrictLogging {
   }
 
   private def handleNotificationMessage(message: NotificationMessage): Unit = {
-    println("n - " + Json.prettyPrint(message.json))
     val deviceInfoChange = DeviceInfoChange.fromNotification(message)
     knownDevices.update(message.deviceId, deviceInfoChange)
   }

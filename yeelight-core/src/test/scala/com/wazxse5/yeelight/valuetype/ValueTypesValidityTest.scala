@@ -166,7 +166,7 @@ class ValueTypesValidityTest extends AnyFunSuite with Matchers {
   }
 
   test(s"${Name.name} validity") {
-    Name("").isValid shouldBe false
+    Name("").isValid shouldBe true
     Name("test").isValid shouldBe true
     Name("any").isValid shouldBe true
   }

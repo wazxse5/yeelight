@@ -14,4 +14,8 @@ case class SetHsv(
 case object SetHsv extends YeelightCommandCompanion {
   override val commandName: String = "set_hsv"
   override val snapshotName: String = "setHsv"
+
+  def apply(hue: Hue, saturation: Saturation): SetHsv = {
+    SetHsv(hue, saturation, Effect.smooth, Duration(500))
+  }
 }

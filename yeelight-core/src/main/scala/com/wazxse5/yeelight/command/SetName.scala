@@ -9,7 +9,7 @@ case class SetName(
 }
 
 object SetName extends YeelightCommandCompanion {
-  val commandName: String = "setName"
+  val commandName: String = "set_name"
   val snapshotName: String = "setName"
   def apply(name: String): SetName = new SetName(Name(name))
 }

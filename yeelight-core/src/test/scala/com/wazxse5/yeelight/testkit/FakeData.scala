@@ -1,11 +1,11 @@
-package com.wazxse5.yeelight.connection
+package com.wazxse5.yeelight.testkit
 
 import com.wazxse5.yeelight.core.DeviceInfo
-import com.wazxse5.yeelight.valuetype.{Brightness, ColorMode, DeviceModel, FlowPower, Hue, IpAddress, MusicPower, Name, Port, Power, Rgb, Saturation, Temperature}
+import com.wazxse5.yeelight.valuetype._
 
 import scala.language.implicitConversions
 
-object FakeDevices {
+object FakeData {
   def all = Seq(deviceColor1, deviceDesk2)
 
   val deviceColor1: DeviceInfo = DeviceInfo(
@@ -58,7 +58,7 @@ object FakeDevices {
     power = Power.on,
     rgb = Rgb(16777215),
     saturation = Saturation(0),
-    temperature = Temperature(3000),
+    temperature = Temperature(4000),
     timerValue = None,
     None, None, None, None, None, None, None, None, None, None, None
   )

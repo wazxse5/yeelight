@@ -3,6 +3,7 @@ package com.wazxse5.yeelight.core
 import com.wazxse5.yeelight.core.Change.OptionChange
 import com.wazxse5.yeelight.message.{AdvertisementMessage, DiscoveryResponseMessage}
 import com.wazxse5.yeelight.valuetype._
+import org.joda.time.DateTime
 
 case class DeviceInfo(
   deviceId: String,
@@ -40,8 +41,9 @@ case class DeviceInfo(
   nlBrightness: Option[Brightness],
   activeMode: Option[ActiveMode]
 ) {
+    val lastUpdate: DateTime = DateTime.now
 
-  def update(update: DeviceInfoChange): DeviceInfo = copy(
+    def update(update: DeviceInfoChange): DeviceInfo = copy(
     model = model.withChange(update.model),
     firmwareVersion = firmwareVersion.withChange(update.firmwareVersion),
     supportedCommands = supportedCommands.withChange(update.supportedCommands),

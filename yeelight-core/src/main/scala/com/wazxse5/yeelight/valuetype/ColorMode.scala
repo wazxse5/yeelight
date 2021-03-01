@@ -5,6 +5,7 @@ import play.api.libs.json.{JsNumber, JsValue}
 import scala.util.Try
 
 sealed trait ColorMode extends PropValueType[Int] {
+  override def strValue: String = value.toString
   override def companion: PropCompanion = ColorMode
   override def snapshotInfo: SnapshotInfo = SnapshotInfo(companion.name, JsNumber(value))
 }
@@ -30,16 +31,13 @@ object ColorMode extends PropCompanion {
 
 case object ColorModeRgb extends ColorMode {
   override val value = 1
-  override val strValue = "rgb"
 }
 
 case object ColorModeTemperature extends ColorMode {
   override val value = 2
-  override val strValue = "temperature"
 }
 
 case object ColorModeHsv extends ColorMode {
   override val value = 3
-  override val strValue = "hsv"
 }
 

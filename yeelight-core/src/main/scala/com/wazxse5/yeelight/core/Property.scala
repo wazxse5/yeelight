@@ -16,9 +16,9 @@ class Property[A <: PropValueType[_]] private (
 
   def strValueOrUnknown: String = value.map(_.strValue).getOrElse("unknown")
 
-  def withValue(newValue: Option[A]): Property[A] =  {
+  def withValue(newValue: Option[A], lastUpdate: DateTime = DateTime.now): Property[A] =  {
     val newLastChange = if (value == newValue) _lastChange else DateTime.now
-    new Property(newValue, DateTime.now, newLastChange, _isBackground)
+    new Property(newValue, lastUpdate, newLastChange, _isBackground)
   }
 
   def withValue(newValue: A): Property[A] = withValue(Some(newValue))

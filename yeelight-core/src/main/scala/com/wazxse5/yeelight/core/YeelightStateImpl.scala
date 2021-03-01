@@ -4,6 +4,7 @@ import com.wazxse5.yeelight.valuetype._
 import org.joda.time.DateTime
 
 class YeelightStateImpl(deviceId: String, yeelightService: YeelightService) extends YeelightState {
+  private implicit def deviceIdImplicit: String = deviceId
   
   private var _brightness = Property.empty[Brightness]
   private var _colorMode = Property.empty[ColorMode]
@@ -38,114 +39,118 @@ class YeelightStateImpl(deviceId: String, yeelightService: YeelightService) exte
   )
 
   override def brightness: Property[Brightness] = {
-    _brightness = _brightness.withValue(yeelightService.deviceInfo(deviceId).brightness)
+    _brightness = _brightness.withValue(deviceInfo.brightness, deviceInfo.lastUpdate)
     _brightness
   }
 
   override def colorMode: Property[ColorMode] = {
-    _colorMode = _colorMode.withValue(yeelightService.deviceInfo(deviceId).colorMode)
+    _colorMode = _colorMode.withValue(deviceInfo.colorMode, deviceInfo.lastUpdate)
     _colorMode
   }
 
   override def flowExpression: Property[FlowExpression] = {
-    _flowExpression = _flowExpression.withValue(yeelightService.deviceInfo(deviceId).flowExpression)
+    _flowExpression = _flowExpression.withValue(deviceInfo.flowExpression, deviceInfo.lastUpdate)
     _flowExpression
   }
 
   override def flowPower: Property[FlowPower] = {
-    _flowPower = _flowPower.withValue(yeelightService.deviceInfo(deviceId).flowPower)
+    _flowPower = _flowPower.withValue(deviceInfo.flowPower, deviceInfo.lastUpdate)
     _flowPower
   }
 
   override def hue: Property[Hue] = {
-    _hue = _hue.withValue(yeelightService.deviceInfo(deviceId).hue)
+    _hue = _hue.withValue(deviceInfo.hue, deviceInfo.lastUpdate)
     _hue
   }
 
   override def musicPower: Property[MusicPower] = {
-    _musicPower = _musicPower.withValue(yeelightService.deviceInfo(deviceId).musicPower)
+    _musicPower = _musicPower.withValue(deviceInfo.musicPower, deviceInfo.lastUpdate)
     _musicPower
   }
 
   override def name: Property[Name] = {
-    _name = _name.withValue(yeelightService.deviceInfo(deviceId).name)
+    _name = _name.withValue(deviceInfo.name, deviceInfo.lastUpdate)
     _name
   }
 
   override def power: Property[Power] = {
-    _power = _power.withValue(yeelightService.deviceInfo(deviceId).power)
+    _power = _power.withValue(deviceInfo.power, deviceInfo.lastUpdate)
     _power
   }
 
   override def rgb: Property[Rgb] = {
-    _rgb = _rgb.withValue(yeelightService.deviceInfo(deviceId).rgb)
+    _rgb = _rgb.withValue(deviceInfo.rgb, deviceInfo.lastUpdate)
     _rgb
   }
 
   override def saturation: Property[Saturation] = {
-    _saturation = _saturation.withValue(yeelightService.deviceInfo(deviceId).saturation)
+    _saturation = _saturation.withValue(deviceInfo.saturation, deviceInfo.lastUpdate)
     _saturation
   }
 
   override def temperature: Property[Temperature] = {
-    _temperature = _temperature.withValue(yeelightService.deviceInfo(deviceId).temperature)
+    _temperature = _temperature.withValue(deviceInfo.temperature, deviceInfo.lastUpdate)
     _temperature
   }
 
   override def timerValue: Property[TimerValue] = {
-    _timerValue = _timerValue.withValue(yeelightService.deviceInfo(deviceId).timerValue)
+    _timerValue = _timerValue.withValue(deviceInfo.timerValue, deviceInfo.lastUpdate)
     _timerValue
   }
 
   override def bgBrightness: Property[Brightness] = {
-    _bgBrightness = _bgBrightness.withValue(yeelightService.deviceInfo(deviceId).bgBrightness)
+    _bgBrightness = _bgBrightness.withValue(deviceInfo.bgBrightness, deviceInfo.lastUpdate)
     _bgBrightness
   }
 
   override def bgColorMode: Property[ColorMode] = {
-    _bgColorMode = _bgColorMode.withValue(yeelightService.deviceInfo(deviceId).bgColorMode)
+    _bgColorMode = _bgColorMode.withValue(deviceInfo.bgColorMode, deviceInfo.lastUpdate)
     _bgColorMode
   }
   override def bgFlowExpression: Property[FlowExpression] = {
-    _bgFlowExpression = _bgFlowExpression.withValue(yeelightService.deviceInfo(deviceId).bgFlowExpression)
+    _bgFlowExpression = _bgFlowExpression.withValue(deviceInfo.bgFlowExpression, deviceInfo.lastUpdate)
     _bgFlowExpression
   }
   override def bgFlowPower: Property[FlowPower] = {
-    _bgFlowPower = _bgFlowPower.withValue(yeelightService.deviceInfo(deviceId).bgFlowPower)
+    _bgFlowPower = _bgFlowPower.withValue(deviceInfo.bgFlowPower, deviceInfo.lastUpdate)
     _bgFlowPower
   }
   override def bgHue: Property[Hue] = {
-    _bgHue = _bgHue.withValue(yeelightService.deviceInfo(deviceId).bgHue)
+    _bgHue = _bgHue.withValue(deviceInfo.bgHue, deviceInfo.lastUpdate)
     _bgHue
   }
   override def bgPower: Property[Power] = {
-    _bgPower = _bgPower.withValue(yeelightService.deviceInfo(deviceId).bgPower)
+    _bgPower = _bgPower.withValue(deviceInfo.bgPower, deviceInfo.lastUpdate)
     _bgPower
   }
   override def bgRgb: Property[Rgb] = {
-    _bgRgb = _bgRgb.withValue(yeelightService.deviceInfo(deviceId).bgRgb)
+    _bgRgb = _bgRgb.withValue(deviceInfo.bgRgb, deviceInfo.lastUpdate)
     _bgRgb
   }
   override def bgSaturation: Property[Saturation] = {
-    _bgSaturation = _bgSaturation.withValue(yeelightService.deviceInfo(deviceId).bgSaturation)
+    _bgSaturation = _bgSaturation.withValue(deviceInfo.bgSaturation, deviceInfo.lastUpdate)
     _bgSaturation
   }
   override def bgTemperature: Property[Temperature] = {
-    _bgTemperature = _bgTemperature.withValue(yeelightService.deviceInfo(deviceId).bgTemperature)
+    _bgTemperature = _bgTemperature.withValue(deviceInfo.bgTemperature, deviceInfo.lastUpdate)
     _bgTemperature
   }
 
   override def nlBrightness: Property[Brightness] = {
-    _nlBrightness = _nlBrightness.withValue(yeelightService.deviceInfo(deviceId).nlBrightness)
+    _nlBrightness = _nlBrightness.withValue(deviceInfo.nlBrightness, deviceInfo.lastUpdate)
     _nlBrightness
   }
 
   override def activeMode: Property[ActiveMode] = {
-    _activeMode = _activeMode.withValue(yeelightService.deviceInfo(deviceId).activeMode)
+    _activeMode = _activeMode.withValue(deviceInfo.activeMode, deviceInfo.lastUpdate)
     _activeMode
   }
 
   override def lastUpdate: DateTime = all.maxBy(_.lastUpdate).lastUpdate
+  
+  private def deviceInfo(implicit deviceId: String): DeviceInfo = {
+    yeelightService.deviceInfo(deviceId)
+  }
 }
 
 object YeelightStateImpl {
