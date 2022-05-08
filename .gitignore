@@ -1,0 +1,5 @@
+# Project exclude paths
+/.gradle/
+/yeelight-core/build/
+/yeelight-gui/build/
+/yeelight-gui/build/classes/java/main/

@@ -1,0 +1,15 @@
+plugins {
+    id 'application'
+    id "org.openjfx.javafxplugin" version "0.0.12"
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls' ]
+}
+
+mainClassName = 'HelloFX'
+
+dependencies {
+    implementation project(':yeelight-core')
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="640.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.wazxse5.yeelight.gui.controller.MainController">
+   <children>
+      <Button layoutX="139.0" layoutY="198.0" mnemonicParsing="false" onAction="#search" text="Search" />
+      <Button layoutX="140.0" layoutY="290.0" mnemonicParsing="false" onAction="#toggle" text="Toggle" />
+   </children>
+</AnchorPane>
