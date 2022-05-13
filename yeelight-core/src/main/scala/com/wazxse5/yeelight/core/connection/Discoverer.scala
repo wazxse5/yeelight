@@ -4,9 +4,9 @@ import akka.actor.{ActorRef, Props}
 import akka.io.Udp._
 import akka.io.{IO, Udp}
 import akka.util.ByteString
-import com.wazxse5.yeelight.core.Logger
 import com.wazxse5.yeelight.core.connection.Discoverer.Search
 import com.wazxse5.yeelight.core.message.{DiscoveryMessage, DiscoveryResponseMessage}
+import com.wazxse5.yeelight.core.util.Logger
 
 import java.net.{InetSocketAddress, NetworkInterface}
 import scala.jdk.CollectionConverters._

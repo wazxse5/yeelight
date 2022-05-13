@@ -2,9 +2,9 @@ package com.wazxse5.yeelight.core.connection
 
 import akka.actor.{ActorRef, Props}
 import akka.io.Udp.{Bound, Received}
-import com.wazxse5.yeelight.core.Logger
 import com.wazxse5.yeelight.core.connection.Listener.{Start, Stop}
 import com.wazxse5.yeelight.core.message.AdvertisementMessage
+import com.wazxse5.yeelight.core.util.Logger
 
 class Listener(adapter: ConnectionAdapter) extends ConnectionActor {
 

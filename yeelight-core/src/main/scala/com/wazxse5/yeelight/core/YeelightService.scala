@@ -1,13 +1,10 @@
 package com.wazxse5.yeelight.core
 
 import com.wazxse5.yeelight.core.command.YeelightCommand
-
-import scala.jdk.CollectionConverters._
+import javafx.collections.ObservableList
 
 trait YeelightService {
-  def devices: Seq[YeelightDevice]
-  
-  def devicesJava: java.util.List[YeelightDevice] = devices.asJava
+  def devices: ObservableList[YeelightDevice]
   
   def search(): Unit
   

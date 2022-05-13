@@ -1,4 +1,4 @@
-package com.wazxse5.yeelight.core
+package com.wazxse5.yeelight.core.util
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
