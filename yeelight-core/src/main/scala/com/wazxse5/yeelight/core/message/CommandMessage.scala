@@ -1,6 +1,6 @@
 package com.wazxse5.yeelight.core.message
 
-import com.wazxse5.yeelight.core.command.YeelightCommand
+import com.wazxse5.yeelight.api.command.YeelightCommand
 import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Random

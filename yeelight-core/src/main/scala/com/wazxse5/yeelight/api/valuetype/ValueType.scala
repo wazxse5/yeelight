@@ -1,4 +1,4 @@
-package com.wazxse5.yeelight.core.valuetype
+package com.wazxse5.yeelight.api.valuetype
 
 import play.api.libs.json.JsValue
 

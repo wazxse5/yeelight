@@ -1,6 +1,6 @@
-package com.wazxse5.yeelight.core.command
+package com.wazxse5.yeelight.api.command
 
-import com.wazxse5.yeelight.core.valuetype.{Brightness, Duration, Effect}
+import com.wazxse5.yeelight.api.valuetype.{Brightness, Duration, Effect}
 import play.api.libs.json.JsValue
 
 case class SetBrightness(
@@ -16,7 +16,7 @@ case class SetBrightness(
 object SetBrightness {
   val commandName: String = "set_bright"
   
-  def apply(brightness: Brightness): SetBrightness = new SetBrightness(brightness, Effect.smooth, Duration(500))
+  def apply(brightness: Brightness): SetBrightness = new SetBrightness(brightness, Effect.smooth, new Duration(500))
   
-  def apply(brightness: Int): SetBrightness = apply(Brightness(brightness))
+  def apply(brightness: Int): SetBrightness = apply(new Brightness(brightness))
 }

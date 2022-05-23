@@ -1,6 +1,6 @@
-package com.wazxse5.yeelight.core.command
+package com.wazxse5.yeelight.api.command
 
-import com.wazxse5.yeelight.core.valuetype.{Duration, Percent}
+import com.wazxse5.yeelight.api.valuetype.{Duration, Percent}
 import play.api.libs.json.JsValue
 
 case class AdjustBrightness(
@@ -15,8 +15,8 @@ case class AdjustBrightness(
 object AdjustBrightness {
   val commandName: String = "adjust_bright"
   
-  def apply(percent: Percent): AdjustBrightness = new AdjustBrightness(percent, Duration(500))
+  def apply(percent: Percent): AdjustBrightness = new AdjustBrightness(percent, new Duration(500))
   
-  def apply(percent: Int): AdjustBrightness = apply(Percent(percent))
+  def apply(percent: Int): AdjustBrightness = apply(new Percent(percent))
   
 }

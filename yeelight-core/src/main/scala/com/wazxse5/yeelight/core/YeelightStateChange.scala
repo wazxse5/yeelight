@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.core
 
+import com.wazxse5.yeelight.api.valuetype.{Brightness, Power, Temperature}
 import com.wazxse5.yeelight.core.message.{DiscoveryResponseMessage, NotificationMessage}
-import com.wazxse5.yeelight.core.valuetype.{Brightness, Power, Temperature}
 import play.api.libs.json.{JsString, JsValue}
 
 case class YeelightStateChange(

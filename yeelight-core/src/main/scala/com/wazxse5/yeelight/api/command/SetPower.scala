@@ -1,6 +1,6 @@
-package com.wazxse5.yeelight.core.command
+package com.wazxse5.yeelight.api.command
 
-import com.wazxse5.yeelight.core.valuetype.{Duration, Effect, Power}
+import com.wazxse5.yeelight.api.valuetype.{Duration, Effect, Power}
 import play.api.libs.json.JsValue
 
 case class SetPower(
@@ -16,7 +16,7 @@ case class SetPower(
 object SetPower {
   val commandName: String = "set_power"
   
-  def on: SetPower = SetPower(Power.on, Effect.smooth, Duration(500))
+  def on: SetPower = SetPower(Power.on, Effect.smooth, new Duration(500))
   
-  def off: SetPower = SetPower(Power.off, Effect.smooth, Duration(500))
+  def off: SetPower = SetPower(Power.off, Effect.smooth, new Duration(500))
 }

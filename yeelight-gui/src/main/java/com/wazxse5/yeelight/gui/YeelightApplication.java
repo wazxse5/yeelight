@@ -1,6 +1,6 @@
 package com.wazxse5.yeelight.gui;
 
-import com.wazxse5.yeelight.core.YeelightService;
+import com.wazxse5.yeelight.api.YeelightService;
 import com.wazxse5.yeelight.core.YeelightServiceImpl;
 import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.controller.MainController;

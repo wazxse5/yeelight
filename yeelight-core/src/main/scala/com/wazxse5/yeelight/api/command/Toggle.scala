@@ -1,4 +1,5 @@
-package com.wazxse5.yeelight.core.command
+package com.wazxse5.yeelight.api.command
+
 import play.api.libs.json.JsValue
 
 case object Toggle extends YeelightCommand {

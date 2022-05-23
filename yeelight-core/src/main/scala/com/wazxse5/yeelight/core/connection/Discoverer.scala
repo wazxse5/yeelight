@@ -4,14 +4,15 @@ import akka.actor.{ActorRef, Props}
 import akka.io.Udp._
 import akka.io.{IO, Udp}
 import akka.util.ByteString
-import com.wazxse5.yeelight.core.connection.Discoverer.Search
+import com.wazxse5.yeelight.core.YeelightActor
+import com.wazxse5.yeelight.core.connection.ConnectionAdapter.Discover
 import com.wazxse5.yeelight.core.message.{DiscoveryMessage, DiscoveryResponseMessage}
 import com.wazxse5.yeelight.core.util.Logger
 
 import java.net.{InetSocketAddress, NetworkInterface}
 import scala.jdk.CollectionConverters._
 
-class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
+class Discoverer(adapter: ActorRef) extends YeelightActor {
   val remote: InetSocketAddress = new InetSocketAddress("239.255.255.250", 1982)
 
   findLocalInetSocketAddress match {
@@ -20,11 +21,11 @@ class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
   }
 
   def receiveReady(connection: ActorRef): Receive = {
-    case Search =>
+    case Discover =>
       connection ! Send(ByteString(DiscoveryMessage.text), remote)
     case Received(data, _) =>
       val messageOpt = DiscoveryResponseMessage.fromString(data.utf8String)
-      messageOpt.foreach(adapter.handleMessage)
+      messageOpt.foreach(adapter ! _)
     case Unbind =>
       connection ! Unbind
     case Unbound =>
@@ -52,9 +53,7 @@ class Discoverer(adapter: ConnectionAdapter) extends ConnectionActor {
 }
 
 object Discoverer {
-  final case object Search
-
-  def props(adapter: ConnectionAdapter): Props = Props(new Discoverer(adapter))
+  def props(connectionAdapter: ActorRef): Props = Props(new Discoverer(connectionAdapter))
 }
 
 

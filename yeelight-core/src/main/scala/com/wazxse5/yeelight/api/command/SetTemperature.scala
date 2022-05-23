@@ -1,6 +1,6 @@
-package com.wazxse5.yeelight.core.command
+package com.wazxse5.yeelight.api.command
 
-import com.wazxse5.yeelight.core.valuetype.{Duration, Effect, Temperature}
+import com.wazxse5.yeelight.api.valuetype.{Duration, Effect, Temperature}
 import play.api.libs.json.JsValue
 
 case class SetTemperature(
@@ -16,8 +16,8 @@ case class SetTemperature(
 object SetTemperature {
   val commandName: String = "set_ct_abx"
   
-  def apply(temperature: Temperature): SetTemperature = new SetTemperature(temperature, Effect.smooth, Duration(500))
+  def apply(temperature: Temperature): SetTemperature = new SetTemperature(temperature, Effect.smooth, new Duration(500))
   
-  def apply(temperature: Int): SetTemperature = apply(Temperature(temperature))
+  def apply(temperature: Int): SetTemperature = apply(new Temperature(temperature))
 }
 

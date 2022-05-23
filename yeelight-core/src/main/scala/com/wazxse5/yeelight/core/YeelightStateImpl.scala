@@ -1,15 +1,20 @@
 package com.wazxse5.yeelight.core
 
-import javafx.beans.property.{SimpleBooleanProperty, SimpleIntegerProperty, SimpleStringProperty}
+import com.wazxse5.yeelight.api.YeelightState
+import com.wazxse5.yeelight.api.valuetype.{Brightness, Power, Temperature}
 
-class YeelightStateImpl extends YeelightState {
-  
-  val isConnectedProperty = new SimpleBooleanProperty()
-  
-  val powerProperty = new SimpleStringProperty()
-  
-  val brightnessProperty = new SimpleIntegerProperty()
+case class YeelightStateImpl(
+  isConnected: Boolean,
+  power: Power,
+  brightness: Brightness,
+  temperature: Temperature,
+) extends YeelightState
 
-  val temperatureProperty = new SimpleIntegerProperty()
-
+object YeelightStateImpl {
+  def empty: YeelightStateImpl = YeelightStateImpl(
+    isConnected = false,
+    power = Power.off,
+    brightness = new Brightness(1),
+    temperature = new Temperature(1700),
+  )
 }
