@@ -4,7 +4,7 @@ import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Try
 
-class Temperature(val value: Int) extends ParamValueType[Int] {
+case class Temperature(value: Int) extends ParamValueType[Int] {
   override def paramValue: JsValue = JsNumber(value)
   
   override def isValid: Boolean = 1700 <= value && value <= 6500

@@ -4,7 +4,7 @@ import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Try
 
-class Percent(val value: Int) extends ParamValueType[Int] {
+case class Percent(value: Int) extends ParamValueType[Int] {
   override def paramValue: JsValue = JsNumber(value)
   
   override def isValid: Boolean = -100 <= value && value <= 100

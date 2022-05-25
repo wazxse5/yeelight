@@ -1,8 +1,9 @@
 package com.wazxse5.yeelight.core
 
+import com.wazxse5.yeelight.api.command.{SetBrightness, SetPower, SetTemperature, YeelightCommand}
 import com.wazxse5.yeelight.api.valuetype.{Brightness, Power, Temperature}
-import com.wazxse5.yeelight.core.message.{DiscoveryResponseMessage, NotificationMessage}
-import play.api.libs.json.{JsString, JsValue}
+import com.wazxse5.yeelight.core.message.{CommandResultMessage, DiscoveryResponseMessage, NotificationMessage}
+import play.api.libs.json.JsValue
 
 case class YeelightStateChange(
   isConnected: Option[Boolean] = None,
@@ -33,6 +34,17 @@ object YeelightStateChange {
       brightness = find(Brightness.propFgName, Brightness.fromJsValue),
       temperature = find(Temperature.propFgName, Temperature.fromJsValue)
     )
+  }
+  
+  def fromCommandResult(command: YeelightCommand, resultMessage: CommandResultMessage): Option[YeelightStateChange] = {
+    def isOk = resultMessage.result.isOk
+    
+    command match {
+      case SetBrightness(brightness, _, _) if isOk => Some(YeelightStateChange(brightness = Some(brightness)))
+      case SetTemperature(temperature, _, _) if isOk => Some(YeelightStateChange(temperature = Some(temperature)))
+      case SetPower(power, _, _) if isOk => Some(YeelightStateChange(power = Some(power)))
+      case _ => None
+    }
   }
   
   def isConnected(newValue: Boolean): YeelightStateChange = {

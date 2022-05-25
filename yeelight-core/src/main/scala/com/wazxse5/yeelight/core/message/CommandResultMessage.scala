@@ -1,6 +1,6 @@
 package com.wazxse5.yeelight.core.message
 
-import play.api.libs.json.{JsArray, JsObject, JsValue}
+import play.api.libs.json.{JsArray, JsObject, JsString, JsValue}
 
 import scala.util.Try
 
@@ -22,6 +22,8 @@ case class CommandResultMessage(deviceId: String, json: JsValue) extends Yeeligh
     case Result(value) => value.asOpt[Seq[String]].getOrElse(Seq.empty)
     case Error(_) => Seq.empty
   }
+  
+  def resultIsOk: Boolean = result == Result(JsArray())
 }
 
 object CommandResultMessage {
@@ -33,11 +35,15 @@ object CommandResultMessage {
 
 sealed trait CommandResultMessageStatus {
   def value: JsValue
+  def isOk: Boolean
 }
 
-final case class Result(value: JsArray) extends CommandResultMessageStatus
+final case class Result(value: JsArray) extends CommandResultMessageStatus {
+  override def isOk: Boolean = value == JsArray(Seq(JsString("ok")))
+}
 
 final case class Error(value: JsObject) extends CommandResultMessageStatus {
+  override def isOk: Boolean = false
   def errorCode: Int = (value \ "code").as[Int]
   def errorMessage: String = (value \ "message").as[String]
 }

@@ -20,6 +20,7 @@ class YeelightServiceImpl extends YeelightService {
   private val connectionAdapter = actorSystem.actorOf(ConnectionAdapter.props(yeelightServiceImplActor))
   private var eventListeners = Seq.empty[ActorRef]
   private val devicesMap: TrieMap[String, YeelightDeviceImpl] = TrieMap.empty
+  private val messages: TrieMap[Int, Message] = TrieMap.empty
   
   override def devices: Map[String, YeelightDevice] = devicesMap.toMap
   
@@ -41,7 +42,9 @@ class YeelightServiceImpl extends YeelightService {
   override def performCommand(deviceId: String, command: YeelightCommand): Unit = {
     if (devicesMap.contains(deviceId)) {
       val message = CommandMessage(deviceId, command)
+      messages.put(message.id, message)
       connectionAdapter ! SendMessage(message)
+      Logger.info(s"Sending message $message")
     } else {
       Logger.error(s"Cannot perform command on unknown device $deviceId")
     }
@@ -124,7 +127,18 @@ class YeelightServiceImpl extends YeelightService {
     }
   
     private def handleCommandResultMessage(m: CommandResultMessage): Unit = {
-      Logger.warn(s"Unimplemented handle message: $m")
+      messages.get(m.id) match {
+        case Some(CommandMessage(_, deviceId, command)) =>
+          devicesMap.get(deviceId) match {
+            case Some(device) =>
+              val stateChange = YeelightStateChange.fromCommandResult(command, m)
+              stateChange.foreach(updateDevice(device, _))
+            case None =>
+              Logger.warn(s"CommandResultMessage $m for unknown device $deviceId")
+          }
+        case Some(otherMessage) => Logger.warn(s"CommandResultMessage $m for unknown message $otherMessage")
+        case None => Logger.warn(s"CommandResultMessage $m for unknown command")
+      }
     }
   
     private def handleNotificationMessage(m: NotificationMessage): Unit = {

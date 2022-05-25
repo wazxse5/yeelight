@@ -1,9 +1,10 @@
 plugins {
     id 'scala'
+    id 'java-library'
 }
 
 dependencies {
-    implementation 'org.scala-lang:scala-library:2.13.8'
+    api 'org.scala-lang:scala-library:2.13.8'
     implementation 'com.typesafe.akka:akka-actor_2.13:2.6.19'
     implementation 'com.typesafe.play:play-json_2.13:2.9.2'
 }

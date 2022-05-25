@@ -4,7 +4,7 @@ import play.api.libs.json.{JsNumber, JsValue}
 
 import scala.util.Try
 
-class Brightness(val value: Int) extends ParamValueType[Int] {
+case class Brightness(value: Int) extends ParamValueType[Int] {
   override def paramValue: JsValue = JsNumber(value)
   
   override def isValid: Boolean = value >= 1 && value <= 100
