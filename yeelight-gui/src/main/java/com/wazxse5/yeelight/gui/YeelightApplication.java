@@ -3,7 +3,7 @@ package com.wazxse5.yeelight.gui;
 import com.wazxse5.yeelight.api.YeelightService;
 import com.wazxse5.yeelight.core.YeelightServiceImpl;
 import com.wazxse5.yeelight.core.util.Logger;
-import com.wazxse5.yeelight.gui.controller.MainController;
+import com.wazxse5.yeelight.gui.controller.MainPanelController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,9 +23,9 @@ public class YeelightApplication extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/fxml/Main.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/fxml/MainPanel.fxml"));
             Parent parent = fxmlLoader.load();
-            MainController mainController = fxmlLoader.getController();
+            MainPanelController mainController = fxmlLoader.getController();
             mainController.setYeelightService(yeelightService);
 
             Scene scene = new Scene(parent);
@@ -33,7 +33,7 @@ public class YeelightApplication extends Application {
             stage.setTitle("Yeelight");
             stage.show();
         } catch (IOException e) {
-            Logger.error("Cannot load Main.fxml file: " + e.getMessage());
+            Logger.error("Cannot load MainPanel.fxml file: " + e.getMessage());
         }
     }
 

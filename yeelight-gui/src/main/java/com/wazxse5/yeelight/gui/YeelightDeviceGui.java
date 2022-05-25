@@ -4,6 +4,8 @@ import com.wazxse5.yeelight.api.YeelightDevice;
 import com.wazxse5.yeelight.api.YeelightState;
 import com.wazxse5.yeelight.api.command.YeelightCommand;
 import com.wazxse5.yeelight.api.valuetype.DeviceModel;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.List;
 
@@ -11,9 +13,12 @@ public class YeelightDeviceGui {
     private final YeelightDevice yeelightDevice;
     private final YeelightStateGui yeelightStateGui;
 
+    public final StringProperty guiNameProperty;
+
     public YeelightDeviceGui(YeelightDevice yeelightDevice) {
         this.yeelightDevice = yeelightDevice;
         this.yeelightStateGui = new YeelightStateGui(yeelightDevice.state());
+        this.guiNameProperty = new SimpleStringProperty(yeelightDevice.deviceId());
     }
 
     public String deviceId() {

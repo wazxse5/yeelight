@@ -1,6 +1,6 @@
 package com.wazxse5.yeelight.core
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import com.wazxse5.yeelight.api._
 import com.wazxse5.yeelight.api.command.YeelightCommand
 import com.wazxse5.yeelight.api.valuetype.DeviceModel
@@ -18,7 +18,7 @@ class YeelightServiceImpl extends YeelightService {
   private implicit val actorSystem: ActorSystem = ActorSystem("yeelight-actor-system")
   private val yeelightServiceImplActor = actorSystem.actorOf(YeelightServiceImplActor.props)
   private val connectionAdapter = actorSystem.actorOf(ConnectionAdapter.props(yeelightServiceImplActor))
-  private var eventListeners = Seq.empty[YeelightEventListener]
+  private var eventListeners = Seq.empty[ActorRef]
   private val devicesMap: TrieMap[String, YeelightDeviceImpl] = TrieMap.empty
   
   override def devices: Map[String, YeelightDevice] = devicesMap.toMap
@@ -48,7 +48,8 @@ class YeelightServiceImpl extends YeelightService {
   }
   
   override def addEventListener(listener: YeelightEventListener): Unit = {
-    eventListeners = eventListeners.appended(listener)
+    val actorEventListener = actorSystem.actorOf(YeelightEventListenerExecutor.props(listener))
+    eventListeners = eventListeners.appended(actorEventListener)
   }
   
   override def exit(): Unit = {
@@ -67,7 +68,7 @@ class YeelightServiceImpl extends YeelightService {
       this.postAction = None
       super.aroundReceive(receive, msg)
       postAction.foreach(action =>
-        eventListeners.foreach(_.onAction(action))
+        eventListeners.foreach(_ ! action)
       )
     }
     

@@ -6,19 +6,27 @@ import javafx.beans.property.*;
 public class YeelightStateGui {
 
     private final SimpleBooleanProperty _isConnectedProperty;
+    private final SimpleBooleanProperty _isOnProperty;
     private final SimpleStringProperty _powerProperty;
     private final SimpleIntegerProperty _brightnessProperty;
     private final SimpleIntegerProperty _temperatureProperty;
 
     public YeelightStateGui(YeelightState yeelightState) {
         _isConnectedProperty = new SimpleBooleanProperty(yeelightState.isConnected());
+        _isOnProperty = new SimpleBooleanProperty();
         _powerProperty = new SimpleStringProperty(yeelightState.power().value());
         _brightnessProperty = new SimpleIntegerProperty(yeelightState.brightness().value());
         _temperatureProperty = new SimpleIntegerProperty(yeelightState.temperature().value());
+
+        _isOnProperty.bind(_powerProperty.isEqualTo("on"));
     }
 
     public ReadOnlyBooleanProperty isConnectedProperty() {
         return _isConnectedProperty;
+    }
+
+    public ReadOnlyBooleanProperty isOnProperty() {
+        return _isOnProperty;
     }
 
     public ReadOnlyStringProperty powerProperty() {
