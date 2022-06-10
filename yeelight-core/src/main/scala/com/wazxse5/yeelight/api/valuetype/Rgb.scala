@@ -8,6 +8,12 @@ case class Rgb(value: Int) extends ParamValueType[Int] {
   override def paramValue: JsValue = JsNumber(value)
   
   override def isValid: Boolean = 1 <= value && value <= 16777215
+  
+  def red: Int = value >>> 16
+  
+  def green: Int = value << 16 >>> 24
+  
+  def blue: Int = value << 24 >>> 24
 }
 
 object Rgb {

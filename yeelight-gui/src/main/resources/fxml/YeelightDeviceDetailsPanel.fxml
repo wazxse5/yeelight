@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
@@ -20,6 +21,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
             <Label text="Name" />
@@ -30,6 +32,8 @@
             <Slider fx:id="sTemperature" majorTickUnit="300.0" max="6500.0" min="1700.0" minorTickCount="100" snapToTicks="true" value="1700.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label fx:id="lTemperaturePercent" text="Label" GridPane.columnIndex="2" GridPane.rowIndex="2" />
             <TextField fx:id="tfDeviceName" maxWidth="200.0" GridPane.columnIndex="1" />
+            <Label text="Color" GridPane.rowIndex="3" />
+            <ColorPicker fx:id="colorPicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
    </children>

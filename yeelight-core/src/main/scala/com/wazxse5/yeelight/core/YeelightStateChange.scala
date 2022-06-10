@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.core
 
 import com.wazxse5.yeelight.api.command.{SetBrightness, SetPower, SetTemperature, YeelightCommand}
-import com.wazxse5.yeelight.api.valuetype.{Brightness, Power, Temperature}
+import com.wazxse5.yeelight.api.valuetype.{Brightness, Hue, Power, Rgb, Saturation, Temperature}
 import com.wazxse5.yeelight.core.message.{CommandResultMessage, DiscoveryResponseMessage, NotificationMessage}
 import play.api.libs.json.JsValue
 
@@ -10,6 +10,9 @@ case class YeelightStateChange(
   power: Option[Power] = None,
   brightness: Option[Brightness] = None,
   temperature: Option[Temperature] = None,
+  rgb: Option[Rgb] = None,
+  hue: Option[Hue] = None,
+  saturation: Option[Saturation] = None,
 )
 
 object YeelightStateChange {
@@ -18,7 +21,10 @@ object YeelightStateChange {
     YeelightStateChange(
       power = Power.fromString(message.power),
       brightness = Brightness.fromString(message.brightness),
-      temperature = Temperature.fromString(message.temperature)
+      temperature = Temperature.fromString(message.temperature),
+      rgb = Rgb.fromString(message.rgb),
+      hue = Hue.fromString(message.hue),
+      saturation = Saturation.fromString(message.saturation),
     )
   }
   
@@ -32,7 +38,10 @@ object YeelightStateChange {
     YeelightStateChange(
       power = find(Power.propFgName, Power.fromJsValue),
       brightness = find(Brightness.propFgName, Brightness.fromJsValue),
-      temperature = find(Temperature.propFgName, Temperature.fromJsValue)
+      temperature = find(Temperature.propFgName, Temperature.fromJsValue),
+      rgb = find(Rgb.propFgName, Rgb.fromJsValue),
+      hue = find(Hue.propFgName, Hue.fromJsValue),
+      saturation = find(Saturation.propFgName, Saturation.fromJsValue),
     )
   }
   

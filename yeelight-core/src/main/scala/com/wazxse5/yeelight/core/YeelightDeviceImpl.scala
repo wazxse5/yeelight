@@ -26,6 +26,9 @@ class YeelightDeviceImpl(
       power = change.power.getOrElse(_state.power),
       brightness = change.brightness.getOrElse(_state.brightness),
       temperature = change.temperature.getOrElse(_state.temperature),
+      rgb = change.rgb.getOrElse(_state.rgb),
+      hue = change.hue.getOrElse(_state.hue),
+      saturation = change.saturation.getOrElse(_state.saturation),
     )
   }
   
