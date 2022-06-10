@@ -12,11 +12,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class YeelightApplication extends Application {
+public class YeelightApp extends Application {
 
     private final YeelightService yeelightService = new YeelightServiceImpl();
 
-    public static void main(String[] args) {
+    public static void run() {
         launch();
     }
 
