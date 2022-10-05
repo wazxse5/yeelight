@@ -2,8 +2,6 @@ package com.wazxse5.yeelight.api.valuetype
 
 import play.api.libs.json.{JsString, JsValue}
 
-import scala.util.Try
-
 sealed trait Power extends ParamValueType[String] {
   override def paramValue: JsValue = JsString(value)
 }
@@ -19,7 +17,7 @@ object Power {
   
   val typeByValue: Map[String, Power] = Seq(on, off).map(v => v.value -> v).toMap
   
-  def fromString(str: String): Option[Power] = Try(typeByValue(str)).toOption
+  def fromString(str: String): Option[Power] = typeByValue.get(str)
   
   def fromJsValue(jsValue: JsValue): Option[Power] = jsValue match {
     case JsString(value) => fromString(value)

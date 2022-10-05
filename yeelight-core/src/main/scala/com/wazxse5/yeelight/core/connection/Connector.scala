@@ -40,8 +40,8 @@ class Connector(
   override def receive: Receive = {
     case SendMessage(_, true) => stash()
     case CommandFailed => connectionAdapter ! ConnectionFailed(deviceId)
-    case Connected(_, _) =>
-      connectionAdapter ! ConnectionSucceeded(deviceId)
+    case Connected(inetAddress, _) =>
+      connectionAdapter ! ConnectionSucceeded(deviceId, inetAddress.getHostName, inetAddress.getPort)
       sender() ! Register(self)
       unstashAll()
       context.become(ready(sender()))

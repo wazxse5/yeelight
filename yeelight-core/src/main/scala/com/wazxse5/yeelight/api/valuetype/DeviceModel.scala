@@ -2,8 +2,6 @@ package com.wazxse5.yeelight.api.valuetype
 
 import play.api.libs.json.{JsString, JsValue}
 
-import scala.util.Try
-
 sealed trait DeviceModel extends ValueType[String]
 
 object DeviceModel {
@@ -17,7 +15,7 @@ object DeviceModel {
   val typeByValue: Map[String, DeviceModel] = Seq(mono, color, stripe, ceiling, deskLamp, bsLamp).map(v => v.value -> v).toMap
   val values: Seq[String] = typeByValue.keys.toSeq
   
-  def fromString(str: String): Option[DeviceModel] = Try(typeByValue(str)).toOption
+  def fromString(str: String): Option[DeviceModel] = typeByValue.get(str)
   def fromJsValue(jsValue: JsValue): Option[DeviceModel] = jsValue match {
     case JsString(value) => fromString(value)
     case _ => None

@@ -2,11 +2,13 @@ package com.wazxse5.yeelight.core
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import com.wazxse5.yeelight.api._
-import com.wazxse5.yeelight.api.command.YeelightCommand
+import com.wazxse5.yeelight.api.command.{GetProps, YeelightCommand}
 import com.wazxse5.yeelight.api.valuetype.DeviceModel
+import com.wazxse5.yeelight.core.YeelightServiceImpl.AddDevice
 import com.wazxse5.yeelight.core.connection.ConnectionAdapter
 import com.wazxse5.yeelight.core.connection.ConnectionAdapter._
 import com.wazxse5.yeelight.core.message._
+import com.wazxse5.yeelight.core.util.Implicits.ReturnNone
 import com.wazxse5.yeelight.core.util.Logger
 
 import scala.collection.concurrent.TrieMap
@@ -23,7 +25,17 @@ class YeelightServiceImpl extends YeelightService {
   private val messages: TrieMap[Int, Message] = TrieMap.empty
   
   override def devices: Map[String, YeelightDevice] = devicesMap.toMap
-  
+
+  override def addDevice(deviceId: String, model: DeviceModel, ip: String, port: Int): Unit = {
+    devicesMap.get(deviceId) match {
+      case Some(device) =>
+        if (!device.state.isConnected) yeelightServiceImplActor ! ConnectDevice(deviceId, ip, port)
+        else Logger.info("Attempted to add a device that is already connected")
+      case None =>
+        yeelightServiceImplActor ! AddDevice(deviceId, model, ip, port)
+    }
+  }
+
   override def search(): Unit = {
     Logger.info("Searching for new devices")
     connectionAdapter ! Discover
@@ -65,105 +77,117 @@ class YeelightServiceImpl extends YeelightService {
   
   
   class YeelightServiceImplActor extends Actor {
-    private var postAction: Option[YeelightEvent] = None
-  
-    override def aroundReceive(receive: Receive, msg: Any): Unit = {
-      this.postAction = None
-      super.aroundReceive(receive, msg)
-      postAction.foreach(action =>
-        eventListeners.foreach(_ ! action)
-      )
+
+    override def receive: Receive = (message: Any) => {
+      val postAction = message match {
+        case message: ServiceMessage => handleServiceMessage(message)
+        case message: YeelightMessage => handleYeelightMessage(message)
+        case _ => None
+      }
+      postAction.foreach(a => eventListeners.foreach(_ ! a))
     }
-    
-    override def receive: Receive = {
-      case message: ServiceMessage => handleServiceMessage(message)
-      case message: YeelightMessage => handleYeelightMessage(message)
-    }
-  
-    private def handleServiceMessage(message: ServiceMessage): Unit = {
+
+    private def handleServiceMessage(message: ServiceMessage): Option[YeelightEvent] = {
       message match {
-        case ConnectionSucceeded(deviceId) =>
+        case ConnectionSucceeded(deviceId, address, port) =>
           devicesMap.get(deviceId) match {
             case Some(device) =>
               Logger.info(s"Connected device $deviceId")
-              updateDevice(device, YeelightStateChange.isConnected(true))
+              if (device.state.isUnknown) performCommand(device.deviceId, GetProps.all)
+              updateDevice(device, YeelightStateChange.isConnected(newValue = true, Some(address), Some(port)))
             case None =>
-              Logger.error(s"Connected unknown device $deviceId")
+              Logger.error(s"Connected unknown device $deviceId").returnNone
+          }
+        case ConnectionFailed(deviceId) =>
+          devicesMap.remove(deviceId).map { _ =>
+            Logger.info(s"Failed to connect device $deviceId")
+            DeviceRemoved(deviceId)
           }
         case Disconnected(deviceId) =>
           devicesMap.get(deviceId) match {
             case Some(device) =>
               Logger.info(s"Disconnected device $deviceId")
-              updateDevice(device, YeelightStateChange.isConnected(false))
+              updateDevice(device, YeelightStateChange.isConnected(newValue = false))
             case None =>
-              Logger.error(s"Disconnected unknown device $deviceId")
+              Logger.error(s"Disconnected unknown device $deviceId").returnNone
           }
+        case AddDevice(deviceId, model, ip, port) =>
+          val device = new YeelightDeviceImpl(deviceId, model, YeelightServiceImpl.this)
+          addDevice(device, ip, port)
       }
     }
   
-    private def handleYeelightMessage(message: YeelightMessage): Unit = {
+    private def handleYeelightMessage(message: YeelightMessage): Option[YeelightEvent] = {
       message match {
         case m: AdvertisementMessage => handleAdvertisementMessage(m)
         case m: DiscoveryResponseMessage => handleDiscoveryResponseMessage(m)
         case m: CommandResultMessage => handleCommandResultMessage(m)
         case m: NotificationMessage => handleNotificationMessage(m)
-        case _ => Logger.error(s"Unknown YeelightMessage: $message")
+        case _ => Logger.error(s"Unknown YeelightMessage: $message").returnNone
       }
     }
   
-    private def handleAdvertisementMessage(m: AdvertisementMessage): Unit = {
-      Logger.warn(s"Unimplemented handle message: $m")
+    private def handleAdvertisementMessage(m: AdvertisementMessage): Option[YeelightEvent] = {
+      Logger.warn(s"Unimplemented handle message: $m").returnNone
     }
   
-    private def handleDiscoveryResponseMessage(m: DiscoveryResponseMessage): Unit = {
+    private def handleDiscoveryResponseMessage(m: DiscoveryResponseMessage): Option[YeelightEvent] = {
       val yeelightStateChange = YeelightStateChange.fromDiscoveryResponse(m)
       devicesMap.get(m.deviceId) match {
         case Some(device) =>
           updateDevice(device, yeelightStateChange)
         case None =>
-          val device = new YeelightDeviceImpl(m.deviceId, DeviceModel.fromString(m.model).get, m.firmwareVersion, m.supportedCommands, YeelightServiceImpl.this)
-          addDevice(device, m.address, m.port, yeelightStateChange)
+          val device = new YeelightDeviceImpl(m.deviceId, DeviceModel.fromString(m.model).get, YeelightServiceImpl.this)
+          device.update(yeelightStateChange)
+          addDevice(device, m.address, m.port)
       }
     }
   
-    private def handleCommandResultMessage(m: CommandResultMessage): Unit = {
+    private def handleCommandResultMessage(m: CommandResultMessage): Option[YeelightEvent] = {
       messages.get(m.id) match {
         case Some(CommandMessage(_, deviceId, command)) =>
           devicesMap.get(deviceId) match {
             case Some(device) =>
               val stateChange = YeelightStateChange.fromCommandResult(command, m)
-              stateChange.foreach(updateDevice(device, _))
+              updateDevice(device, stateChange)
             case None =>
-              Logger.warn(s"CommandResultMessage $m for unknown device $deviceId")
+              Logger.warn(s"CommandResultMessage $m for unknown device $deviceId").returnNone
           }
-        case Some(otherMessage) => Logger.warn(s"CommandResultMessage $m for unknown message $otherMessage")
-        case None => Logger.warn(s"CommandResultMessage $m for unknown command")
+        case Some(otherMessage) =>
+          Logger.warn(s"CommandResultMessage $m for unknown message $otherMessage").returnNone
+        case None =>
+          Logger.warn(s"CommandResultMessage $m for unknown command").returnNone
       }
     }
   
-    private def handleNotificationMessage(m: NotificationMessage): Unit = {
+    private def handleNotificationMessage(m: NotificationMessage): Option[YeelightEvent] = {
       devicesMap.get(m.deviceId) match {
         case Some(device) =>
           updateDevice(device, YeelightStateChange.fromNotification(m))
         case None =>
-          Logger.warn(s"Notification from unknown device ${m.deviceId}")
+          Logger.warn(s"Notification from unknown device ${m.deviceId}").returnNone
       }
     }
   
-    private def addDevice(device: YeelightDeviceImpl, address: String, port: Int, change: YeelightStateChange): Unit = {
-      device.update(change)
+    private def addDevice(device: YeelightDeviceImpl, address: String, port: Int): Option[YeelightEvent] = {
       devicesMap.put(device.deviceId, device)
       connectionAdapter ! ConnectDevice(device.deviceId, address, port)
-      this.postAction = Some(DeviceAdded(device.deviceId))
+      Some(DeviceAdded(device.deviceId))
     }
     
-    private def updateDevice(device: YeelightDeviceImpl, change: YeelightStateChange): Unit = {
-      device.update(change)
-      this.postAction = Some(DeviceUpdated(device.deviceId))
+    private def updateDevice(device: YeelightDeviceImpl, change: YeelightStateChange): Option[YeelightEvent] = {
+      Option.when(change.containsChanges) {
+        device.update(change)
+        DeviceUpdated(device.deviceId)
+      }
     }
   }
   
   object YeelightServiceImplActor {
     def props: Props = Props(new YeelightServiceImplActor())
   }
+}
+
+object YeelightServiceImpl {
+  private final case class AddDevice(deviceId: String, model: DeviceModel, ip: String, port: Int) extends ServiceMessage
 }

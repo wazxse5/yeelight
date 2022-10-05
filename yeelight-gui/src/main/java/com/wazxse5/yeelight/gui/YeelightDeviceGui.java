@@ -4,10 +4,9 @@ import com.wazxse5.yeelight.api.YeelightDevice;
 import com.wazxse5.yeelight.api.YeelightState;
 import com.wazxse5.yeelight.api.command.YeelightCommand;
 import com.wazxse5.yeelight.api.valuetype.DeviceModel;
+import com.wazxse5.yeelight.gui.data.YeelightDeviceAppData;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import java.util.List;
 
 public class YeelightDeviceGui {
     private final YeelightDevice yeelightDevice;
@@ -15,10 +14,12 @@ public class YeelightDeviceGui {
 
     public final StringProperty guiNameProperty;
 
-    public YeelightDeviceGui(YeelightDevice yeelightDevice) {
+    public YeelightDeviceGui(YeelightDevice yeelightDevice, YeelightDeviceAppData initialAppData) {
         this.yeelightDevice = yeelightDevice;
         this.yeelightStateGui = new YeelightStateGui(yeelightDevice.state());
-        this.guiNameProperty = new SimpleStringProperty(yeelightDevice.deviceId());
+
+        String guiName = initialAppData != null ? initialAppData.guiName() : yeelightDevice.deviceId();
+        this.guiNameProperty = new SimpleStringProperty(guiName);
     }
 
     public String deviceId() {
@@ -27,14 +28,6 @@ public class YeelightDeviceGui {
 
     public DeviceModel model() {
         return yeelightDevice.model();
-    }
-
-    public String firmwareVersion() {
-        return yeelightDevice.firmwareVersion();
-    }
-
-    public List<String> supportedCommands() {
-        return yeelightDevice.supportedCommandsJava();
     }
 
     public YeelightStateGui state() {

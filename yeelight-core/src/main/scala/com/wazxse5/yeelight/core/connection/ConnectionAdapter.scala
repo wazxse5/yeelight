@@ -39,8 +39,8 @@ object ConnectionAdapter {
   final case object StopListening extends ServiceMessage
   
   final case class ConnectDevice(deviceId: String, address: String, port: Int) extends ServiceMessage
+  final case class ConnectionSucceeded(deviceId: String, address: String, port: Int) extends ServiceMessage
   final case class ConnectionFailed(deviceId: String) extends ServiceMessage
-  final case class ConnectionSucceeded(deviceId: String) extends ServiceMessage
   final case object Disconnect extends ServiceMessage
   final case class Disconnected(deviceId: String) extends ServiceMessage
   

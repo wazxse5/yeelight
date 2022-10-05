@@ -8,6 +8,9 @@ import javafx.scene.paint.Color;
 public class YeelightStateGui {
 
     private final SimpleBooleanProperty _isConnectedProperty;
+    private final SimpleStringProperty _addressProperty;
+    private final SimpleIntegerProperty _portProperty;
+
     private final SimpleBooleanProperty _isOnProperty;
     private final SimpleStringProperty _powerProperty;
     private final SimpleIntegerProperty _brightnessProperty;
@@ -16,6 +19,8 @@ public class YeelightStateGui {
 
     public YeelightStateGui(YeelightState yeelightState) {
         _isConnectedProperty = new SimpleBooleanProperty(yeelightState.isConnected());
+        _addressProperty = new SimpleStringProperty(yeelightState.address());
+        _portProperty = new SimpleIntegerProperty(yeelightState.port());
         _isOnProperty = new SimpleBooleanProperty();
         _powerProperty = new SimpleStringProperty(yeelightState.power().value());
         _brightnessProperty = new SimpleIntegerProperty(yeelightState.brightness().value());
@@ -27,6 +32,14 @@ public class YeelightStateGui {
 
     public ReadOnlyBooleanProperty isConnectedProperty() {
         return _isConnectedProperty;
+    }
+
+    public ReadOnlyStringProperty addressProperty() {
+        return _addressProperty;
+    }
+
+    public ReadOnlyIntegerProperty portProperty() {
+        return _portProperty;
     }
 
     public ReadOnlyBooleanProperty isOnProperty() {
@@ -51,6 +64,8 @@ public class YeelightStateGui {
 
     public void update(YeelightState newState) {
         _isConnectedProperty.set(newState.isConnected());
+        _addressProperty.set(newState.address());
+        _portProperty.set(newState.port());
         _powerProperty.set(newState.power().value());
         _brightnessProperty.set(newState.brightness().value());
         _temperatureProperty.set(newState.temperature().value());

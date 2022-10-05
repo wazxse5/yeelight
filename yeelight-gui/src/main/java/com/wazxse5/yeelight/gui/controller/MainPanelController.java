@@ -1,8 +1,11 @@
 package com.wazxse5.yeelight.gui.controller;
 
-import com.wazxse5.yeelight.api.*;
+import com.wazxse5.yeelight.api.YeelightService;
 import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.YeelightDeviceGui;
+import com.wazxse5.yeelight.gui.data.YeelightAppData;
+import com.wazxse5.yeelight.gui.data.YeelightAppData$;
+import com.wazxse5.yeelight.gui.data.YeelightDeviceAppData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,22 +17,41 @@ import javafx.scene.layout.HBox;
 import javafx.util.Callback;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainPanelController {
 
+    YeelightAppData initialAppData;
     YeelightService yeelightService;
     ObservableList<YeelightDeviceGui> devicesList = FXCollections.observableArrayList();
 
     @FXML ListView<YeelightDeviceGui> lvDevices;
     @FXML AnchorPane devicePane;
 
-
-    public void setYeelightService(YeelightService yeelightService) {
+    public void setYeelightService(YeelightService yeelightService, YeelightAppData initialAppData) {
         this.yeelightService = yeelightService;
+        this.initialAppData = initialAppData;
         this.lvDevices.setItems(devicesList);
         this.lvDevices.setCellFactory(new YeelightDeviceGuiCellFactory());
         this.yeelightService.addEventListener(new GuiYeelightEventListener(this));
 
+        initialAppData.devicesJava().forEach(d ->
+            yeelightService.addDevice(d.deviceId(), d.deviceModel(), d.ip(), d.port())
+        );
+    }
+
+    public YeelightAppData getYeelightAppData() {
+        List<YeelightDeviceAppData> devices = devicesList.stream().map(d ->
+            new YeelightDeviceAppData(
+                d.deviceId(),
+                d.model().value(),
+                d.guiNameProperty.getValueSafe(),
+                d.state().addressProperty().getValueSafe(),
+                d.state().portProperty().get()
+            )
+        ).collect(Collectors.toList());
+        return YeelightAppData$.MODULE$.apply(devices);
     }
 
     static class YeelightDeviceGuiCellFactory implements Callback<ListView<YeelightDeviceGui>, ListCell<YeelightDeviceGui>> {
