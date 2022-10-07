@@ -7,6 +7,8 @@ import com.wazxse5.yeelight.api.valuetype.DeviceModel
 class YeelightDeviceImpl(
   val deviceId: String,
   val model: DeviceModel,
+  val firmwareVersion: String,
+  val supportedCommands: Seq[String],
   yeelightServiceImpl: YeelightServiceImpl,
 ) extends YeelightDevice {
 
@@ -23,8 +25,6 @@ class YeelightDeviceImpl(
       isConnected = change.isConnected.getOrElse(_state.isConnected),
       address = change.address.getOrElse(_state.address),
       port = change.port.getOrElse(_state.port),
-      firmwareVersion = change.firmwareVersion.getOrElse(_state.firmwareVersion),
-      supportedCommands = change.supportedCommands.getOrElse(_state.supportedCommands),
       power = change.power.getOrElse(_state.power),
       brightness = change.brightness.getOrElse(_state.brightness),
       temperature = change.temperature.getOrElse(_state.temperature),

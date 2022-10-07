@@ -13,16 +13,16 @@ import scala.util.Try
 
 
 case class YeelightAppData(
-  devices: Seq[YeelightDeviceAppData]
+  devices: Seq[YeelightKnownDeviceGui]
 ) {
-  def devicesJava: JList[YeelightDeviceAppData] = devices.asJava
+  def devicesJava: JList[YeelightKnownDeviceGui] = devices.asJava
 }
 
 object YeelightAppData {
 
   val empty: YeelightAppData = YeelightAppData(Seq.empty)
 
-  def apply(devices: JList[YeelightDeviceAppData]): YeelightAppData = YeelightAppData(devices.asScala.toSeq)
+  def apply(devices: JList[YeelightKnownDeviceGui]): YeelightAppData = YeelightAppData(devices.asScala.toSeq)
 
   private val path = {
     val home = System.getProperty("user.home")
@@ -33,7 +33,7 @@ object YeelightAppData {
     Try {
       val dataString = Files.readString(path)
       val dataJson = Json.parse(dataString)
-      val devices = (dataJson \ "devices").as[Seq[YeelightDeviceAppData]]
+      val devices = (dataJson \ "devices").as[Seq[YeelightKnownDeviceGui]]
       YeelightAppData(devices)
     } getOrElse empty
   }

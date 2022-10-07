@@ -3,7 +3,7 @@ package com.wazxse5.yeelight.gui.controller;
 import com.wazxse5.yeelight.api.*;
 import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.YeelightDeviceGui;
-import com.wazxse5.yeelight.gui.data.YeelightDeviceAppData;
+import com.wazxse5.yeelight.gui.data.YeelightKnownDeviceGui;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
@@ -22,7 +22,7 @@ class GuiYeelightEventListener implements YeelightEventListener {
         if (event instanceof DeviceAdded) {
             if (mainController.devicesList.stream().noneMatch(p -> p.deviceId().equals(event.deviceId()))) {
                 YeelightDevice addedDevice = mainController.yeelightService.devicesJava().get(event.deviceId());
-                YeelightDeviceAppData deviceAppData = mainController.initialAppData.devicesJava().stream().filter(d -> d.deviceId().equals(event.deviceId())).findAny().orElse(null);
+                YeelightKnownDeviceGui deviceAppData = mainController.initialAppData.devicesJava().stream().filter(d -> d.deviceId().equals(event.deviceId())).findAny().orElse(null);
                 YeelightDeviceGui addedDeviceGui = new YeelightDeviceGui(addedDevice, deviceAppData);
 
                 AnchorPane devicePane = loadDevicePane(addedDeviceGui);

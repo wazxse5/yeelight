@@ -9,8 +9,6 @@ case class YeelightStateChange(
   isConnected: Option[Boolean] = None,
   address: Option[String] = None,
   port: Option[Int] = None,
-  firmwareVersion: Option[String] = None,
-  supportedCommands: Option[Seq[String]] = None,
   brightness: Option[Brightness] = None,
   hue: Option[Hue] = None,
   power: Option[Power] = None,
@@ -29,8 +27,6 @@ object YeelightStateChange {
   
   def fromDiscoveryResponse(message: DiscoveryResponseMessage): YeelightStateChange = {
     YeelightStateChange(
-      firmwareVersion = Some(message.firmwareVersion),
-      supportedCommands = Some(message.supportedCommands),
       power = Power.fromString(message.power),
       brightness = Brightness.fromString(message.brightness),
       temperature = Temperature.fromString(message.temperature),

@@ -5,7 +5,7 @@ import akka.io.Tcp._
 import akka.io.{IO, Tcp}
 import akka.util.ByteString
 import com.wazxse5.yeelight.core.YeelightActor
-import com.wazxse5.yeelight.core.connection.ConnectionAdapter._
+import com.wazxse5.yeelight.core.message.ServiceMessage.{ConnectionFailed, ConnectionSucceeded, DisconnectedDevice, SendCommandMessage}
 import com.wazxse5.yeelight.core.message.YeelightConnectedMessage
 import play.api.libs.json.Json
 
@@ -21,7 +21,7 @@ class Connector(
   IO(Tcp) ! Connect(new InetSocketAddress(address, port))
 
   def ready(connection: ActorRef): Receive = {
-    case SendMessage(message, _) =>
+    case SendCommandMessage(message, _) =>
       connection ! Write(ByteString(message.text))
     case Received(data) =>
       val json = Json.parse(data.utf8String.replace("\r\n",""))
@@ -31,14 +31,12 @@ class Connector(
       val text = write.data.utf8String
     // TODO: wyciągnięcie internalId komendy i zwrócenie do serwisu
     case _: ConnectionClosed =>
-      connectionAdapter ! Disconnected(deviceId)
+      connectionAdapter ! DisconnectedDevice(deviceId)
       context.stop(self)
   }
 
-  //
-
   override def receive: Receive = {
-    case SendMessage(_, true) => stash()
+    case SendCommandMessage(_, true) => stash()
     case CommandFailed => connectionAdapter ! ConnectionFailed(deviceId)
     case Connected(inetAddress, _) =>
       connectionAdapter ! ConnectionSucceeded(deviceId, inetAddress.getHostName, inetAddress.getPort)

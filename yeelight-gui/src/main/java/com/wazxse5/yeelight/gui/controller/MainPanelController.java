@@ -5,7 +5,7 @@ import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.YeelightDeviceGui;
 import com.wazxse5.yeelight.gui.data.YeelightAppData;
 import com.wazxse5.yeelight.gui.data.YeelightAppData$;
-import com.wazxse5.yeelight.gui.data.YeelightDeviceAppData;
+import com.wazxse5.yeelight.gui.data.YeelightKnownDeviceGui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,20 +35,19 @@ public class MainPanelController {
         this.lvDevices.setItems(devicesList);
         this.lvDevices.setCellFactory(new YeelightDeviceGuiCellFactory());
         this.yeelightService.addEventListener(new GuiYeelightEventListener(this));
-
-        initialAppData.devicesJava().forEach(d ->
-            yeelightService.addDevice(d.deviceId(), d.deviceModel(), d.ip(), d.port())
-        );
+        this.yeelightService.start();
     }
 
     public YeelightAppData getYeelightAppData() {
-        List<YeelightDeviceAppData> devices = devicesList.stream().map(d ->
-            new YeelightDeviceAppData(
+        List<YeelightKnownDeviceGui> devices = devicesList.stream().map(d ->
+            new YeelightKnownDeviceGui(
                 d.deviceId(),
                 d.model().value(),
-                d.guiNameProperty.getValueSafe(),
+                d.firmwareVersion(),
+                d.supportedCommands(),
                 d.state().addressProperty().getValueSafe(),
-                d.state().portProperty().get()
+                d.state().portProperty().get(),
+                d.guiNameProperty.getValueSafe()
             )
         ).collect(Collectors.toList());
         return YeelightAppData$.MODULE$.apply(devices);

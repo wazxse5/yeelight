@@ -5,7 +5,7 @@ import akka.io.Udp._
 import akka.io.{IO, Udp}
 import akka.util.ByteString
 import com.wazxse5.yeelight.core.YeelightActor
-import com.wazxse5.yeelight.core.connection.ConnectionAdapter.Discover
+import com.wazxse5.yeelight.core.message.ServiceMessage.Discover
 import com.wazxse5.yeelight.core.message.{DiscoveryMessage, DiscoveryResponseMessage}
 import com.wazxse5.yeelight.core.util.Logger
 

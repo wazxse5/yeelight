@@ -7,25 +7,19 @@ case class YeelightStateImpl(
   isConnected: Boolean,
   address: String,
   port: Int,
-  firmwareVersion: String,
-  supportedCommands: Seq[String],
   power: Power,
   brightness: Brightness,
   temperature: Temperature,
   rgb: Rgb,
   hue: Hue,
   saturation: Saturation
-) extends YeelightState {
-  def isUnknown: Boolean = firmwareVersion == "unknown"
-}
+) extends YeelightState
 
 object YeelightStateImpl {
   val empty: YeelightStateImpl = YeelightStateImpl(
     isConnected = false,
     address = "unknown",
     port = -1,
-    firmwareVersion = "unknown",
-    supportedCommands = Seq.empty,
     power = Power.off,
     brightness = Brightness(1),
     temperature = Temperature(1700),

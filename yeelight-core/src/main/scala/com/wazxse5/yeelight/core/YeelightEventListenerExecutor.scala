@@ -1,9 +1,9 @@
 package com.wazxse5.yeelight.core
 
-import akka.actor.{Actor, Props}
+import akka.actor.Props
 import com.wazxse5.yeelight.api.{YeelightEvent, YeelightEventListener}
 
-class YeelightEventListenerExecutor(listener: YeelightEventListener) extends Actor {
+class YeelightEventListenerExecutor(listener: YeelightEventListener) extends YeelightActor {
   override def receive: Receive = {
     case event: YeelightEvent => listener.onAction(event)
   }

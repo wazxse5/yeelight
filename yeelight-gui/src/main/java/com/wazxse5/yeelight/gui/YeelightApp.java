@@ -6,17 +6,19 @@ import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.controller.MainPanelController;
 import com.wazxse5.yeelight.gui.data.YeelightAppData;
 import com.wazxse5.yeelight.gui.data.YeelightAppData$;
+import com.wazxse5.yeelight.gui.data.YeelightKnownDeviceGui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import scala.collection.Iterable;
 
 import java.io.IOException;
 
 public class YeelightApp extends Application {
 
-    private final YeelightService yeelightService = new YeelightServiceImpl();
+    private YeelightService yeelightService;
     private MainPanelController mainPanelController;
 
     public static void run() {
@@ -27,6 +29,9 @@ public class YeelightApp extends Application {
     public void start(Stage stage) {
         try {
             YeelightAppData appData = YeelightAppData$.MODULE$.read();
+            Iterable<YeelightKnownDeviceGui> knownDevices = appData.devices().map(YeelightKnownDeviceGui::toKnownDevice);
+            yeelightService = new YeelightServiceImpl(knownDevices.toSet());
+
             FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/fxml/MainPanel.fxml"));
             Parent parent = fxmlLoader.load();
             mainPanelController = fxmlLoader.getController();
