@@ -5,7 +5,7 @@ import com.wazxse5.yeelight.core.YeelightActor
 import com.wazxse5.yeelight.core.message.Message
 import com.wazxse5.yeelight.core.message.ServiceMessage._
 
-class ConnectionAdapter(yeelightServiceImpl: ActorRef) extends YeelightActor {
+class ConnectionAdapter(yeelightServiceActor: ActorRef) extends YeelightActor {
 
   private val discoverer: ActorRef = system.actorOf(Discoverer.props(self))
   private val listener: ActorRef = system.actorOf(Listener.props(self))
@@ -28,7 +28,7 @@ class ConnectionAdapter(yeelightServiceImpl: ActorRef) extends YeelightActor {
       val appendedConnectors = connectors + ((deviceId, connector))
       context.become(receiveWithConnectors(appendedConnectors))
     case otherMessage: Message =>
-      yeelightServiceImpl.forward(otherMessage)
+      yeelightServiceActor.forward(otherMessage)
   }
 
 }

@@ -5,6 +5,11 @@ import java.time.format.DateTimeFormatter
 
 object Logger {
   // TODO normalne logowanie
+
+  def errorThrow(msg: String): Nothing = {
+    error(msg)
+    sys.error(msg)
+  }
   
   def error(msg: String): Unit = log("ERROR", msg)
   

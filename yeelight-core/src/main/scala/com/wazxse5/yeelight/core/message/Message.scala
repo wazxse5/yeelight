@@ -3,6 +3,7 @@ package com.wazxse5.yeelight.core.message
 import akka.actor.ActorRef
 import com.wazxse5.yeelight.api.YeelightEventListener
 import com.wazxse5.yeelight.core.YeelightDeviceImpl
+import com.wazxse5.yeelight.core.util.Logger
 import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Try
@@ -41,22 +42,21 @@ trait YeelightConnectedMessage extends YeelightMessage {
 
 object YeelightConnectedMessage {
 
-  def fromJson(json: JsValue, deviceId: String): Option[YeelightConnectedMessage] = {
+  def fromJson(json: JsValue, deviceId: String): Try[YeelightConnectedMessage] = {
     Try {
       val id = json \ "id"
       val result = json \ "result"
       val error = json \ "error"
       val method = (json \ "method").asOpt[String]
 
-      val message = if (id.isDefined && (result.isDefined || error.isDefined)) {
+      if (id.isDefined && (result.isDefined || error.isDefined)) {
         CommandResultMessage.fromJson(json, deviceId)
       } else if (method.contains("props")) {
         NotificationMessage.fromJson(json, deviceId)
       } else {
-        None
+        Logger.errorThrow(s"Unknown YeelightMessage for device=$deviceId (${Json.stringify(json)})")
       }
-      message.get
-    }.toOption
+    }.flatten
   }
 
 }

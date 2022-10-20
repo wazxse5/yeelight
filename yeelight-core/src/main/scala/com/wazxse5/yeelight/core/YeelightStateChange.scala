@@ -2,8 +2,8 @@ package com.wazxse5.yeelight.core
 
 import com.wazxse5.yeelight.api.command._
 import com.wazxse5.yeelight.api.valuetype._
-import com.wazxse5.yeelight.core.message.{CommandResultMessage, DiscoveryResponseMessage, NotificationMessage}
-import play.api.libs.json.{JsArray, JsString}
+import com.wazxse5.yeelight.core.message.{CommandResultMessage, DiscoveryResponseMessage, NotificationMessage, ResultGetProps}
+import com.wazxse5.yeelight.core.util.Logger
 
 case class YeelightStateChange(
   isConnected: Option[Boolean] = None,
@@ -24,7 +24,7 @@ case class YeelightStateChange(
 object YeelightStateChange {
 
   val empty: YeelightStateChange = YeelightStateChange()
-  
+
   def fromDiscoveryResponse(message: DiscoveryResponseMessage): YeelightStateChange = {
     YeelightStateChange(
       brightness = Some(Brightness.fromString(message.brightness)),
@@ -49,22 +49,27 @@ object YeelightStateChange {
       temperature = propertyValueMap.get(PropertyName.temperature).map(Temperature.fromJsValue),
     )
   }
-  
+
   def fromCommandResult(command: YeelightCommand, resultMessage: CommandResultMessage): YeelightStateChange = {
     val result = resultMessage.result
 
     command match {
       case GetProps(propertyNames) =>
-        val propertyValues = result.value.asInstanceOf[JsArray].value.map(_.asInstanceOf[JsString].value)
-        val propertyValueMap = propertyNames.zip(propertyValues).toMap
-        YeelightStateChange(
-          brightness = propertyValueMap.get(PropertyName.brightness).map(Brightness.fromString),
-          hue = propertyValueMap.get(PropertyName.hue).map(Hue.fromString),
-          power = propertyValueMap.get(PropertyName.power).map(Power.fromString),
-          rgb = propertyValueMap.get(PropertyName.rgb).map(Rgb.fromString),
-          saturation = propertyValueMap.get(PropertyName.saturation).map(Saturation.fromString),
-          temperature = propertyValueMap.get(PropertyName.temperature).map(Temperature.fromString),
-        )
+        resultMessage.result match {
+          case ResultGetProps(propertyValues) =>
+            val propertyValueMap = propertyNames.zip(propertyValues).toMap
+            YeelightStateChange(
+              brightness = propertyValueMap.get(PropertyName.brightness).map(Brightness.fromString),
+              hue = propertyValueMap.get(PropertyName.hue).map(Hue.fromString),
+              power = propertyValueMap.get(PropertyName.power).map(Power.fromString),
+              rgb = propertyValueMap.get(PropertyName.rgb).map(Rgb.fromString),
+              saturation = propertyValueMap.get(PropertyName.saturation).map(Saturation.fromString),
+              temperature = propertyValueMap.get(PropertyName.temperature).map(Temperature.fromString),
+            )
+          case other =>
+            Logger.error(s"CommandResultMessage for Command GetProps does not contain property values [$other]")
+            YeelightStateChange.empty
+        }
       case SetBrightness(brightness, _, _) if result.isOk => YeelightStateChange(brightness = Some(brightness))
       case SetHsv(hue, saturation, _, _) if result.isOk => YeelightStateChange(hue = Some(hue), saturation = Some(saturation))
       case SetPower(power, _, _) if result.isOk => YeelightStateChange(power = Some(power))
@@ -73,7 +78,7 @@ object YeelightStateChange {
       case _ => empty
     }
   }
-  
+
   def isConnected(newValue: Boolean, address: Option[String] = None, port: Option[Int] = None): YeelightStateChange = {
     YeelightStateChange(
       isConnected = Some(newValue),
@@ -81,5 +86,5 @@ object YeelightStateChange {
       port = port
     )
   }
-  
+
 }
