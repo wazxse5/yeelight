@@ -27,27 +27,26 @@ object YeelightStateChange {
   
   def fromDiscoveryResponse(message: DiscoveryResponseMessage): YeelightStateChange = {
     YeelightStateChange(
-      power = Power.fromString(message.power),
-      brightness = Brightness.fromString(message.brightness),
-      temperature = Temperature.fromString(message.temperature),
-      rgb = Rgb.fromString(message.rgb),
-      hue = Hue.fromString(message.hue),
-      saturation = Saturation.fromString(message.saturation),
+      brightness = Some(Brightness.fromString(message.brightness)),
+      hue = Some(Hue.fromString(message.hue)),
+      power = Some(Power.fromString(message.power)),
+      rgb = Some(Rgb.fromString(message.rgb)),
+      saturation = Some(Saturation.fromString(message.saturation)),
+      temperature = Some(Temperature.fromString(message.temperature)),
     )
   }
 
   def fromNotification(message: NotificationMessage): YeelightStateChange = {
     val propertyValueMap = message.params
       .map { case (p, v) => PropertyName.fromString(p) -> v }
-      .collect { case (Some(p), v)  => p -> v}
 
     YeelightStateChange(
-      brightness = propertyValueMap.get(PropertyName.brightness).flatMap(Brightness.fromJsValue),
-      hue = propertyValueMap.get(PropertyName.hue).flatMap(Hue.fromJsValue),
-      power = propertyValueMap.get(PropertyName.power).flatMap(Power.fromJsValue),
-      rgb = propertyValueMap.get(PropertyName.rgb).flatMap(Rgb.fromJsValue),
-      saturation = propertyValueMap.get(PropertyName.saturation).flatMap(Saturation.fromJsValue),
-      temperature = propertyValueMap.get(PropertyName.temperature).flatMap(Temperature.fromJsValue),
+      brightness = propertyValueMap.get(PropertyName.brightness).map(Brightness.fromJsValue),
+      hue = propertyValueMap.get(PropertyName.hue).map(Hue.fromJsValue),
+      power = propertyValueMap.get(PropertyName.power).map(Power.fromJsValue),
+      rgb = propertyValueMap.get(PropertyName.rgb).map(Rgb.fromJsValue),
+      saturation = propertyValueMap.get(PropertyName.saturation).map(Saturation.fromJsValue),
+      temperature = propertyValueMap.get(PropertyName.temperature).map(Temperature.fromJsValue),
     )
   }
   
@@ -59,12 +58,12 @@ object YeelightStateChange {
         val propertyValues = result.value.asInstanceOf[JsArray].value.map(_.asInstanceOf[JsString].value)
         val propertyValueMap = propertyNames.zip(propertyValues).toMap
         YeelightStateChange(
-          brightness = propertyValueMap.get(PropertyName.brightness).flatMap(Brightness.fromString),
-          hue = propertyValueMap.get(PropertyName.hue).flatMap(Hue.fromString),
-          power = propertyValueMap.get(PropertyName.power).flatMap(Power.fromString),
-          rgb = propertyValueMap.get(PropertyName.rgb).flatMap(Rgb.fromString),
-          saturation = propertyValueMap.get(PropertyName.saturation).flatMap(Saturation.fromString),
-          temperature = propertyValueMap.get(PropertyName.temperature).flatMap(Temperature.fromString),
+          brightness = propertyValueMap.get(PropertyName.brightness).map(Brightness.fromString),
+          hue = propertyValueMap.get(PropertyName.hue).map(Hue.fromString),
+          power = propertyValueMap.get(PropertyName.power).map(Power.fromString),
+          rgb = propertyValueMap.get(PropertyName.rgb).map(Rgb.fromString),
+          saturation = propertyValueMap.get(PropertyName.saturation).map(Saturation.fromString),
+          temperature = propertyValueMap.get(PropertyName.temperature).map(Temperature.fromString),
         )
       case SetBrightness(brightness, _, _) if result.isOk => YeelightStateChange(brightness = Some(brightness))
       case SetHsv(hue, saturation, _, _) if result.isOk => YeelightStateChange(hue = Some(hue), saturation = Some(saturation))

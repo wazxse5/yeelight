@@ -18,5 +18,5 @@ object SetHsv {
   val commandName: String = "set_hsv"
   
   def apply(hue: Hue, saturation: Saturation): SetHsv =
-    new SetHsv(hue, saturation, Effect.smooth, new Duration(500))
+    new SetHsv(hue, saturation, Effect.smooth, Duration(500))
 }

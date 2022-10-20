@@ -1,47 +1,17 @@
 package com.wazxse5.yeelight.api.valuetype
 
-import play.api.libs.json.{JsString, JsValue}
+case class DeviceModel private(value: String) extends ValueType[String]
 
-sealed trait DeviceModel extends ValueType[String]
+object DeviceModel extends StringValueTypeCompanion[DeviceModel] {
+  val mono: DeviceModel = new DeviceModel("mono")
+  val color: DeviceModel = new DeviceModel("color")
+  val stripe: DeviceModel = new DeviceModel("stripe")
+  val ceiling: DeviceModel = new DeviceModel("ceiling")
+  val deskLamp: DeviceModel = new DeviceModel("desklamp")
+  val bsLamp: DeviceModel = new DeviceModel("bslamp")
+  val typeByValue: Map[String, DeviceModel] = Set(mono, color, stripe, ceiling, deskLamp, bsLamp).map(v => v.value -> v).toMap
 
-object DeviceModel {
-  def mono: DeviceModel = DeviceModelMono
-  def color: DeviceModel = DeviceModelColor
-  def stripe: DeviceModel = DeviceModelStripe
-  def ceiling: DeviceModel = DeviceModelCeiling
-  def deskLamp: DeviceModel = DeviceModelDeskLamp
-  def bsLamp: DeviceModel = DeviceModelBsLamp
-  
-  val typeByValue: Map[String, DeviceModel] = Seq(mono, color, stripe, ceiling, deskLamp, bsLamp).map(v => v.value -> v).toMap
-  val values: Seq[String] = typeByValue.keys.toSeq
-  
-  def fromString(str: String): Option[DeviceModel] = typeByValue.get(str)
-  def fromJsValue(jsValue: JsValue): Option[DeviceModel] = jsValue match {
-    case JsString(value) => fromString(value)
-    case _ => None
-  }
-}
+  override def isValid(value: String): Boolean = typeByValue.contains(value)
 
-case object DeviceModelMono extends DeviceModel {
-  override val value = "mono"
-}
-
-case object DeviceModelColor extends DeviceModel {
-  override val value = "color"
-}
-
-case object DeviceModelStripe extends DeviceModel {
-  override val value = "stripe"
-}
-
-case object DeviceModelCeiling extends DeviceModel {
-  override val value = "ceiling"
-}
-
-case object DeviceModelDeskLamp extends DeviceModel {
-  override val value = "desklamp"
-}
-
-case object DeviceModelBsLamp extends DeviceModel {
-  override val value = "bslamp"
+  override protected def create(value: String): DeviceModel = typeByValue(value)
 }

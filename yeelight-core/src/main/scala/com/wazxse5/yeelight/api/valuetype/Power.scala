@@ -1,34 +1,17 @@
 package com.wazxse5.yeelight.api.valuetype
 
-import play.api.libs.json.{JsString, JsValue}
+case class Power private(value: String) extends StringParamValueType
 
-sealed trait Power extends ParamValueType[String] {
-  override def paramValue: JsValue = JsString(value)
-}
-
-object Power {
+object Power extends StringValueTypeCompanion[Power] {
   val paramName = "power"
   val propFgName = "power"
   val propBgName = "bg_power"
-  
-  def on: Power = PowerOn
-  
-  def off: Power = PowerOff
-  
+
+  val on: Power = new Power("on")
+  val off: Power = new Power("off")
   val typeByValue: Map[String, Power] = Seq(on, off).map(v => v.value -> v).toMap
-  
-  def fromString(str: String): Option[Power] = typeByValue.get(str)
-  
-  def fromJsValue(jsValue: JsValue): Option[Power] = jsValue match {
-    case JsString(value) => fromString(value)
-    case _ => None
-  }
-}
 
-case object PowerOn extends Power {
-  override val value = "on"
-}
+  override def isValid(value: String): Boolean = typeByValue.contains(value)
 
-case object PowerOff extends Power {
-  override val value = "off"
+  override protected def create(value: String): Power = typeByValue(value)
 }

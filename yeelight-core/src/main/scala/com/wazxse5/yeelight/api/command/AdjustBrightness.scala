@@ -15,8 +15,8 @@ case class AdjustBrightness(
 object AdjustBrightness {
   val commandName: String = "adjust_bright"
   
-  def apply(percent: Percent): AdjustBrightness = new AdjustBrightness(percent, new Duration(500))
+  def apply(percent: Percent): AdjustBrightness = new AdjustBrightness(percent, Duration(500))
   
-  def apply(percent: Int): AdjustBrightness = apply(new Percent(percent))
+  def apply(percent: Int): AdjustBrightness = apply(Percent(percent))
   
 }

@@ -1,22 +1,11 @@
 package com.wazxse5.yeelight.api.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+case class Percent private(value: Int) extends IntParamValueType
 
-import scala.util.Try
-
-case class Percent(value: Int) extends ParamValueType[Int] {
-  override def paramValue: JsValue = JsNumber(value)
-  
-  override def isValid: Boolean = -100 <= value && value <= 100
-}
-
-object Percent {
+object Percent extends IntValueTypeCompanion[Percent] {
   val paramName = "percentage"
-  
-  def fromString(str: String): Option[Percent] = Try(new Percent(str.toInt)).filter(_.isValid).toOption
-  
-  def fromJsValue(jsValue: JsValue): Option[Percent] = jsValue match {
-    case JsNumber(value) => fromString(value.toString)
-    case _ => None
-  }
+
+  override def isValid(value: Int): Boolean = -100 <= value && value <= 100
+
+  override protected def create(value: Int): Percent = new Percent(value)
 }

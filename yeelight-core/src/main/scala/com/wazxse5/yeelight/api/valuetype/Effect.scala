@@ -1,23 +1,15 @@
 package com.wazxse5.yeelight.api.valuetype
 
-import play.api.libs.json.{JsString, JsValue}
+case class Effect private(value: String) extends StringParamValueType
 
-sealed trait Effect extends ParamValueType[String] {
-  override def paramValue: JsValue = JsString(value)
-}
-
-
-object Effect {
+object Effect extends StringValueTypeCompanion[Effect] {
   val paramName = "effect"
-  
-  def sudden: Effect = EffectSudden
-  def smooth: Effect = EffectSmooth
-}
 
-case object EffectSudden extends Effect {
-  override val value = "sudden"
-}
+  val sudden: Effect = new Effect("sudden")
+  val smooth: Effect = new Effect("smooth")
+  val typeByValue: Map[String, Effect] = Set(sudden, smooth).map(v => v.value -> v).toMap
 
-case object EffectSmooth extends Effect {
-  override val value = "smooth"
+  override def isValid(value: String): Boolean = typeByValue.contains(value)
+
+  override protected def create(value: String): Effect = typeByValue(value)
 }

@@ -16,5 +16,5 @@ case class SetRgb(
 object SetRgb {
   val commandName: String = "set_rgb"
   
-  def apply(rgb: Rgb): SetRgb = new SetRgb(rgb, Effect.smooth, new Duration(500))
+  def apply(rgb: Rgb): SetRgb = new SetRgb(rgb, Effect.smooth, Duration(500))
 }

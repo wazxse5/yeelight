@@ -113,7 +113,7 @@ class YeelightServiceImplActor(
       case None =>
         data.connectionAdapter ! ConnectDevice(m.deviceId, m.address, m.port)
         data.withDeviceAdded(
-          new YeelightDeviceImpl(m.deviceId, DeviceModel.fromString(m.model).get, m.firmwareVersion, m.supportedCommands, yeelightService),
+          new YeelightDeviceImpl(m.deviceId, DeviceModel(m.model), m.firmwareVersion, m.supportedCommands, yeelightService),
           yeelightStateChange
         )
     }

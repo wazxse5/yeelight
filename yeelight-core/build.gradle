@@ -7,4 +7,5 @@ dependencies {
     api 'org.scala-lang:scala-library:2.13.8'
     api 'com.typesafe.play:play-json_2.13:2.9.3'
     implementation 'com.typesafe.akka:akka-actor_2.13:2.6.19'
+    testImplementation 'org.scalatest:scalatest_2.13:3.2.14'
 }

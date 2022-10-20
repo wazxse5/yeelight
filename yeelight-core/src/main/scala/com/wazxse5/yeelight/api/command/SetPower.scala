@@ -16,7 +16,7 @@ case class SetPower(
 object SetPower {
   val commandName: String = "set_power"
   
-  def on: SetPower = SetPower(Power.on, Effect.smooth, new Duration(500))
+  def on: SetPower = SetPower(Power.on, Effect.smooth, Duration(500))
   
-  def off: SetPower = SetPower(Power.off, Effect.smooth, new Duration(500))
+  def off: SetPower = SetPower(Power.off, Effect.smooth, Duration(500))
 }

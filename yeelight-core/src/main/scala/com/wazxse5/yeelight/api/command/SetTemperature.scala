@@ -16,7 +16,7 @@ case class SetTemperature(
 object SetTemperature {
   val commandName: String = "set_ct_abx"
   
-  def apply(temperature: Temperature): SetTemperature = new SetTemperature(temperature, Effect.smooth, new Duration(500))
+  def apply(temperature: Temperature): SetTemperature = new SetTemperature(temperature, Effect.smooth, Duration(500))
   
   def apply(temperature: Int): SetTemperature = apply(new Temperature(temperature))
 }

@@ -16,7 +16,7 @@ case class SetBrightness(
 object SetBrightness {
   val commandName: String = "set_bright"
   
-  def apply(brightness: Brightness): SetBrightness = new SetBrightness(brightness, Effect.smooth, new Duration(500))
+  def apply(brightness: Brightness): SetBrightness = new SetBrightness(brightness, Effect.smooth, Duration(500))
   
-  def apply(brightness: Int): SetBrightness = apply(new Brightness(brightness))
+  def apply(brightness: Int): SetBrightness = apply(Brightness(brightness))
 }

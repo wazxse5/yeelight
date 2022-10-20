@@ -24,8 +24,8 @@ class Discoverer(adapter: ActorRef) extends YeelightActor {
     case Discover =>
       connection ! Send(ByteString(DiscoveryMessage.text), remote)
     case Received(data, _) =>
-      val messageOpt = DiscoveryResponseMessage.fromString(data.utf8String)
-      messageOpt.foreach(adapter ! _)
+      val message = DiscoveryResponseMessage.fromString(data.utf8String)
+      message.foreach(adapter ! _)
     case Unbind =>
       connection ! Unbind
     case Unbound =>

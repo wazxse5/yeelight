@@ -1,12 +1,11 @@
 package com.wazxse5.yeelight.api.valuetype
 
-import play.api.libs.json.{JsNumber, JsValue}
+case class Duration private(value: Int) extends IntParamValueType
 
-case class Duration(value: Int) extends ParamValueType[Int] {
-  override def paramValue: JsValue = JsNumber(value)
-  override def isValid: Boolean = value >= 30
-}
-
-object Duration {
+object Duration extends IntValueTypeCompanion[Duration] {
   val paramName = "duration"
+
+  override def isValid(value: Int): Boolean = value >= 30
+
+  override protected def create(value: Int): Duration = new Duration(value)
 }
