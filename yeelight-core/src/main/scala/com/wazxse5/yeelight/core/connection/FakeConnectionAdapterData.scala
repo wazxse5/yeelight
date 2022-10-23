@@ -2,6 +2,7 @@ package com.wazxse5.yeelight.core.connection
 
 import com.wazxse5.yeelight.api.valuetype._
 import com.wazxse5.yeelight.core.message.{CommandResultMessageResult, DiscoveryResponseMessage, ResultGetProps, ResultOk}
+import play.api.libs.json.JsValue
 
 case class FakeCaData(
   isListening: Boolean = false,
@@ -23,15 +24,19 @@ case class FakeCaData(
 
   def updated(
     deviceId: String,
-    f: FakeCaDevice => (FakeCaDevice, CommandResultMessageResult)
-  ): (FakeCaData, CommandResultMessageResult) = {
+    f: FakeCaDevice => (FakeCaDevice, CommandResultMessageResult, Map[PropertyName, JsValue])
+  ): (FakeCaData, CommandResultMessageResult, Map[PropertyName, JsValue]) = {
     devices.get(deviceId) match {
       case Some(device) =>
-        val (updatedDevice, result) = f(device)
-        copy(devices = devices + (device.deviceId -> updatedDevice)) -> result
+        val (updatedDevice, commandResult, changesToNotify) = f(device)
+        (copy(devices = devices + (device.deviceId -> updatedDevice)), commandResult, changesToNotify)
       case None => ???
     }
   }
+}
+
+object FakeCaData {
+  val empty: FakeCaData = FakeCaData(isListening = false, Map.empty, Set.empty)
 }
 
 case class FakeCaDevice(
@@ -41,23 +46,24 @@ case class FakeCaDevice(
   supportedCommands: Seq[String],
   ip: String,
   port: Int,
-  power: Power,
   brightness: Brightness,
-  temperature: Temperature,
-  rgb: Rgb,
   hue: Hue,
+  power: Power,
+  rgb: Rgb,
   saturation: Saturation,
+  temperature: Temperature,
 ) {
 
-  private type UpdateResult = (FakeCaDevice, CommandResultMessageResult)
+  private type UpdateResult = (FakeCaDevice, CommandResultMessageResult, Map[PropertyName, JsValue])
 
   def adjustBrightness(percent: Percent): UpdateResult = {
-    val newBrightness = (brightness.value + percent.value).min(100).max(1)
-    copy(brightness = Brightness(newBrightness)) -> ResultOk
+    val newBrightness = Brightness((brightness.value + percent.value).min(100).max(1))
+    val changesMap = Map(PropertyName.brightness -> brightness.paramValue)
+    (copy(brightness = newBrightness), ResultOk, changesMap)
   }
 
   def getProps(propertyNames: Seq[PropertyName]): UpdateResult = {
-    this -> ResultGetProps(
+    val result = ResultGetProps(
       propertyNames.map {
         case PropertyName.brightness => brightness.value.toString
         case PropertyName.hue => hue.value.toString
@@ -68,30 +74,33 @@ case class FakeCaDevice(
         case _ => ""
       }
     )
+    (this, result, Map.empty)
   }
 
   def setBrightness(value: Brightness): UpdateResult = {
-    copy(brightness = value) -> ResultOk
+    (copy(brightness = value), ResultOk, Map(PropertyName.brightness -> value.paramValue))
   }
 
   def setHsv(value: Hue, saturation: Saturation): UpdateResult = {
-    copy(hue = value, saturation = saturation) -> ResultOk
+    val changesMap = Map(PropertyName.hue -> hue.paramValue,PropertyName.saturation -> saturation.paramValue)
+    (copy(hue = value, saturation = saturation), ResultOk, changesMap)
   }
 
   def setPower(value: Power): UpdateResult = {
-    copy(power = value) -> ResultOk
+    (copy(power = value), ResultOk, Map(PropertyName.power -> value.paramValue))
   }
 
   def setRgb(value: Rgb): UpdateResult = {
-    copy(rgb = value) -> ResultOk
+    (copy(rgb = value), ResultOk, Map(PropertyName.rgb -> value.paramValue))
   }
 
   def setTemperature(value: Temperature): UpdateResult = {
-    copy(temperature = value) -> ResultOk
+    (copy(temperature = value), ResultOk, Map(PropertyName.temperature -> value.paramValue))
   }
 
   def toggle: UpdateResult = {
-    copy(power = if (power == Power.on) Power.off else Power.on) -> ResultOk
+    val newValue = if (power == Power.on) Power.off else Power.on
+    (copy(power = newValue), ResultOk, Map(PropertyName.power -> newValue.paramValue))
   }
 
   def discoveryResponseMessage: DiscoveryResponseMessage = {

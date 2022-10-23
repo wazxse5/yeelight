@@ -23,7 +23,7 @@ object YeelightStateImpl {
     power = Power.off,
     brightness = Brightness(1),
     temperature = Temperature(1700),
-    rgb = Rgb(0, 0, 0),
+    rgb = Rgb(1),
     hue = Hue(0),
     saturation = Saturation(0)
   )

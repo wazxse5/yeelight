@@ -1,6 +1,7 @@
 package com.wazxse5.yeelight.api
 
 import com.wazxse5.yeelight.api.command.YeelightCommand
+import com.wazxse5.yeelight.core.YeelightAppData
 
 import java.lang.{String => JString}
 import java.util.{Map => JMap}
@@ -23,6 +24,8 @@ trait YeelightService {
   def performCommand(deviceId: String, command: YeelightCommand): Unit
   
   def addEventListener(listener: YeelightEventListener): Unit
+
+  def getAppData: YeelightAppData
   
   def exit(): Unit
 }

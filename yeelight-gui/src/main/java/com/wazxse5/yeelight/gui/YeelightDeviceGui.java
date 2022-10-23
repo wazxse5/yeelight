@@ -4,7 +4,6 @@ import com.wazxse5.yeelight.api.YeelightDevice;
 import com.wazxse5.yeelight.api.YeelightState;
 import com.wazxse5.yeelight.api.command.YeelightCommand;
 import com.wazxse5.yeelight.api.valuetype.DeviceModel;
-import com.wazxse5.yeelight.gui.data.YeelightKnownDeviceGui;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import scala.collection.immutable.Seq;
@@ -15,11 +14,11 @@ public class YeelightDeviceGui {
 
     public final StringProperty guiNameProperty;
 
-    public YeelightDeviceGui(YeelightDevice yeelightDevice, YeelightKnownDeviceGui initialAppData) {
+    public YeelightDeviceGui(YeelightDevice yeelightDevice, String initialGuiName) {
         this.yeelightDevice = yeelightDevice;
         this.yeelightStateGui = new YeelightStateGui(yeelightDevice.state());
 
-        String guiName = initialAppData != null ? initialAppData.guiName() : yeelightDevice.deviceId();
+        String guiName = initialGuiName != null ? initialGuiName : yeelightDevice.deviceId();
         this.guiNameProperty = new SimpleStringProperty(guiName);
     }
 
@@ -37,6 +36,10 @@ public class YeelightDeviceGui {
 
     public Seq<String> supportedCommands() {
         return yeelightDevice.supportedCommands();
+    }
+
+    public String guiName() {
+        return guiNameProperty.getValueSafe();
     }
 
     public YeelightStateGui state() {

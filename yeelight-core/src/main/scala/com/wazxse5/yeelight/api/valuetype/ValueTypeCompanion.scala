@@ -1,7 +1,7 @@
 package com.wazxse5.yeelight.api.valuetype
 
 import com.wazxse5.yeelight.api.exception.InvalidValueTypeValueException
-import play.api.libs.json.{JsNumber, JsString, JsValue}
+import play.api.libs.json.{JsNumber, JsResult, JsString, JsValue, Reads, Writes}
 
 import scala.util.Try
 
@@ -15,10 +15,15 @@ trait ValueTypeCompanion[A, VT <: ValueType[A]] {
   }
 
   def fromString(str: String): VT
+  def fromStringOpt(str: String): Option[VT] = Try(fromString(str)).toOption
 
   def fromJsValue(jsValue: JsValue): VT
+  def fromJsValueOpt(jsValue: JsValue): Option[VT] = Try(fromJsValue(jsValue)).toOption
 
   def name: String = this.getClass.getSimpleName.stripSuffix("$")
+
+  implicit def writes: Writes[VT]
+  implicit def reads: Reads[VT] = (json: JsValue) => JsResult.fromTry(Try(fromJsValue(json)))
 }
 
 trait IntValueTypeCompanion[VT <: ValueType[Int]] extends ValueTypeCompanion[Int, VT] {
@@ -32,6 +37,8 @@ trait IntValueTypeCompanion[VT <: ValueType[Int]] extends ValueTypeCompanion[Int
       case other => throw InvalidValueTypeValueException(other, name)
     }
   }
+
+  override implicit def writes: Writes[VT] = (o: VT) => JsNumber(o.value)
 }
 
 trait StringValueTypeCompanion[VT <: ValueType[String]] extends ValueTypeCompanion[String, VT] {
@@ -43,4 +50,6 @@ trait StringValueTypeCompanion[VT <: ValueType[String]] extends ValueTypeCompani
       case other => throw InvalidValueTypeValueException(other, name)
     }
   }
+
+  override implicit def writes: Writes[VT] = (o: VT) => JsString(o.value)
 }

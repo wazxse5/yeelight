@@ -4,15 +4,11 @@ import com.wazxse5.yeelight.api.YeelightService;
 import com.wazxse5.yeelight.core.YeelightServiceImpl;
 import com.wazxse5.yeelight.core.util.Logger;
 import com.wazxse5.yeelight.gui.controller.MainPanelController;
-import com.wazxse5.yeelight.gui.data.YeelightAppData;
-import com.wazxse5.yeelight.gui.data.YeelightAppData$;
-import com.wazxse5.yeelight.gui.data.YeelightKnownDeviceGui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import scala.collection.Iterable;
 
 import java.io.IOException;
 
@@ -28,14 +24,13 @@ public class YeelightApp extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            YeelightAppData appData = YeelightAppData$.MODULE$.read();
-            Iterable<YeelightKnownDeviceGui> knownDevices = appData.devices().map(YeelightKnownDeviceGui::toKnownDevice);
-            yeelightService = new YeelightServiceImpl(knownDevices.toSet());
+            YeelightGuiAppData guiAppData = YeelightGuiAppData$.MODULE$.read();
+            yeelightService = new YeelightServiceImpl(guiAppData.appData());
 
             FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource("/fxml/MainPanel.fxml"));
             Parent parent = fxmlLoader.load();
             mainPanelController = fxmlLoader.getController();
-            mainPanelController.setYeelightService(yeelightService, appData);
+            mainPanelController.initialize(yeelightService, guiAppData);
 
             Scene scene = new Scene(parent);
             stage.setScene(scene);
@@ -48,8 +43,11 @@ public class YeelightApp extends Application {
 
     @Override
     public void stop() {
-        YeelightAppData appData = mainPanelController.getYeelightAppData();
-        YeelightAppData$.MODULE$.write(appData);
+        YeelightGuiAppData appData = YeelightGuiAppData$.MODULE$.apply(
+            yeelightService.getAppData(),
+            mainPanelController.getDevicesGuiNames()
+        );
+        YeelightGuiAppData$.MODULE$.write(appData);
         yeelightService.exit();
     }
 }
